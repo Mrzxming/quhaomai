@@ -1,0 +1,28 @@
+
+.growth.data-v-7b92d2fc {
+	background: #fff;
+	height: 100%;
+}
+.growth_time.data-v-7b92d2fc {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 10rpx;
+}
+.ny-item.data-v-7b92d2fc {
+	margin-bottom: 0rpx;
+	position: relative;
+}
+.ny-item.data-v-7b92d2fc:after {
+	content: "";
+	left: 20rpx;
+	right: 20rpx;
+	bottom: 0;
+	height: 1px;
+	background-color: #E5E5E5;
+	position: absolute;
+}
+.green.data-v-7b92d2fc {
+	color: #33CC66;
+	font-weight: 600;
+}
+

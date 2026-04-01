@@ -1,0 +1,34 @@
+
+.nav{ overflow: hidden; position: relative;}
+.nav .list{ overflow: hidden; box-sizing: content-box; position: relative;
+}
+.nav .list .icon{ width: 100%;
+}
+.nav .list .icon .image{ width: 100%; height: auto; margin: 0 auto; display: block;
+}
+.nav .list .con{ font-size: 25rpx; margin-top: 6rpx; height: 40rpx; line-height: 40rpx;}
+.list-style1{ padding: 0 20rpx 30rpx;
+}
+.list-style1 .list{ border-bottom: 1px solid #e3e8ee; height: 120rpx; display: flex; flex-direction: row; justify-content: center; align-items: center;}
+.list-style1 .list .icon{ width: 100rpx; height: 100rpx; margin-right: 10rpx;}
+.list-style1 .list .con{ flex: 1 1 0%; margin-top: 0; font-size: 30rpx;}
+.list-style1 .list .uni-icon{ width: 40rpx;}
+.list-style2 .list{ width: 20%; float: left; text-align: center; overflow: hidden;}
+.list-style2 .list .uni-icon{ display: none;}
+.list-style2.whole-margin{ padding: 20rpx 0;}
+.list-style2.all-padding .list{ box-sizing: border-box; padding: 10rpx;
+}
+.list-style2.all-border .list{ box-sizing: border-box; margin-bottom: -1px; border: 1px solid #e7ecec; border-right: 0;}
+/* 新版样式3 */
+.dots-container {position: absolute;left: 0;right: 0;bottom: 20rpx;display: flex;justify-content: center;}
+.dot {width: 30rpx;height: 8rpx;background: linear-gradient(-88deg, #ff4f2d, #f91f27);opacity: .2;overflow: hidden;}
+.dot:first-child{ border-radius: 4rpx 0 0 4rpx;
+}
+.dot:last-child{ border-radius: 0 4rpx 4rpx 0;
+}
+.dot.active { opacity: 1;
+}
+.list-style3{ margin: 0rpx 20rpx 0; padding: 10rpx 0 50rpx; border-radius: 20rpx 20rpx 0 0;
+}
+.list-style3 .swiper{ height: 200px;}
+

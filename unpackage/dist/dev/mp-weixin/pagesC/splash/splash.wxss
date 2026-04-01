@@ -1,0 +1,30 @@
+
+.skip{
+	position: absolute;
+	top: 40px;
+	right: 10px;
+	padding: 3px 10px 3px 20px;
+	background:rgba(153,153,153,.9);
+	color: #FFF9F8;
+	border-radius: 20px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.skip .uni-icon{
+	vertical-align: middle;
+	margin-top: 1px;
+}
+.backhome{
+	position: absolute;
+	bottom: 50px;
+	left: 50%;
+	padding: 5px 20px;
+	width: 60px;
+	text-align: center;
+	background: rgba(153,153,153,.9);
+	border-radius: 20px;
+	color: #fff;
+	margin-left: -50px;
+}
+

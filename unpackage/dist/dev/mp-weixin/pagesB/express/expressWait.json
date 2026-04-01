@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "退换货详情",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-popup": "/components/uni-popup",
+    "lyy-pass-input": "/uni_modules/lyy-pass-input/components/lyy-pass-input/lyy-pass-input",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-number-kg": "/components/uni-number-kg"
+  }
+}

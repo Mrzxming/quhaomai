@@ -1,0 +1,7 @@
+{
+  "enablePullDownRefresh": false,
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

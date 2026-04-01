@@ -1,0 +1,1 @@
+.uni-list-cell-navigate{align-items:flex-start}.uni-list-cell-navigate .title{margin-right:20rpx;color:#000}.uni-list-cell-navigate .value{flex:1}.uni-list-cell-navigate .value textarea{width:100%;height:50px;margin-top:10rpx}.field-tips{margin:0 30rpx}

@@ -1,0 +1,9 @@
+
+.uni-card {
+	margin: 0;
+}
+.uni-title {
+	background: #F5F5F5;
+	padding: 20rpx 30rpx;
+}
+

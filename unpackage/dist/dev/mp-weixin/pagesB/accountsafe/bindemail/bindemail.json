@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "绑定邮箱",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "captcha": "/components/captcha4/index"
+  }
+}

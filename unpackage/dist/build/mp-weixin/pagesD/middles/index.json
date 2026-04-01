@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "backgroundColor": "#000000",
+  "usingComponents": {
+    "custom-camera": "/components/CustomCamera/WeChat/index"
+  }
+}

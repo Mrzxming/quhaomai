@@ -1,0 +1,772 @@
+@charset "UTF-8";
+page {
+  overflow-x: hidden;
+}
+/* 顶部导航栏开始 */
+.search-tab {
+  margin: 30rpx 20rpx 10rpx 10rpx;
+  font-size: 32rpx;
+  color: #000000;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  text-align: center;
+  align-items: center;
+}
+.search_submit {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+/* 顶部导航栏结束 */
+.tui-content {
+  text-align: left;
+}
+.placeholders {
+  color: #C0C0C0;
+  font-size: 28rpx;
+}
+.swiper-boxs {
+  -webkit-filter: blur(5px);
+          filter: blur(5px);
+  width: 100%;
+}
+.swiper-box {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+.cover {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 999;
+  opacity: 0.5;
+}
+.wxshare {
+  text-align: center;
+  border-radius: 20rpx;
+  width: 87%;
+  background: linear-gradient(to bottom, #ffffff 10%, #ffffff 40%, #ffffff 50%);
+  position: fixed;
+  top: 30%;
+  left: 6%;
+  z-index: 9999;
+}
+.wxshare_3_1 {
+  font-size: 38rpx;
+  margin-bottom: 20rpx;
+  margin-top: 50rpx;
+}
+.add_box3_a {
+  width: 50%;
+  height: 90rpx;
+  text-align: center;
+  line-height: 90rpx;
+  color: #000000;
+  border: 2rpx solid #e5e5e5;
+  border-radius: 0 0 20rpx 0;
+  font-size: 30rpx;
+}
+.add_box3_1_a {
+  width: 50%;
+  height: 90rpx;
+  border: 2rpx solid #e5e5e5;
+  border-radius: 0 0 0 20rpx;
+  text-align: center;
+  line-height: 90rpx;
+  color: #888888;
+  font-size: 30rpx;
+}
+.inputclass {
+  width: 52%;
+}
+.inputclass_1 {
+  height: 90rpx;
+  line-height: 90rpx;
+}
+/* 导航 start */
+.main-title {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 120;
+  background-color: #f5f5f5;
+}
+.status_bar {
+  background-color: #f5f5f5;
+  height: 25px;
+  width: 100%;
+}
+.chat_1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 75%;
+  padding: 0rpx 40rpx 10rpx 30rpx;
+}
+.chat_2 {
+  display: flex;
+  flex-direction: row;
+}
+.chat_2_1 {
+  display: flex;
+  flex-direction: row;
+  margin-top: 6rpx;
+}
+/* 导航 end */
+.cover1 {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 999;
+  opacity: 0.2;
+}
+.wxshare1 {
+  text-align: center;
+  border-radius: 20rpx;
+  z-index: 9999;
+  width: 80%;
+  position: fixed;
+  top: 9%;
+  left: 17%;
+}
+.wximg {
+  width: 560rpx;
+  height: 1350rpx;
+}
+.wxshare_3_1 {
+  font-size: 38rpx;
+  margin-bottom: 20rpx;
+  margin-top: 50rpx;
+  margin-left: 20rpx;
+  margin-right: 20rpx;
+}
+.tui-order-title-1 {
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+  margin-top: 50rpx;
+  margin-left: 30rpx;
+  margin-right: 20rpx;
+  text-align: left;
+}
+.add_box3_cui_2 {
+  width: 30%;
+  margin-left: 35%;
+  margin-bottom: 50rpx;
+  height: 60rpx;
+  text-align: center;
+  line-height: 60rpx;
+  color: #ffffff;
+  background-color: #FE0302;
+  border-radius: 20rpx;
+  font-size: 30rpx;
+}
+.banbtn {
+  margin-top: -20rpx;
+  font-size: 32rpx;
+  margin-left: 70rpx;
+}
+.banvideo {
+  margin-top: 144rpx;
+  background-color: #f5f5f5;
+}
+.bantop {
+  padding-top: 25px;
+}
+.bindyes {
+  width: 600rpx;
+  height: 88rpx;
+  background: #FE0302;
+  box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(192, 192, 192, 0.15);
+  border-radius: 44rpx;
+}
+.top-video {
+  display: flex;
+  padding: 16rpx 24rpx;
+  align-items: center;
+  background-color: #FFEDED;
+  justify-content: space-around;
+}
+.top-video .video-text {
+  width: 75%;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 24rpx;
+  color: #1B1B1B;
+  line-height: 32rpx;
+  text-align: left;
+  font-style: normal;
+}
+.top-video .video-img {
+  width: 20%;
+}
+.account-section {
+  margin: 30rpx 30rpx;
+}
+/* 未绑定状态样式 */
+.unbind-state .bind-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+.bind-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+.bind-icon {
+  margin-right: 24rpx;
+}
+.bind-text {
+  flex: 1;
+}
+.bind-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+.bind-subtitle {
+  font-size: 26rpx;
+  color: #999;
+}
+.bind-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.bind-btn {
+  background-color: #FE0302;
+  color: #fff;
+  border-radius: 44rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-size: 36rpx;
+  flex: 1;
+  margin-right: 20rpx;
+}
+.btn-icon {
+  width: 32rpx;
+  height: 36rpx;
+  margin-right: 12rpx;
+}
+.badge {
+  background-color: red;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  position: absolute;
+  right: 20rpx;
+  top: 20rpx;
+}
+/* 已绑定状态样式 */
+/* 未绑定状态样式 */
+.unbind-state .bind-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 60rpx 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+.bind-text {
+  margin-bottom: 50rpx;
+}
+.text-center {
+  text-align: center;
+}
+.bind-title {
+  font-weight: 500;
+  font-size: 40rpx;
+  color: #626262;
+  line-height: 40rpx;
+  margin-bottom: 20rpx;
+}
+.bind-subtitle {
+  font-weight: 400;
+  font-size: 28rpx;
+  color: #626262;
+  line-height: 28rpx;
+}
+.bind-actions.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30rpx;
+  /* Android兼容方案：使用margin替代gap */
+}
+/* Android兼容：为垂直布局的子元素添加margin */
+.bind-btn {
+  background-color: #FE0302;
+  color: #fff;
+  border-radius: 44rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-size: 32rpx;
+  width: 100%;
+  max-width: 500rpx;
+}
+.laylist-btn {
+  background: #fff;
+  color: #FE2F02;
+  border: 1px solid #FE2F02;
+  border-radius: 44rpx;
+  height: 84rpx;
+  line-height: 36rpx;
+  font-weight: 500;
+  text-align: center;
+  font-size: 36rpx;
+  width: 100%;
+  max-width: 500rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.btn-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 12rpx;
+}
+.badge {
+  background-color: red;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  position: absolute;
+  right: 140rpx;
+  top: 20rpx;
+}
+.down-box {
+  position: absolute;
+  width: 200rpx;
+  height: 60rpx;
+  top: 150rpx;
+  left: 380rpx;
+  z-index: 9;
+  opacity: 0;
+}
+/* 已绑定状态样式 */
+.binded-state .binded-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0eeef;
+  padding: 20rpx 30rpx;
+}
+.platform-tag {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.action-btn .switch-btn,
+.action-btn .unbind-btn {
+  color: #FE0302;
+  font-size: 26rpx;
+  border: 1rpx solid #f9ada3;
+  border-radius: 24rpx;
+  padding: 8rpx 20rpx;
+  text-align: center;
+}
+.action-btn .default-tag {
+  color: #999;
+  font-size: 26rpx;
+}
+.card-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 30rpx;
+}
+.store-info {
+  margin-left: 20rpx;
+  flex: 1;
+}
+.info-item {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+.info-item:last-child {
+  margin-bottom: 0;
+}
+/* 支持第三方平台样式 */
+.third-platform-section {
+  margin: 40rpx 30rpx 20rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+.section-header {
+  margin-bottom: 30rpx;
+}
+.section-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  padding: 0 30rpx;
+  white-space: nowrap;
+}
+.title-line {
+  flex: 1;
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent, #e5e5e5);
+}
+.left-line {
+  max-width: 100rpx;
+  background: linear-gradient(270deg, transparent, #e5e5e5);
+}
+.right-line {
+  max-width: 100rpx;
+  background: linear-gradient(90deg, transparent, #e5e5e5);
+}
+.platform-scroll-container {
+  width: 100%;
+  overflow: hidden;
+}
+.platform-scroll {
+  width: 100%;
+  white-space: nowrap;
+  text-align: center;
+}
+.platform-list {
+  display: inline-flex;
+  padding: 10rpx 0;
+  /* 确保列表宽度与标题区域一致 */
+  padding-left: 30rpx;
+  padding-right: 30rpx;
+}
+.platform-item {
+  display: inline-block;
+  margin-right: 20rpx;
+  width: 90rpx;
+  height: 80rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.platform-item:last-child {
+  margin-right: 0;
+}
+.platform-image {
+  width: 100%;
+  height: 100%;
+}
+.container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.main-content {
+  width: 100%;
+  flex: 1;
+  /* 移除可能干扰滚动的样式 */
+}
+.content-wrapper {
+  /* 确保内容正常排列 */
+  padding-top: 40rpx;
+  padding-bottom: 20rpx;
+  /* 添加底部间距 */
+}
+/* 底部弹窗样式 */
+.bind-popup-container {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 30rpx 30rpx 0 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* 标题区域 */
+.popup-header {
+  padding: 40rpx 30rpx 30rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.popup-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+}
+/* 表单区域 */
+.popup-form {
+  padding: 40rpx 30rpx;
+}
+.form-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+  position: relative;
+}
+.form-item:last-child {
+  margin-bottom: 0;
+}
+.item-label {
+  font-size: 32rpx;
+  color: #333333;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+.item-input {
+  flex: 1;
+  margin-right: 20rpx;
+}
+.input-field {
+  width: 100%;
+  height: 80rpx;
+  font-size: 32rpx;
+  color: #333333;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 40rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+}
+.input-placeholder {
+  font-size: 28rpx;
+  color: #999999;
+}
+/* 验证码按钮 */
+.code-btn {
+  width: 180rpx;
+  height: 80rpx;
+  background: #FE0302;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.code-btn.disabled {
+  background: #CCCCCC;
+}
+/* 底部按钮区域 */
+.popup-footer {
+  padding: 30rpx;
+  background: #F8F8F8;
+  border-radius: 0 0 30rpx 30rpx;
+}
+.confirm-btn {
+  width: 100%;
+  height: 88rpx;
+  background: #FE0302;
+  border-radius: 44rpx;
+  font-size: 36rpx;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+/* 确保弹窗覆盖整个底部 */
+:deep(.uni-popup__wrapper) {
+  border-radius: 30rpx 30rpx 0 0 !important;
+}
+:deep(.uni-popup__wrapper-box) {
+  border-radius: 30rpx 30rpx 0 0 !important;
+  overflow: hidden;
+}
+/* 铺货流程样式 - 整体没有背景 */
+.process-container {
+  margin-top: 30rpx;
+  /* 移除背景色 */
+  padding: 0;
+}
+/* 每个步骤的包装器 - 垂直布局 */
+.process-step-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  position: relative;
+}
+/* 步骤标题行（在上方） */
+.step-title-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+  margin-left: -8rpx;
+  margin-top: 20rpx;
+}
+/* 左侧标题 - 横向排列 */
+.step-left-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 20rpx;
+}
+/* 内容行（在下方，包含左侧虚线和右侧卡片） */
+.step-content-row {
+  display: flex;
+  position: relative;
+}
+/* 左侧虚线列 */
+.step-left-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  width: 20rpx;
+  position: relative;
+}
+.step-number {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1B1B1B;
+  line-height: 1;
+  margin-right: 10rpx;
+}
+.step-number-text {
+  font-size: 32rpx;
+  color: #1B1B1B;
+  line-height: 1;
+}
+/* 虚线容器 - 贯穿整个内容区域 */
+.dashed-line-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100rpx;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  justify-content: flex-end;
+}
+/* 虚线延伸 - 贯穿整个内容卡片高度，延伸到下一个步骤标题上方 */
+.dashed-line-extend {
+  width: 2rpx;
+  flex: 1;
+  background: repeating-linear-gradient(to bottom, #CCCCCC 0, #CCCCCC 8rpx, transparent 8rpx, transparent 16rpx);
+  min-height: 200rpx;
+}
+/* 实心灰色向下箭头 */
+.arrow-down-icon {
+  width: 0;
+  height: 0;
+  border-left: 8rpx solid transparent;
+  border-right: 8rpx solid transparent;
+  border-top: 12rpx solid #666666;
+  margin-top: 10rpx;
+  flex-shrink: 0;
+}
+/* 右侧内容卡片（有背景和阴影） */
+.step-content-card {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  margin-bottom: 30rpx;
+  position: relative;
+  z-index: 1;
+}
+/* 第一行：下载嘚嘚象APP 立即下载 - 间距不要太大 */
+.step-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  gap: 20rpx;
+  /* Android兼容方案：使用margin替代gap */
+}
+/* Android兼容：为水平布局的子元素添加margin */
+.step-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1B1B1B;
+  line-height: 44rpx;
+}
+.step-download {
+  font-size: 28rpx;
+  color: #007AFF;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+/* 中间图标 */
+.step-image {
+  width: 110rpx;
+  height: 110rpx;
+  margin: 20rpx 0;
+  border-radius: 12rpx;
+  display: block;
+}
+/* 第三行：两行文案 */
+.step-desc-black {
+  font-size: 24rpx;
+  color: #1B1B1B;
+  line-height: 40rpx;
+}
+.step-desc-red {
+  font-size: 24rpx;
+  color: #FE0302;
+  line-height: 40rpx;
+  margin-top: 8rpx;
+}
+.step-desc {
+  font-weight: 400;
+  font-size: 28rpx;
+  color: #1B1B1B;
+  line-height: 40rpx;
+}
+.step-desc.full-width {
+  width: 95%;
+  padding: 20rpx;
+  border-radius: 12rpx;
+}
+/* 说明区域样式 - 外侧无背景 */
+.instruction-section {
+  width: 94%;
+  margin: 36rpx 30rpx;
+  /* 无背景色 */
+}
+.instruction-card {
+  background-color: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+.instruction-title {
+  font-weight: 400;
+  font-size: 32rpx;
+  color: #1B1B1B;
+  margin-bottom: 20rpx;
+}
+.instruction-text {
+  font-weight: 400;
+  font-size: 28rpx;
+  color: #1B1B1B;
+  line-height: 40rpx;
+  margin-bottom: 20rpx;
+}
+.instruction-image {
+  width: 100%;
+  height: 396rpx;
+  border-radius: 12rpx;
+  display: block;
+}

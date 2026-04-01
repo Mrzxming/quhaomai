@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "关注商品",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

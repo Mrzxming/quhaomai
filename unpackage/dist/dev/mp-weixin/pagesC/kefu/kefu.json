@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "客服",
+  "usingComponents": {
+    "jyf-parser": "/components/jyf-parser/jyf-parser",
+    "emotion": "/components/emotion/index"
+  }
+}

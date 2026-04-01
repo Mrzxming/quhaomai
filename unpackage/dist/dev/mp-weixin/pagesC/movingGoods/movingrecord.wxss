@@ -1,0 +1,40 @@
+page {
+  background-color: #fff;
+}
+.tui-list-cell {
+  display: flex;
+  align-items: center;
+  padding: 0rpx 30rpx 30rpx 30rpx;
+  font-size: 28rpx;
+  width: 100%;
+}
+.title_1 {
+  font-size: 24rpx;
+  width: 75%;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 40rpx;
+}
+.title_1_1 {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.tui-list-cell_1 {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0rpx 0rpx 0rpx 0rpx;
+  font-size: 28rpx;
+}
+.tui-line-cell_2_1 {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

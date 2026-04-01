@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "品牌详情",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-product-list": "/components/dsc-product-list",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

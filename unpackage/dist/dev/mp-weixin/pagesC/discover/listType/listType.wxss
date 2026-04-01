@@ -1,0 +1,11 @@
+
+.con.data-v-4bb6bb0a {
+    max-width: 640px;
+    min-width: 320px;
+    min-height: 100vh;
+    margin-right: auto;
+    margin-left: auto;
+    overflow: hidden;
+	padding-bottom: 60px;
+}
+

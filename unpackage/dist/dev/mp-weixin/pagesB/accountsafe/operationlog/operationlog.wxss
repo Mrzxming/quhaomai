@@ -1,0 +1,23 @@
+
+.growth.data-v-7fc097f7 {
+		height: 100%;
+		background: #fff;
+}
+.ny-item.data-v-7fc097f7 {
+		margin-bottom: 0rpx;
+		position: relative;
+}
+.card_t.data-v-7fc097f7 {
+		padding-left: 10rpx;
+		padding-right: 10rpx;
+}
+.ny-item.data-v-7fc097f7:after {
+		content: "";
+		left: 20rpx;
+		right: 20rpx;
+		bottom: 0;
+		height: 1px;
+		background-color: #E5E5E5;
+		position: absolute;
+}
+

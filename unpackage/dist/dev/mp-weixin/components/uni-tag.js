@@ -1,0 +1,11 @@
+(global["webpackJsonp"]=global["webpackJsonp"]||[]).push([["components/uni-tag"],{2151:function(n,e,t){"use strict";t.r(e);var r=t(2152),i=t(2154);for(var u in i)["default"].indexOf(u)<0&&function(n){t.d(e,n,(function(){return i[n]}))}(u);t(2156);var o,c=t(45),d=Object(c["default"])(i["default"],r["render"],r["staticRenderFns"],!1,null,null,null,!1,r["components"],o);d.options.__file="components/uni-tag.vue",e["default"]=d.exports},2152:function(n,e,t){"use strict";t.r(e);var r=t(2153);t.d(e,"render",(function(){return r["render"]})),t.d(e,"staticRenderFns",(function(){return r["staticRenderFns"]})),t.d(e,"recyclableRender",(function(){return r["recyclableRender"]})),t.d(e,"components",(function(){return r["components"]}))},2153:function(n,e,t){"use strict";var r;t.r(e),t.d(e,"render",(function(){return i})),t.d(e,"staticRenderFns",(function(){return o})),t.d(e,"recyclableRender",(function(){return u})),t.d(e,"components",(function(){return r}));var i=function(){var n=this,e=n.$createElement;n._self._c},u=!1,o=[];i._withStripped=!0},2154:function(n,e,t){"use strict";t.r(e);var r=t(2155),i=t.n(r);for(var u in r)["default"].indexOf(u)<0&&function(n){t.d(e,n,(function(){return r[n]}))}(u);e["default"]=i.a},2155:function(n,e,t){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r={props:{type:{type:String,default:"default"},size:{type:String,default:"normal"},text:String,disabled:{type:[String,Boolean],defalut:!1},inverted:{type:[String,Boolean],defalut:!1},circle:{type:[String,Boolean],defalut:!1}},methods:{onClick:function(){!0!==this.disabled&&"true"!==this.disabled&&this.$emit("click")}}};e.default=r},2156:function(n,e,t){"use strict";t.r(e);var r=t(2157),i=t.n(r);for(var u in r)["default"].indexOf(u)<0&&function(n){t.d(e,n,(function(){return r[n]}))}(u);e["default"]=i.a},2157:function(n,e,t){}}]);
+//# sourceMappingURL=../../.sourcemap/mp-weixin/components/uni-tag.js.map
+;(global["webpackJsonp"] = global["webpackJsonp"] || []).push([
+    'components/uni-tag-create-component',
+    {
+        'components/uni-tag-create-component':(function(module, exports, __webpack_require__){
+            __webpack_require__('2')['createComponent'](__webpack_require__(2151))
+        })
+    },
+    [['components/uni-tag-create-component']]
+]);

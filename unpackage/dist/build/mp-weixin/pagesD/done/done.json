@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "收银台",
+  "usingComponents": {
+    "dsc-common-nav": "/components/dsc-common-nav"
+  }
+}

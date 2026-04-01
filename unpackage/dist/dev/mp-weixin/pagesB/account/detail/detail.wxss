@@ -1,0 +1,62 @@
+
+.time_list .uni-input.data-v-2cbe21aa {
+	padding: 0 15rpx !important;
+    background: #F6F6F6;
+}
+.main.data-v-2cbe21aa {
+	height: 100%;
+	background: #fff;
+}
+.has-mgtb.data-v-2cbe21aa {
+	display: flex;
+	justify-content: space-around;
+	width: 92%;
+	flex-wrap: nowrap;
+	margin: auto;
+	padding-top: 20rpx;
+}
+.has-mgtb input.data-v-2cbe21aa {
+	background-color: #F6F6F6;
+	border-radius: 20px;
+	width: 80%;
+	height: 30px;
+	line-height: 30px;
+	padding: 0 4%;
+}
+.has-mgtb .sou.data-v-2cbe21aa {
+	font-size: 30rpx;
+	color: #A0A0A0;
+}
+.ny-item.data-v-2cbe21aa {
+	padding: 20rpx 30rpx;
+	margin: 0 20rpx;
+	border-bottom: 1px solid #F6F6F6;
+}
+.ny-item view.data-v-2cbe21aa {
+	margin-top: 6rpx;
+}
+.time_price.data-v-2cbe21aa {
+	display: flex;
+	justify-content: space-between;
+}
+.red.data-v-2cbe21aa {
+	color: red;
+	font-size: 32rpx;
+	font-weight: 600;
+}
+.black.data-v-2cbe21aa {
+	color: #333;
+	font-size: 32rpx;
+	font-weight: 600;
+}
+.time_list.data-v-2cbe21aa {
+	background-color: #F6F6F6;
+	padding: 15rpx;
+	margin: 0 20rpx;
+	margin-top: 20rpx;
+	font-size: 32rpx;
+	font-weight: bold;
+	display: flex;
+	justify-content: space-between;
+}
+

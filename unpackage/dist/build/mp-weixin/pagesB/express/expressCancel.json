@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "取消寄件",
+  "usingComponents": {
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-popup": "/components/uni-popup",
+    "uni-number-kg": "/components/uni-number-kg"
+  }
+}

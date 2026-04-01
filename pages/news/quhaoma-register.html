@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>趣好卖 - 注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #FFD4C8 0%, #FFF5E8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 100px 30px 40px;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        
+        .container {
+            flex: 1;
+            background: #F8F8F8;
+            border-radius: 24px 24px 0 0;
+            padding: 40px 24px 30px;
+            position: relative;
+        }
+        
+        .phone-input-group {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .phone-prefix {
+            font-size: 15px;
+            color: #333;
+            padding-right: 12px;
+            border-right: 1px solid #E5E5E5;
+        }
+        
+        .phone-input-group input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            background: transparent;
+        }
+        
+        .phone-input-group input::placeholder {
+            color: #BFBFBF;
+        }
+        
+        .code-input-group {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .code-input-group input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            background: transparent;
+        }
+        
+        .code-input-group input::placeholder {
+            color: #BFBFBF;
+        }
+        
+        .get-code-btn {
+            font-size: 14px;
+            color: #D23328;
+            background: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .password-group {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .password-group input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            background: transparent;
+        }
+        
+        .password-group input::placeholder {
+            color: #BFBFBF;
+        }
+        
+        .eye-icon {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 16px;
+            background: #D23328;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        
+        .register-btn:active {
+            opacity: 0.9;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .login-link a {
+            color: #666;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .login-link a span {
+            color: #D23328;
+        }
+        
+        .privacy-agreement {
+            display: flex;
+            align-items: flex-start;
+            font-size: 12px;
+            color: #999;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .privacy-agreement input[type="checkbox"] {
+            margin-right: 6px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            width: 14px;
+            height: 14px;
+        }
+        
+        .privacy-agreement a {
+            color: #333;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="back-btn" onclick="history.back()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    
+    <div class="header">
+        <div class="page-title">注册</div>
+    </div>
+    
+    <div class="container">
+        <div class="phone-input-group">
+            <span class="phone-prefix">+86</span>
+            <input type="tel" placeholder="请输入手机号" id="phone" maxlength="11">
+        </div>
+        
+        <div class="code-input-group">
+            <input type="text" placeholder="请输入验证码" id="code" maxlength="6">
+            <button class="get-code-btn" onclick="getCode()">获取验证码</button>
+        </div>
+        
+        <div class="password-group">
+            <input type="password" placeholder="设置密码（6-20位）" id="password" maxlength="20">
+            <svg class="eye-icon" onclick="togglePassword()" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5C7 5 2.73 8.11 1 12.5C2.73 16.89 7 20 12 20C17 20 21.27 16.89 23 12.5C21.27 8.11 17 5 12 5Z" stroke="#999" stroke-width="1.5" fill="none"/>
+                <circle cx="12" cy="12.5" r="3" stroke="#999" stroke-width="1.5" fill="none"/>
+            </svg>
+        </div>
+        
+        <button class="register-btn" onclick="handleRegister()">注册</button>
+        
+        <div class="login-link">
+            <a href="quhaoma-login.html">已有账号？<span>立即登录</span></a>
+        </div>
+        
+        <div class="privacy-agreement">
+            <input type="checkbox" id="agreePrivacy">
+            <label for="agreePrivacy">
+                我同意 <a href="#">《趣好卖服务条款》</a>和<a href="#">《隐私政策》</a>
+            </label>
+        </div>
+    </div>
+    
+    <script>
+        function getCode() {
+            const phone = document.getElementById('phone').value;
+            if (!phone || phone.length !== 11) {
+                alert('请输入正确的手机号');
+                return;
+            }
+            alert('验证码已发送');
+        }
+        
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+        }
+        
+        function handleRegister() {
+            const phone = document.getElementById('phone').value;
+            const code = document.getElementById('code').value;
+            const password = document.getElementById('password').value;
+            const agreed = document.getElementById('agreePrivacy').checked;
+            
+            if (!phone || phone.length !== 11) {
+                alert('请输入正确的手机号');
+                return;
+            }
+            if (!code) {
+                alert('请输入验证码');
+                return;
+            }
+            if (!password || password.length < 6) {
+                alert('请设置6-20位密码');
+                return;
+            }
+            if (!agreed) {
+                alert('请先同意服务条款');
+                return;
+            }
+            
+            alert('注册成功！');
+            location.href = 'quhaoma-login.html';
+        }
+    </script>
+</body>
+</html>

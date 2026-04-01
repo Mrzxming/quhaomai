@@ -1,0 +1,238 @@
+@charset "UTF-8";
+/* 禁止页面滚动 */
+page {
+  height: 100vh;
+  overflow: hidden;
+}
+.cashier-desk .header-title {
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 32rpx;
+  padding: 10rpx 20rpx;
+}
+.cashier-desk .header-title .price {
+  color: #f92028;
+  font-size: 40rpx;
+}
+.cashier-desk .btn {
+  position: fixed;
+  margin: 0 60rpx 50rpx;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.cashier-desk .btn button {
+  padding: 0;
+  font-size: 32rpx;
+  color: #fff;
+  border-radius: 50rpx;
+  border: 0 !important;
+}
+.cashier-desk .btn button::after {
+  content: " ";
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+.cashier-content {
+  background: #FFFFFF;
+  margin-top: 20rpx;
+}
+.cashier-content .title {
+  padding: 20rpx;
+  font-size: 32rpx;
+}
+/* 支付选项样式优化 */
+.base_select_item {
+  margin: 20rpx;
+  border: 3rpx solid #d9d9d9;
+  border-radius: 12rpx;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+.base_select_item:active {
+  background-color: #f8f8f8;
+}
+/* uni-list-cell 样式 */
+.uni-list-cell {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.uni-list-cell-pd {
+  padding: 24rpx 10rpx 24rpx 20rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+/* 调整radio按钮位置，让对号向左移动 */
+.uni-list-cell-pd > view:last-child {
+  padding-right: 0;
+  margin-right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+/* uni-radio组件样式调整 - 减少右边距让对号向左移动 */
+.uni-list-cell-pd  uni-radio {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+.uni-list-cell-pd  .uni-radio-input {
+  margin-right: 40rpx !important;
+  padding-right: 0 !important;
+}
+/* 调整radio按钮容器，让对号向左移动 */
+.uni-list-cell-pd  .uni-radio-input-wrapper {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+/* 支付信息容器 */
+.payment-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* 支付宝禁用样式 */
+.disabled-item {
+  opacity: 0.5;
+  pointer-events: none;
+  background-color: #f5f5f5 !important;
+  border-color: #d0d0d0 !important;
+}
+.disabled-text {
+  color: #999 !important;
+  font-size: 28rpx;
+}
+/* 支付宝禁用提醒文本 - 放在按钮内 */
+.alipay-warning-text {
+  color: #ff4d4f;
+  font-size: 22rpx;
+  margin-top: 8rpx;
+  line-height: 1.5;
+}
+/* 支付方式分割线 */
+.payment-divider {
+  height: 1rpx;
+  background-color: #f0f0f0;
+  margin: 0 20rpx;
+}
+.flow-done {
+  padding-top: 60px;
+}
+.flow-done-con {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+}
+.flow-done-con .iconfont {
+  font-size: 80px;
+  line-height: normal;
+}
+.flow-done-con .icon-qian {
+  color: #EFCE0C;
+}
+.flow-done-con .icon-hookring2 {
+  color: #3ec074;
+}
+.flow-done-con .flow-done-title {
+  font-size: 18px;
+  margin-top: 20rpx;
+  color: #444444;
+}
+.flow-done-con .flow-done-price {
+  font-size: 28px;
+  margin-top: 20rpx;
+  color: #444444;
+}
+.flow-done-all {
+  margin-top: 30px;
+}
+.flow-done-all .uni-list-cell-navigate .title,
+.flow-done-all .uni-list-cell-navigate .value {
+  font-size: 16px;
+}
+.flow-done-all .btn-bar {
+  margin: 20px 10px;
+}
+.flow-done-all .btn-bar .btn {
+  box-shadow: none;
+  margin: 0 10px;
+  border-radius: 30px;
+}
+.weixin-content {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin: 0 60rpx;
+  padding: 150rpx 0;
+}
+.weixin-content .weixin-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 30rpx auto;
+}
+.weixin-content .weixin-price .text {
+  font-size: 40rpx;
+}
+.weixin-content .weixin-price .price {
+  color: #f92028;
+  font-size: 48rpx;
+  margin-top: 20rpx;
+}
+.weixin-content .weixin-pay-btn button {
+  padding: 0;
+  font-size: 32rpx;
+  color: #fff;
+  border-radius: 50rpx;
+  border: 0 !important;
+  margin-top: 50rpx;
+}
+.swiper-container {
+  margin-top: 50rpx;
+}
+.swiper-container .swiper-item {
+  background-image: url("https://shhai2.oss-cn-shanghai.aliyuncs.com/data/gallery_album/5/original_img/5_P_1705968094621.png");
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  width: 710rpx;
+  height: 282rpx;
+  margin: 0 auto;
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+}
+.swiper-container .swiper-item image {
+  width: 100%;
+  height: 100%;
+  border-radius: 20rpx;
+}
+.image_1 {
+  background-image: url("https://shhai2.oss-cn-shanghai.aliyuncs.com/data/gallery_album/5/original_img/5_P_1705968095762.png");
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  margin: -11px 20px 0 20p;
+  padding: 8px;
+}

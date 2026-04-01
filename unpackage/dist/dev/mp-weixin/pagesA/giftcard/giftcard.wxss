@@ -1,0 +1,5 @@
+
+.header-title{ padding: 20rpx 30rpx; border-bottom: 1px solid #DDDDDD; font-size: 30rpx;
+}
+.uni-list-cell::after{ left: 0;}
+

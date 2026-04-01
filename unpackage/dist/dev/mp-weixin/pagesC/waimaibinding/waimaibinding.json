@@ -1,0 +1,9 @@
+{
+  "enablePullDownRefresh": false,
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-popups": "/components/uni-popup/uni-popup_1",
+    "captcha": "/components/captcha4/index"
+  }
+}

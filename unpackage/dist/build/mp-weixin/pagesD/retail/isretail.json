@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "申请分销",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "shmily-drag-image": "/components/shmily-drag-image/shmily-drag-image"
+  }
+}

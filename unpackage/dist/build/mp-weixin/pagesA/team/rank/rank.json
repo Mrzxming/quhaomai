@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "拼团排行",
+  "usingComponents": {
+    "uni-segmented-control": "/components/uni-segmented-control/uni-segmented-control",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-tabbar": "/components/dsc-tabbar"
+  }
+}

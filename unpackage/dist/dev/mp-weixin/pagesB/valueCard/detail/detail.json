@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "储值卡详情",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

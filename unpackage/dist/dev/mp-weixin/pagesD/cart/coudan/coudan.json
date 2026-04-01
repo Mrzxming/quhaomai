@@ -1,0 +1,14 @@
+{
+  "navigationBarTitleText": "凑单",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "uni-nav-bar": "/components/uni-nav-bar",
+    "uni-drawer": "/components/uni-drawer",
+    "dsc-filter": "/components/dsc-filter",
+    "dsc-product-list": "/components/dsc-product-list",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

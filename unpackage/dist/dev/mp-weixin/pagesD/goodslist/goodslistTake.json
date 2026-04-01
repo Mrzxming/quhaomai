@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "商品列表",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "goods-service-label": "/components/goods-service-label/goods-service-label",
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-popups": "/components/uni-popup/uni-popup_1"
+  }
+}

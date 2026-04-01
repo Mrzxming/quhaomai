@@ -1,0 +1,301 @@
+
+.s-user-top {
+	padding: 22rpx 20rpx;
+	position: relative;
+}
+.s-user-top .user-bg-box-1 {
+	width: 90rpx;
+	height: 32rpx;
+	position: absolute;
+	right: 0;
+	top: 20rpx;
+}
+.s-user-top .user-bg2-box-1 {
+	width: 91rpx;
+	height: 36rpx;
+	position: absolute;
+	bottom: 0;
+	left: 20rpx;
+}
+.s-user-top .user_profile_box {
+	display: flex;
+	flex-direction: row;
+}
+.s-user-top .user_profile_box .user-img {
+	width: 108rpx;
+	height: 108rpx;
+	border-radius: 50%;
+	border: 2px solid #EEEEEE;
+}
+.s-user-top .user_profile_box .user-img .img {
+	border-radius: 50%;
+}
+.s-user-top .user_profile_box .profile-index-top {
+	flex: 1;
+	margin-left: 30rpx;
+}
+.s-user-top .user_profile_box .profile-index-top text {
+	font-size: 32rpx;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+.s-user-top .user_profile_box .profile-index-top .username {
+	font-size: 25rpx;
+	color: #777777;
+}
+.my-box .uni-card {
+	margin: 0;
+}
+.my-box .uni-list-cell-navigate {
+	justify-content: flex-start;
+}
+.my-box .uni-list-cell-navigate .title {
+	padding: 20rpx 0;
+	font-size: 32rpx;
+	margin-right: 20rpx;
+	color: #333333;
+}
+.my-box .uni-list-cell-navigate .value {
+	font-size: 28rpx;
+	color: #666;
+}
+.my-box .btn-bar {
+	padding: 0 30rpx;
+	margin-top: 20rpx;
+}
+.user-sex {
+	display: flex;
+	flex-direction: row;
+	padding: 50rpx 30rpx;
+	justify-content: center;
+	text-align: center;
+}
+.user-sex .left,
+.user-sex .right {
+	flex: 1 1 0%;
+	color: #b2b2b2;
+}
+.user-sex .iconfont {
+	font-size: 130rpx;
+	line-height: normal;
+}
+.user-sex .left.active {
+	color: #3fc6ff;
+}
+.user-sex .right.active {
+	color: #f36ab7;
+}
+.picker {
+	width: 100%;
+}
+.copyright {
+	text-align: center;
+	margin-top: 100rpx;
+	padding-bottom: 50rpx;
+}
+.copyright-content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 20rpx;
+	margin-bottom: 20rpx;
+}
+.copyright view {
+	font-size: 25rpx;
+	color: #999999;
+}
+.copyright .link {
+	color: #4b89dc;
+	font-size: 25rpx;
+}
+.profile-btn {
+	margin: 40rpx 30rpx 0;
+}
+.profile-btn button {
+	font-size: 32rpx;
+}
+.uni-popup-right {
+	width: 80%;
+}
+
+/* 仅针对当前页面的 profile-popup 设置白色背景 */
+
+/* 只设置内容区域背景，避免使用深度选择器影响其他页面 */
+.profile .profile-popup .my-box {
+	background-color: #ffffff;
+	min-height: 100vh;
+	width: 100%;
+	position: relative;
+	z-index: 1;
+}
+.cover {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: rgb(0, 0, 0);
+	z-index: 999;
+	opacity: 0.5;
+}
+.wxshare {
+	text-align: center;
+	border-radius: 20rpx;
+	width: 80%;
+	background-color: #ffffff;
+	position: fixed;
+	top: 25%;
+	left: 10%;
+	z-index: 9999;
+}
+.wxshare_sx {
+	text-align: center;
+	border-radius: 50rpx 50rpx 0 0;
+	width: 100%;
+	background-color: #ffffff;
+	position: fixed;
+	bottom: 0%;
+	left: 0%;
+	z-index: 9999;
+}
+.wxshare_2_1 {
+	margin-top: 50rpx;
+	margin-bottom: 36rpx;
+	font-size: 34rpx;
+}
+.add_box3_a_sx {
+	width: 48%;
+	height: 90rpx;
+	text-align: center;
+	line-height: 90rpx;
+	color: #ffffff;
+	background-color: #e64340;
+	border-radius: 10rpx;
+	font-size: 34rpx;
+}
+.add_box3_1_a_sx {
+	width: 48%;
+	height: 90rpx;
+	border: 2rpx solid #C0C0C0;
+	border-radius: 10rpx;
+	text-align: center;
+	line-height: 90rpx;
+	color: #888888;
+	font-size: 34rpx;
+}
+.wxshare_y {
+	text-align: center;
+	border-radius: 20rpx;
+	width: 80%;
+	background-color: #FAFAFA;
+	position: fixed;
+	top: 25%;
+	left: 10%;
+	z-index: 9999;
+}
+.add_box3_buy_1_s {
+	width: 40%;
+	height: 70rpx;
+	border: 2rpx solid #C0C0C0;
+	border-radius: 10rpx;
+	text-align: center;
+	line-height: 70rpx;
+	margin-top: 50rpx;
+	margin-left: 8%;
+	color: #888888;
+	font-size: 30rpx;
+}
+.add_box3_buy_1_y {
+	width: 38%;
+	height: 70rpx;
+	background-color: #e64340;
+	border-radius: 10rpx;
+	text-align: center;
+	line-height: 70rpx;
+	margin-top: 50rpx;
+	margin-left: 5%;
+	margin-bottom: 80rpx;
+	color: #ffffff;
+	font-size: 30rpx;
+}
+.wxshare_3_1 {
+	font-size: 32rpx;
+	margin-bottom: 50rpx;
+	margin-top: 50rpx;
+}
+.add_box3_a_sx {
+	width: 48%;
+	height: 90rpx;
+	text-align: center;
+	line-height: 90rpx;
+	color: #ffffff;
+	background-color: #5C93FF;
+	border-radius: 10rpx;
+	font-size: 34rpx;
+}
+.add_box3_1_a_sx {
+	width: 48%;
+	height: 90rpx;
+	border: 2rpx solid #C0C0C0;
+	border-radius: 10rpx;
+	text-align: center;
+	line-height: 90rpx;
+	color: #888888;
+	font-size: 34rpx;
+}
+.add_box3_a {
+	width: 50%;
+	height: 90rpx;
+	text-align: center;
+	line-height: 90rpx;
+	color: #000000;
+	border: 2rpx solid #e5e5e5;
+	border-radius: 0 0 20rpx 0;
+	font-size: 30rpx;
+}
+.add_box3_1_a {
+	width: 50%;
+	height: 90rpx;
+	border: 2rpx solid #e5e5e5;
+	border-radius: 0 0 0 20rpx;
+	text-align: center;
+	line-height: 90rpx;
+	color: #888888;
+	font-size: 30rpx;
+}
+.wxshareContent {
+	margin: -20rpx 30rpx 150rpx 30rpx;
+	font-size: 28rpx;
+	text-align: left;
+}
+
+/* 确保内容区域可滚动 */
+scroll-view {
+  box-sizing: border-box;
+}
+
+/* 复选框样式 */
+checkbox {
+  margin-right: 10rpx;
+}
+
+/* 按钮禁用样式 */
+.add_box3_a_sx[disabled] {
+  background-color: #ccc !important;
+}
+
+/* 系统通知图标和内容样式 */
+.notification-content {
+  display: flex;
+  align-items: center;
+}
+.notification-icon {
+  width: 46rpx;
+  height: 46rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+

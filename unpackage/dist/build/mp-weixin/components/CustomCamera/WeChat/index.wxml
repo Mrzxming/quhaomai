@@ -1,0 +1,1 @@
+<layout bind:instruct="__e" vue-id="ba829562-1" data-event-opts="{{[['^instruct',[['handleInstruct']]]]}}" class="data-v-75f7dcde" bind:__l="__l" vue-slots="{{['default']}}"><camera class="camera data-v-75f7dcde" style="width:100%;height:100%;" mode="normal" device-position="{{device}}" data-event-opts="{{[['error',[['error',['$event']]]]]}}" binderror="__e"></camera></layout>

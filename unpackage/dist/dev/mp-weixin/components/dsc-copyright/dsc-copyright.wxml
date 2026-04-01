@@ -1,0 +1,1 @@
+<block wx:if="{{configData}}"><view class="copyright_container"><block wx:if="{{configData.copyright_img}}"><image class="copyright_img" src="{{configData.copyright_img}}" mode="heightFix"></image></block><block wx:if="{{configData.copyright_text_mobile}}"><text class="copyright_text">{{configData.copyright_text_mobile}}</text></block></view></block>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "短信手机登录",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons"
+  }
+}

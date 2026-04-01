@@ -1,0 +1,1 @@
+<view class="not-content"><view class="notimg"><image class="img" src="{{image}}"></image></view><block wx:if="{{isSpan}}"><block><view class="cont">{{$root.m0}}</view></block></block><block wx:else><block><view class="cont"><slot name="spanCon"></slot></view></block></block></view>

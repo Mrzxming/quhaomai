@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "平台客服",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "uni-notice-bar": "/components/uni-notice-bar/uni-notice-bar",
+    "jyf-parser": "/components/jyf-parser/jyf-parser_1",
+    "uni-popup": "/components/uni-popup/uni-popup_1",
+    "emotion": "/components/emotion/index",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

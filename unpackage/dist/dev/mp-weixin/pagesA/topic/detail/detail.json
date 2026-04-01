@@ -1,0 +1,24 @@
+{
+  "navigationBarTitleText": "专题详情",
+  "usingComponents": {
+    "uni-nav-bar": "/components/uni-nav-bar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-countdown": "/components/uni-countdown",
+    "uni-popup": "/components/uni-popup",
+    "dsc-slide": "/pagesD/components/visualization/slide/Frontend",
+    "dsc-title": "/pagesD/components/visualization/title/Frontend",
+    "dsc-announcement": "/pagesD/components/visualization/announcement/Frontend",
+    "dsc-nav": "/pagesD/components/visualization/nav/Frontend",
+    "dsc-line": "/pagesD/components/visualization/line/Frontend",
+    "dsc-blank": "/pagesD/components/visualization/blank/Frontend",
+    "dsc-jigsaw": "/pagesD/components/visualization/jigsaw/Frontend",
+    "dsc-product": "/pagesD/components/visualization/product/Frontend",
+    "dsc-coupon": "/pagesD/components/visualization/coupon/Frontend",
+    "dsc-count-down": "/pagesD/components/visualization/count-down/Frontend",
+    "dsc-button": "/pagesD/components/visualization/button/Frontend",
+    "dsc-search": "/pagesD/components/visualization/search/Frontend",
+    "dsc-store": "/pagesD/components/visualization/store/Frontend",
+    "dsc-shop-signs": "/pagesD/components/visualization/shop-signs/Frontend",
+    "dsc-shop-menu": "/pagesD/components/visualization/shop-menu/Frontend"
+  }
+}

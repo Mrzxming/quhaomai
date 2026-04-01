@@ -1,0 +1,114 @@
+
+.container-box {
+	width: 100%;
+}
+.map_container {
+	width: 100%;
+	height: 50%;
+}
+.map {
+	width: 100%;
+	height: 100%;
+}
+.list-box {
+	box-sizing: border-box;
+	height: 50%;
+	padding-top: 20rpx;
+	background-color: #fff;
+}
+.scroll_view {
+	height: calc(100% - 100rpx);
+}
+.item-btn-submit {
+	font-size: 30rpx;
+	line-height: 100rpx;
+	text-align: center;
+	color: #fff;
+	background: linear-gradient(178deg,#f91f28,#ff4f2e);
+}
+.list_item {
+	display: flex;
+	padding: 0 20rpx 20rpx;
+}
+.item-main {
+	flex: 1;
+	margin-left: 20rpx;
+	color: #A0A0A0;
+}
+.item-main view:nth-child(1) {
+	display: flex;
+	justify-content: space-between;
+	font-size: 30rpx;
+	line-height: 20px;
+	font-weight: 700;
+	margin-bottom: 12rpx;
+	color: #333;
+}
+.item_checked_icon {
+	box-sizing: border-box;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	border: 1px solid #ccc;
+	border-radius: 50%;
+}
+.loading_text {
+	text-align: center;
+	padding: 0 0 20rpx;
+}
+
+/* 社区驿站页 地图窗体覆盖物样式 */
+.info_cart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -100%);
+          transform: translate(-50%, -100%);
+  font-size: 28rpx;
+}
+.info_top {
+  display: flex;
+  flex-direction: column;
+  padding: 20rpx 20rpx 10rpx;
+  color: #F8F8F8;
+  line-height: 1;
+  border-top-left-radius: 10rpx;
+  border-top-right-radius: 10rpx;
+  box-sizing: border-box;
+  background-color: #3366ff;
+}
+.info_top .top_title {
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+}
+.top_address,
+.top_phone{
+  padding: 8rpx 0;
+}
+.info_bottom {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 20rpx;
+  color: #A0A0A0;
+  font-size: 30rpx;
+  border-bottom-left-radius: 10rpx;
+  border-bottom-right-radius: 10rpx;
+}
+.daosanjiao_box {
+	height: 50rpx;
+}
+.daosanjiao {
+  width: 30rpx;
+  height: 30rpx;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  margin: 0 auto;
+  margin-top: -20rpx;
+  background-color: #fff;
+}
+
+/* 社区驿站页 地图窗体覆盖物样式结束 */
+

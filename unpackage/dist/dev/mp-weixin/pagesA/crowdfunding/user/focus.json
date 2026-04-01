@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的关注",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

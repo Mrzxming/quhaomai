@@ -1,0 +1,7 @@
+{
+  "name": "gonghuoFace",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-verify": {}
+  }
+}

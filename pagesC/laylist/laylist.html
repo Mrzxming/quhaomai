@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>去铺货</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+      background: #f6f6f6;
+      color: #222;
+      overflow: hidden;
+    }
+    :root { --rpx: 0.5px; }
+    .page { height: 100vh; display: flex; flex-direction: column; }
+
+    .main-title {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 120;
+      background: #fff;
+    }
+    .status_bar { height: 40px; background: #fff; }
+    .nav-box {
+      height: 44px;
+      padding: 0 calc(var(--rpx) * 20) calc(var(--rpx) * 10) calc(var(--rpx) * 30);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav_l { width: 32px; font-size: 24px; }
+    .nav_t { font-size: calc(var(--rpx) * 32); font-weight: 700; }
+    .more-btn { width: 32px; text-align: right; font-size: 22px; }
+    .banvideo { margin-top: 84px; height: calc(var(--rpx) * 16); background: #f8f8f8; }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: calc(var(--rpx) * 20);
+      padding-bottom: calc(var(--rpx) * 180);
+    }
+    .card-list { display: flex; flex-direction: column; gap: calc(var(--rpx) * 20); }
+    .item-card {
+      background: #fff;
+      border-radius: calc(var(--rpx) * 12);
+      padding: calc(var(--rpx) * 20);
+    }
+    .item-row { display: flex; align-items: flex-start; }
+    .checkbox {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1px solid #ddd; margin-right: calc(var(--rpx) * 18);
+      display: flex; align-items: center; justify-content: center; margin-top: 4px;
+      flex-shrink: 0;
+    }
+    .checkbox.checked { background: #f92028; border-color: #f92028; color: #fff; }
+    .goods-img {
+      width: calc(var(--rpx) * 120); height: calc(var(--rpx) * 120);
+      border-radius: calc(var(--rpx) * 10); overflow: hidden; border: 1px solid #ececec;
+      flex-shrink: 0;
+    }
+    .goods-img img { width: 100%; height: 100%; object-fit: cover; }
+    .goods-right { flex: 1; margin-left: calc(var(--rpx) * 20); min-width: 0; }
+    .name { font-size: calc(var(--rpx) * 28); line-height: 1.4; margin-bottom: calc(var(--rpx) * 8); }
+    .subline { color: #999; font-size: calc(var(--rpx) * 24); margin-bottom: calc(var(--rpx) * 6); }
+    .price { color: #fe2f02; font-size: calc(var(--rpx) * 28); margin-bottom: calc(var(--rpx) * 6); }
+    .ctime { color: #999; font-size: calc(var(--rpx) * 20); }
+    .op-delete {
+      margin-top: calc(var(--rpx) * 10);
+      display: inline-block; color: #f92028; font-size: calc(var(--rpx) * 24);
+      border: 1px solid #f9ada3; border-radius: calc(var(--rpx) * 20); padding: 2px 10px;
+    }
+
+    .specs-container { margin-top: calc(var(--rpx) * 12); display: flex; align-items: flex-start; }
+    .specs-title { font-size: calc(var(--rpx) * 24); color: #666; margin-right: calc(var(--rpx) * 10); white-space: nowrap; }
+    .specs-content { flex: 1; display: flex; flex-wrap: wrap; gap: calc(var(--rpx) * 10); }
+    .spec-tag {
+      padding: calc(var(--rpx) * 4) calc(var(--rpx) * 16);
+      background: #f5f5f5; border-radius: calc(var(--rpx) * 30);
+      font-size: calc(var(--rpx) * 24); color: #666; border: 1px solid #eee;
+    }
+    .spec-tag.selected { background: #e8f5e9; color: #07c160; border-color: #07c160; }
+    .view-all-btn {
+      padding: calc(var(--rpx) * 4) calc(var(--rpx) * 16);
+      color: #007aff; font-size: calc(var(--rpx) * 24);
+      white-space: nowrap; background: rgba(0,122,255,.1); border-radius: calc(var(--rpx) * 30);
+    }
+
+    .empty { text-align: center; color: #999; font-size: 14px; margin-top: 100px; }
+
+    .cart-submit {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 99;
+      background: #fff; border-top: 1px solid #e3e8ee; box-shadow: 0 2px 5px #e3e8ee;
+      padding: calc(var(--rpx) * 20) calc(var(--rpx) * 30) calc(var(--rpx) * 26);
+    }
+    .submit-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .left-box { display: flex; align-items: center; min-width: 0; }
+    .sel-text { margin-left: 8px; font-size: calc(var(--rpx) * 26); white-space: nowrap; }
+    .sub-btn {
+      width: calc(var(--rpx) * 400); height: calc(var(--rpx) * 88);
+      background: #fe2f02; border-radius: calc(var(--rpx) * 44);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: calc(var(--rpx) * 32);
+    }
+
+    .menu-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 998;
+      opacity: 0; pointer-events: none; transition: .25s;
+    }
+    .menu-mask.show { opacity: 1; pointer-events: auto; }
+    .menu-content {
+      position: fixed; top: 80px; right: 10px; min-width: 150px;
+      background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.1);
+      transform: scale(.85); opacity: 0; transition: .25s; z-index: 999; pointer-events: none;
+      padding: 8px 0;
+    }
+    .menu-content.show { transform: scale(1); opacity: 1; pointer-events: auto; }
+    .menu-item { display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-size: 14px; }
+    .menu-item:active { background: #f5f5f5; }
+
+    .toast {
+      position: fixed; left: 50%; top: 45%; transform: translate(-50%, -50%);
+      background: rgba(0,0,0,.78); color: #fff; border-radius: 8px;
+      padding: 10px 14px; font-size: 14px; z-index: 9999; display: none;
+      max-width: 82vw; text-align: center;
+    }
+    .load-more { text-align: center; color: #999; font-size: 13px; padding: 16px 0 6px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="main-title">
+      <div class="status_bar"></div>
+      <div class="nav-box">
+        <div class="nav_l" id="goBackBtn">‹</div>
+        <div class="nav_t">去铺货</div>
+        <div class="more-btn" id="moreBtn">⋯</div>
+      </div>
+    </div>
+
+    <div class="banvideo"></div>
+
+    <div class="content" id="content">
+      <div class="card-list" id="listRoot"></div>
+      <div class="empty" id="empty" style="display:none;">暂无数据</div>
+      <div class="load-more" id="loadMoreText"></div>
+    </div>
+
+    <div class="cart-submit">
+      <div class="submit-row">
+        <div class="left-box">
+          <div class="checkbox" id="allCheck"></div>
+          <div class="sel-text">全选 已选（<span id="selectedCount">0</span>）</div>
+        </div>
+        <div class="sub-btn" id="submitBtn">铺货到嘚嘚象</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-mask" id="menuMask"></div>
+  <div class="menu-content" id="menuContent">
+    <div class="menu-item" id="viewHistoryBtn">👁 查看记录</div>
+    <div class="menu-item" id="clearAllBtn">🗑 清空全部</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      function updateRpx() {
+        var w = Math.min(window.innerWidth, 750);
+        document.documentElement.style.setProperty('--rpx', (w / 750) + 'px');
+      }
+      updateRpx();
+      window.addEventListener('resize', updateRpx);
+
+      var state = {
+        websiteUrl: (function () {
+          var o = window.location.origin || '';
+          if (o === 'http://localhost:9000' || o.indexOf('ok9288.com') !== -1) return '';
+          return 'https://www.ok9288.com';
+        })(),
+        page: 1,
+        pageSize: 10,
+        dscLoading: false,
+        loadMoreStatus: 'more',
+        replenishList: [],
+        addprints: [],
+        selectedProducts: [],
+        selectedSpecs: [],
+      };
+
+      function getToken() { return localStorage.getItem('token') || ''; }
+      function getClientHash() { return localStorage.getItem('client_hash') || ''; }
+      function syncAuthFromUrl() {
+        try {
+          var params = new URLSearchParams(window.location.search || '');
+          var token = params.get('token');
+          var clientHash = params.get('client_hash') || params.get('clientHash');
+          if (token) localStorage.setItem('token', token);
+          if (clientHash) localStorage.setItem('client_hash', clientHash);
+        } catch (e) {}
+      }
+
+      var toastEl = document.getElementById('toast');
+      var toastTimer = null;
+      function toast(msg) {
+        if (!msg) return;
+        toastEl.textContent = String(msg);
+        toastEl.style.display = 'block';
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.style.display = 'none'; }, 1800);
+      }
+
+      async function request(path, method, data) {
+        if (!getToken()) throw new Error('auth_missing');
+        var url = state.websiteUrl + path;
+        var headers = {
+          'Content-Type': 'application/json',
+          'token': getToken(),
+          'X-Client-Hash': getClientHash()
+        };
+        var opts = { method: method || 'GET', headers: headers };
+        if (method && method.toUpperCase() !== 'GET') opts.body = JSON.stringify(data || {});
+        if ((!method || method.toUpperCase() === 'GET') && data) {
+          var q = new URLSearchParams(data).toString();
+          if (q) url += (url.indexOf('?') >= 0 ? '&' : '?') + q;
+        }
+        var res = await fetch(url, opts);
+        return await res.json().catch(function () { return {}; });
+      }
+
+      function isGoodsSelected(goodsId) { return state.selectedProducts.includes(goodsId); }
+      function isSpecSelected(productId) { return state.selectedSpecs.includes(productId); }
+
+      function getSelectedSpecCount(goods) {
+        if (!goods.attr_list) return 0;
+        var specIds = goods.attr_list.map(function (s) { return s.product_id; });
+        return state.selectedSpecs.filter(function (id) { return specIds.includes(id); }).length;
+      }
+
+      function selectGoodsWithAllSpecs(goods) {
+        if (!isGoodsSelected(goods.goods_id)) state.selectedProducts.push(goods.goods_id);
+        goods.checked = true;
+        if (!state.addprints.find(function (i) { return i.goods_id === goods.goods_id; })) {
+          state.addprints.push(goods);
+        }
+        (goods.attr_list || []).forEach(function (spec) {
+          if (!isSpecSelected(spec.product_id)) state.selectedSpecs.push(spec.product_id);
+        });
+        state.selectedSpecs = Array.from(new Set(state.selectedSpecs));
+      }
+
+      function unselectGoods(goods) {
+        state.selectedProducts = state.selectedProducts.filter(function (id) { return id !== goods.goods_id; });
+        state.addprints = state.addprints.filter(function (i) { return i.goods_id !== goods.goods_id; });
+        goods.checked = false;
+        var ids = (goods.attr_list || []).map(function (s) { return s.product_id; });
+        state.selectedSpecs = state.selectedSpecs.filter(function (id) { return !ids.includes(id); });
+      }
+
+      function toggleSpecSelection(productId, goods) {
+        var selected = isSpecSelected(productId);
+        var goodsSpecIds = (goods.attr_list || []).map(function (s) { return s.product_id; });
+        var selectedCount = state.selectedSpecs.filter(function (id) { return goodsSpecIds.includes(id); }).length;
+        if (selected) {
+          if (goods.checked && selectedCount <= 1) {
+            toast('每个商品至少保留一个规格');
+            return;
+          }
+          state.selectedSpecs = state.selectedSpecs.filter(function (id) { return id !== productId; });
+        } else {
+          if (!goods.checked) selectGoodsWithAllSpecs(goods);
+          if (!isSpecSelected(productId)) state.selectedSpecs.push(productId);
+        }
+        render();
+      }
+
+      function updateAllSelectedState() {
+        var all = state.replenishList.length > 0 && state.replenishList.every(function (it) { return !!it.checked; });
+        var el = document.getElementById('allCheck');
+        el.className = 'checkbox' + (all ? ' checked' : '');
+        el.textContent = all ? '✓' : '';
+      }
+
+      function render() {
+        var root = document.getElementById('listRoot');
+        var empty = document.getElementById('empty');
+        root.innerHTML = '';
+        if (!state.replenishList.length) {
+          empty.style.display = '';
+        } else {
+          empty.style.display = 'none';
+        }
+
+        state.replenishList.forEach(function (item, index) {
+          var card = document.createElement('div');
+          card.className = 'item-card';
+          var attrCount = (item.attr_list || []).length;
+          var specStatus = item.checked
+            ? ('已选' + getSelectedSpecCount(item) + '个规格')
+            : (attrCount === 1 ? ((item.attr_list[0] && item.attr_list[0].attr_name) || '') : (attrCount + '个规格可选'));
+
+          card.innerHTML = `
+            <div class="item-row">
+              <div class="checkbox ${item.checked ? 'checked' : ''}" data-act="check" data-index="${index}">${item.checked ? '✓' : ''}</div>
+              <div class="goods-img"><img src="${item.goods_img || ''}" alt=""></div>
+              <div class="goods-right">
+                <div class="name">${item.goods_name || ''}</div>
+                <div class="subline">${specStatus}</div>
+                <div class="price">¥${Number(item.product_price || 0).toFixed(2)}</div>
+                <div class="ctime">创建时间：${item.create_time || ''}</div>
+                <span class="op-delete" data-act="delete" data-index="${index}">删除</span>
+              </div>
+            </div>
+            ${(item.attr_list && item.attr_list.length) ? `
+            <div class="specs-container">
+              <div class="specs-title">规格：</div>
+              <div class="specs-content" id="specs-${index}"></div>
+            </div>` : ''}
+          `;
+          root.appendChild(card);
+
+          if (item.attr_list && item.attr_list.length) {
+            var specsRoot = card.querySelector('#specs-' + index);
+            var showAll = !!item.showAllSpecs;
+            item.attr_list.forEach(function (spec, specIndex) {
+              if (!showAll && specIndex >= 3) return;
+              var tag = document.createElement('div');
+              tag.className = 'spec-tag' + (isSpecSelected(spec.product_id) ? ' selected' : '');
+              tag.textContent = spec.attr_name || '';
+              tag.onclick = function () { toggleSpecSelection(spec.product_id, item); };
+              specsRoot.appendChild(tag);
+            });
+            if (item.attr_list.length > 3) {
+              var btn = document.createElement('div');
+              btn.className = 'view-all-btn';
+              btn.textContent = showAll ? '收起' : ('查看全部(' + item.attr_list.length + ')');
+              btn.onclick = function () { item.showAllSpecs = !item.showAllSpecs; render(); };
+              specsRoot.appendChild(btn);
+            }
+          }
+        });
+
+        document.getElementById('selectedCount').textContent = state.addprints.length;
+        updateAllSelectedState();
+        var loadTxt = document.getElementById('loadMoreText');
+        loadTxt.textContent = state.loadMoreStatus === 'loading'
+          ? '加载中...'
+          : (state.loadMoreStatus === 'noMore' ? '没有更多了' : '');
+      }
+
+      async function getlaylist(page) {
+        if (state.loadMoreStatus === 'loading' || state.loadMoreStatus === 'noMore') return;
+        state.page = page || 1;
+        state.loadMoreStatus = 'loading';
+        render();
+        try {
+          var res = await request('/api/puhuo/getpuhuogoodslist', 'GET', { page: state.page });
+          if (res.status === 'success') {
+            var list = res.data || [];
+            list.forEach(function (it) { it.checked = false; it.showAllSpecs = false; });
+            if (state.page > 1) state.replenishList = state.replenishList.concat(list);
+            else state.replenishList = list;
+            state.loadMoreStatus = list.length < state.pageSize ? 'noMore' : 'more';
+          } else {
+            state.loadMoreStatus = 'more';
+          }
+        } catch (e) {
+          state.loadMoreStatus = 'more';
+          if (String(e.message || '') === 'auth_missing') toast('登录信息缺失，请从详情页重新进入');
+        }
+        render();
+      }
+
+      async function deleteOne(item) {
+        if (!confirm('确定删除此铺货商品吗？')) return;
+        try {
+          var res = await request('/api/puhuo/delpuhuogoodslist', 'GET', { goods_id: item.goods_id, type: 0 });
+          toast((res && res.data) || '删除成功');
+          state.replenishList = state.replenishList.filter(function (g) { return g.goods_id !== item.goods_id; });
+          state.addprints = state.addprints.filter(function (g) { return g.goods_id !== item.goods_id; });
+          state.selectedProducts = state.selectedProducts.filter(function (id) { return id !== item.goods_id; });
+          var ids = (item.attr_list || []).map(function (s) { return s.product_id; });
+          state.selectedSpecs = state.selectedSpecs.filter(function (id) { return !ids.includes(id); });
+          render();
+        } catch (e) {
+          toast('删除失败');
+        }
+      }
+
+      async function clearAll() {
+        if (!confirm('确定要清空全部记录吗？')) return;
+        try {
+          var res = await request('/api/puhuo/delpuhuogoodslist', 'POST', { type: 1 });
+          toast((res && res.data) || '已清空');
+          state.replenishList = [];
+          state.addprints = [];
+          state.selectedProducts = [];
+          state.selectedSpecs = [];
+          state.page = 1;
+          state.loadMoreStatus = 'more';
+          render();
+          getlaylist(1);
+        } catch (e) {
+          toast('操作失败');
+        }
+      }
+
+      async function toqqshop() {
+        if (!state.addprints.length) { toast('至少选择一个商品'); return; }
+        var goodsIds = state.addprints.map(function (i) { return i.goods_id; }).join(',');
+        var productIds = state.selectedSpecs.join(',');
+        if (!confirm('确定要铺货到嘚嘚象吗？')) return;
+        try {
+          var res = await request('/api/puhuo/onepuhuoqingqu', 'POST', {
+            goods_id: goodsIds,
+            product_id: productIds,
+            type: 1
+          });
+          if (res && res.errors && res.errors.code == 0) {
+            toast(res.data || res.errors.message || '操作失败');
+          } else {
+            toast((res && res.data) || '操作成功');
+          }
+        } catch (e) {
+          toast('操作失败');
+        }
+      }
+
+      function checkGoods(item) {
+        if (item.checked) unselectGoods(item);
+        else selectGoodsWithAllSpecs(item);
+        render();
+      }
+
+      function checkAll() {
+        var all = state.replenishList.length > 0 && state.replenishList.every(function (it) { return !!it.checked; });
+        if (all) {
+          state.replenishList.forEach(unselectGoods);
+        } else {
+          state.replenishList.forEach(selectGoodsWithAllSpecs);
+        }
+        render();
+      }
+
+      function bindEvents() {
+        document.getElementById('goBackBtn').onclick = function () { history.back(); };
+        document.getElementById('submitBtn').onclick = toqqshop;
+        document.getElementById('allCheck').onclick = checkAll;
+
+        var mask = document.getElementById('menuMask');
+        var menu = document.getElementById('menuContent');
+        document.getElementById('moreBtn').onclick = function () {
+          mask.classList.add('show');
+          menu.classList.add('show');
+        };
+        mask.onclick = function () {
+          mask.classList.remove('show');
+          menu.classList.remove('show');
+        };
+        document.getElementById('viewHistoryBtn').onclick = function () {
+          window.location.href = '/mobile/#/pagesC/importLog/importLog';
+        };
+        document.getElementById('clearAllBtn').onclick = function () {
+          mask.click();
+          clearAll();
+        };
+
+        document.getElementById('listRoot').addEventListener('click', function (e) {
+          var t = e.target;
+          var act = t.getAttribute('data-act');
+          if (!act) return;
+          var idx = Number(t.getAttribute('data-index'));
+          var item = state.replenishList[idx];
+          if (!item) return;
+          if (act === 'check') checkGoods(item);
+          if (act === 'delete') deleteOne(item);
+        });
+
+        var content = document.getElementById('content');
+        content.addEventListener('scroll', function () {
+          if (state.dscLoading) return;
+          if (state.loadMoreStatus === 'noMore' || state.loadMoreStatus === 'loading') return;
+          if (content.scrollTop + content.clientHeight + 80 >= content.scrollHeight) {
+            getlaylist(state.page + 1);
+          }
+        });
+      }
+
+      syncAuthFromUrl();
+      bindEvents();
+      getlaylist(1);
+    })();
+  </script>
+</body>
+</html>

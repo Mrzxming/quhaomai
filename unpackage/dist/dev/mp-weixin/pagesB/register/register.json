@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "uni-popup": "/components/uni-popup",
+    "jyf-parser": "/components/jyf-parser/jyf-parser",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "captcha": "/components/captcha4/index"
+  }
+}

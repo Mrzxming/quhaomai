@@ -1,0 +1,60 @@
+
+.address-items{ padding-bottom: 120rpx;
+}
+.address-item{ background: #FFFFFF; padding: 20rpx; display: flex; flex-direction: row; margin-bottom: 20rpx;}
+.address-item:last-child{ margin-bottom: 0;
+}
+.address-item .address-content{ display: flex; flex-direction: row; flex: 1; justify-content: space-between; align-items: center;}
+.address-item .address-content .left{ flex: 1;}
+.address-item .address-content .left view{ line-height: 1.5; font-size: 26rpx;}
+.address-item .address-content .title{ font-weight: 700;}
+.address-item .address-content .title .name{ margin-right: 15rpx;}
+.address-item .address-content .address{ color: #666666;}
+.address-item .address-content .right{ display: flex; flex-direction: row;}
+.address-item .address-content .right view{ line-height: 1.5; font-size: 26rpx; padding: 20rpx;}
+.address-info-show .uni-card{ margin: 0;}
+.address-info-show .uni-card .uni-list-cell-navigate{ padding: 0;}
+.address-info-show .uni-card .uni-list-cell-navigate .title{ padding: 20rpx 30rpx; min-width: 100rpx; font-size: 28rpx;}
+.address-info-show .uni-card .uni-list-cell-navigate .value text{ width: 100%;}
+.address-info-show .uni-card .uni-list-cell-navigate .value input{ height: 40px; line-height: 40px;}
+.address-info-show .btn-bar{ margin: 30rpx 40rpx; display: flex; flex-direction: column;}
+.address-info-show .btn-bar .btn{ width: 100%; margin-bottom: 30rpx;}
+.container {
+	background-color: #fff;
+}
+.select_post {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20rpx;
+	background-color: #FFFFFF;
+	margin-bottom: 20rpx;
+}
+.none_lauout {
+		display: flex;
+		width: 100%;
+		height: 100%;
+		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+}
+.none_img {
+	margin-left: -30rpx;
+	width: 260rpx;
+	height: 260rpx;
+}
+.butadd {
+	width: 688rpx;
+	height: 88rpx;
+	background: #FE2F02;
+	box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(192,192,192,0.15);
+	border-radius: 44rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	margin: 76rpx 32rpx;
+}
+.btn-color-white {
+		color:#fff
+}
+

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "发布帖子",
+  "usingComponents": {
+    "discover-goods": "/components/dsc-discover/goods",
+    "discover-nav": "/components/dsc-discover/nav",
+    "discover-list": "/components/dsc-discover/list"
+  }
+}

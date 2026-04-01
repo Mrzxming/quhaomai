@@ -1,0 +1,11 @@
+
+.scan-img{ width: 750rpx; height: 450rpx;}
+.scan-content{ text-align: center;
+}
+.scan-content .title{ font-size: 35rpx; color: #000000; margin-top: 50rpx;}
+.scan-content .subtitle{ color: #999999; margin-top: 20rpx;}
+.scan-content .subtitle view{ line-height: 1.5;}
+.scan-content .btn{ margin: 0 100rpx; padding-top: 20rpx;}
+.scan-content .btn button{ margin-top: 30rpx; font-size:16px;}
+.scan-content .btn button[type=default]{ background: #FFFFFF; color: #999999;}
+

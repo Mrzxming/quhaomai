@@ -1,0 +1,20 @@
+{
+  "enablePullDownRefresh": false,
+  "backgroundColorTop": "#F5F5F5",
+  "backgroundColorBottom": "#F5F5F5",
+  "backgroundColor": "#F5F5F5",
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "white",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-popup": "/components/uni-popup",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-copyright": "/components/dsc-copyright/dsc-copyright",
+    "tabbar": "/components/zdy-tabbar/zdy-tabbar",
+    "dsc-product-pick": "/components/visualization/product-pick/Frontend",
+    "dsc-product-list": "/components/dsc-product-list",
+    "uni-status-bar": "/components/uni-status-bar",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

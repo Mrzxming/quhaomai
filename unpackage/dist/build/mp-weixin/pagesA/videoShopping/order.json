@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "视频号商品订单",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "uni-tag": "/components/uni-tag",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

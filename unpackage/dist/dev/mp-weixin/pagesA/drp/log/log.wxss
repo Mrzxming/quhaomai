@@ -1,0 +1,16 @@
+
+.section-list .list.data-v-3a2da988{ padding: 30rpx 36rpx; background-color: #FFFFFF; border-bottom: 2rpx solid #e3e8ee; display: flex; flex-direction: column;}
+.section-list .list .hd.data-v-3a2da988{ display: flex; flex-direction: row; justify-content: space-between; align-items: center;}
+.section-list .list .hd .left.data-v-3a2da988{ display: flex; flex-direction: row; justify-content: flex-start; align-items: center;
+}
+.section-list .list .hd .left .price.data-v-3a2da988{ color: #F2031F; margin-right: 20rpx; font-size: 40rpx;}
+.section-list .list .hd .left .price icon.data-v-3a2da988{ font-size: 25rpx;
+}
+.section-list .list .hd .left .log-tag.data-v-3a2da988{ display: flex; justify-content: center; align-items: center; border-radius: 50rpx; padding: 0 20rpx; border: 2rpx solid #B78D5A; color: #B78D5A; font-size: 25rpx;}
+.section-list .list .hd .left .log-tag.active.data-v-3a2da988{ background: linear-gradient(118deg, #ecd8be, #dbb280);
+}
+.section-list .list .hd .right.data-v-3a2da988{ font-size: 28rpx; color: #666;}
+.section-list .list .fd view.data-v-3a2da988{ font-size: 25rpx; color: #999999;}
+.tab-bar.data-v-3a2da988{
+}
+

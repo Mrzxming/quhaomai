@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "退换货详情",
+  "usingComponents": {
+    "uni-popup": "/components/uni-popup",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "礼品卡",
+  "usingComponents": {
+    "dsc-common-nav": "/components/dsc-common-nav"
+  }
+}

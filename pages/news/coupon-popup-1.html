@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>优惠券弹窗 - 红包造型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .popup-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 1000;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes popIn {
+            0% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .glow-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 23, 68, 0.3);
+            pointer-events: none;
+            animation: ringExpand 3s ease-out infinite;
+        }
+
+        .glow-ring:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .glow-ring:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        @keyframes ringExpand {
+            0% {
+                width: 300px;
+                height: 300px;
+                opacity: 1;
+            }
+            100% {
+                width: 500px;
+                height: 500px;
+                opacity: 0;
+            }
+        }
+
+        .light-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #FF1744;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #FF1744;
+            animation: particleFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-30px) scale(1);
+            }
+        }
+
+        .particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 40%; right: 15%; animation-delay: 0.5s; }
+        .particle:nth-child(3) { top: 60%; left: 20%; animation-delay: 1s; }
+        .particle:nth-child(4) { top: 30%; right: 25%; animation-delay: 1.5s; }
+        .particle:nth-child(5) { top: 70%; left: 15%; animation-delay: 2s; }
+        .particle:nth-child(6) { top: 50%; right: 10%; animation-delay: 2.5s; }
+
+        .popup {
+            width: 300px;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(255, 23, 68, 0.6),
+                        0 0 120px rgba(255, 23, 68, 0.4),
+                        0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 0 60px rgba(255, 23, 68, 0.6),
+                            0 0 120px rgba(255, 23, 68, 0.4),
+                            0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(255, 23, 68, 0.8),
+                            0 0 160px rgba(255, 23, 68, 0.6),
+                            0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .red-envelope {
+            background: linear-gradient(135deg, #FF1744 0%, #F50057 100%);
+            padding: 25px 20px 0;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 85%, 0 75%);
+        }
+
+        .red-envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .title {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .amount-wrapper {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .amount {
+            font-size: 72px;
+            font-weight: 900;
+            color: #FFF;
+            line-height: 1;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .amount-currency {
+            font-size: 32px;
+            vertical-align: super;
+            margin-right: 2px;
+        }
+
+        .amount-unit {
+            font-size: 24px;
+            margin-left: 5px;
+        }
+
+        .condition {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .white-section {
+            background: #fff;
+            padding: 25px 20px 20px;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 18px;
+        }
+
+        .timer-wrapper {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .countdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 32px;
+            color: #FF1744;
+            font-weight: 800;
+            font-family: 'DIN Alternate', 'Arial', sans-serif;
+            margin-bottom: 8px;
+        }
+
+        .time-value {
+            background: #FFF0F0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .time-separator {
+            color: #FF1744;
+            font-weight: 700;
+            margin: 0 2px;
+        }
+
+        .milliseconds {
+            display: inline-block;
+            background: #FFF0F0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 32px;
+            color: #FF1744;
+            font-weight: 800;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .expire-hint {
+            font-size: 13px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .use-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF1744, #F50057);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 23, 68, 0.4);
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .use-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 6px 20px rgba(255, 23, 68, 0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .close-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        .close-btn-circle {
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #fff;
+            animation: countdown 5s linear forwards;
+        }
+
+        @keyframes countdown {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .close-btn-text {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .close-icon {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            stroke-width: 3;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" onclick="closePopup()"></div>
+    <div class="popup-container">
+        <div class="glow-ring"></div>
+        <div class="glow-ring"></div>
+        <div class="glow-ring"></div>
+        <div class="light-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        
+        <div class="popup">
+            <div class="red-envelope">
+                <div class="title">年度限时大促</div>
+                <div class="amount-wrapper">
+                    <div class="amount">
+                        <span class="amount-currency">¥</span><span id="amount">5</span><span class="amount-unit">元</span>
+                    </div>
+                </div>
+                <div class="condition">满75元可用</div>
+            </div>
+            
+            <div class="white-section">
+                <div class="message">领取后立即使用</div>
+                <div class="timer-wrapper">
+                    <div class="countdown">
+                        <span class="time-value" id="minutes">10</span>
+                        <span class="time-separator">:</span>
+                        <span class="time-value" id="seconds">00</span>
+                        <span class="time-separator">:</span>
+                        <span class="milliseconds" id="milliseconds">00</span>
+                    </div>
+                    <div class="expire-hint">后失效</div>
+                </div>
+                <button class="use-btn" onclick="useCoupon()">立即领取</button>
+            </div>
+        </div>
+        
+        <button class="close-btn" onclick="closePopup()">
+            <div class="close-btn-circle"></div>
+            <div class="close-btn-text"><span id="closeCountdown">5</span>s 后关闭</div>
+            <svg class="close-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        let totalMilliseconds = 10 * 60 * 1000;
+        let closeCountdown = 5;
+
+        function updateCountdown() {
+            const minutes = Math.floor(totalMilliseconds / 60000);
+            const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
+            const centiseconds = Math.floor((totalMilliseconds % 1000) / 10);
+
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            document.getElementById('milliseconds').textContent = String(centiseconds).padStart(2, '0');
+
+            if (totalMilliseconds > 0) {
+                totalMilliseconds -= 10;
+            }
+        }
+
+        function updateCloseCountdown() {
+            document.getElementById('closeCountdown').textContent = closeCountdown;
+            if (closeCountdown > 0) {
+                closeCountdown--;
+            } else {
+                closePopup();
+            }
+        }
+
+        setInterval(updateCountdown, 10);
+        setInterval(updateCloseCountdown, 1000);
+        updateCountdown();
+        updateCloseCountdown();
+
+        function closePopup() {
+            document.querySelector('.popup-container').style.animation = 'none';
+            document.querySelector('.popup-container').style.transform = 'translate(-50%, -50%) scale(0)';
+            document.querySelector('.popup-container').style.opacity = '0';
+            document.querySelector('.overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.querySelector('.overlay').style.display = 'none';
+                document.querySelector('.popup-container').style.display = 'none';
+            }, 300);
+        }
+
+        function useCoupon() {
+            alert('跳转到优惠券使用页面');
+            closePopup();
+        }
+    </script>
+</body>
+</html>

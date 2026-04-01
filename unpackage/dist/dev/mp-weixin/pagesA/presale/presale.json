@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "预售",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-popup": "/components/uni-popup",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-tabbar": "/components/dsc-tabbar"
+  }
+}

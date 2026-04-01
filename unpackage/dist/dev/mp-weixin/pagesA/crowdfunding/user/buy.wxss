@@ -1,0 +1,8 @@
+
+.goods-list.data-v-64e3a986{ padding-top: 50px;}
+.goods-list .goods-item.data-v-64e3a986{ border-top: 0;}
+.goods-list .goods-cont.data-v-64e3a986{ font-size: 25rpx; color: #999; line-height: 1.5;}
+.goods-list .goods-cont .uni-red.data-v-64e3a986{ margin: 0 5rpx;}
+.tab-bar.data-v-64e3a986{
+}
+

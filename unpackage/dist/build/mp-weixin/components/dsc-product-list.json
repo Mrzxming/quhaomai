@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-popups": "/components/uni-popup/uni-popup_1"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "uni-popups": "/components/uni-popup/uni-popup_1",
+    "dsc-product-list": "/components/dsc-product-list"
+  }
+}

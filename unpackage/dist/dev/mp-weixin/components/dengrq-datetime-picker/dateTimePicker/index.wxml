@@ -1,0 +1,1 @@
+<view class="datetime-picker data-v-181ad5f8"><custom-picker-view vue-id="eb3ee6fc-1" columns="{{dateConfig}}" selectVals="{{selectVals}}" data-event-opts="{{[['^onChange',[['onChangePickerValue']]]]}}" bind:onChange="__e" class="data-v-181ad5f8" bind:__l="__l"></custom-picker-view></view>

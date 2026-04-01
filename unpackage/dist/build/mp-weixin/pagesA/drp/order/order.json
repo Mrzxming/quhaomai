@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "分销订单",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-popups": "/components/uni-popup/uni-popup_1"
+  }
+}

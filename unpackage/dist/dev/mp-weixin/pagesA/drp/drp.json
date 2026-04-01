@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "分销活动",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "退换货申请",
+  "usingComponents": {
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-number-box": "/components/uni-number-box",
+    "dsc-region": "/components/dsc-region"
+  }
+}

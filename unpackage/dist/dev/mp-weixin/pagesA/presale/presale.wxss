@@ -1,0 +1,18 @@
+
+.presale{ padding-bottom: 120rpx;
+}
+.presale-list .title{ background: #FFFFFF; display: flex; justify-content: space-between; align-items: center; padding: 20rpx;
+}
+.presale-list .title .text{ font-size: 30rpx; color: #333333;
+}
+.presale-list .title .more{ display: flex; justify-content: flex-end; align-items: center; color: #99999;}
+.presale-list .title .more .uni-icon{ display: block;
+}
+.presale-list .goods-list .plan-box{ display: flex; justify-content: flex-start;}
+.presale-list .goods-list .plan-box .market{ text-decoration: line-through; font-size: 25rpx; margin-left: 10rpx;
+}
+.presale-category .list{ padding: 15rpx 0; border-bottom: 2rpx solid #f4f4f4; color: #333;}
+.goods-item{ position: relative;
+}
+.already-over{ width: 100rpx; height: 100rpx; position: absolute; bottom: 10rpx; right: 20rpx; z-index: 9;}
+

@@ -1,0 +1,18 @@
+{
+  "enablePullDownRefresh": true,
+  "backgroundColorTop": "#F5F5F5",
+  "backgroundColorBottom": "#F5F5F5",
+  "backgroundColor": "#F5F5F5",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "x-skeleton": "/uni_modules/x-skeleton/components/x-skeleton/x-skeleton",
+    "uni-swipe-action": "/components/uni-swipe-action/uni-swipe-action",
+    "uni-swipe-action-item": "/components/uni-swipe-action-item/uni-swipe-action-item",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "custom-tabbar": "/components/custom-tabbar/custom-tabbar",
+    "dsc-not-content": "/components/dsc-not-content",
+    "tabbar": "/components/zdy-tabbar/zdy-tabbar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

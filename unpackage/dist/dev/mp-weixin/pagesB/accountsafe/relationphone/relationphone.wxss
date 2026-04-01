@@ -1,0 +1,10 @@
+
+.user-lr-form .item-input label.data-v-570792bd{ width: auto; height: 1.4rem; line-height: 1.4rem;
+}
+.tips.data-v-570792bd{ font-size: 25rpx; color: #888888; margin-top: 10rpx;}
+.phone.data-v-570792bd{
+	font-size: 24rpx;
+	margin-top: 30rpx;
+	color: #999999;
+}
+

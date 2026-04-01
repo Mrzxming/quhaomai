@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "custom-picker-view": "/components/dengrq-datetime-picker/customPickerView/index"
+  }
+}

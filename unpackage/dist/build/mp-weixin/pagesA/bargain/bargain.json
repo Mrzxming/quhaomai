@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "砍价首页",
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more",
+    "dsc-product-list": "/components/dsc-product-list",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-tabbar": "/components/dsc-tabbar"
+  }
+}

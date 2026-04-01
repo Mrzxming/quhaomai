@@ -1,0 +1,13 @@
+{
+  "enablePullDownRefresh": false,
+  "navigationBarTitleText": "会员权益",
+  "navigationBarLeftOption": "backButton",
+  "navigationBarBackgroundColor": "#d2bb87",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "custom-tabbar": "/components/custom-tabbar/custom-tabbar",
+    "uni-popups": "/components/uni-popup/uni-popup_1",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav"
+  }
+}

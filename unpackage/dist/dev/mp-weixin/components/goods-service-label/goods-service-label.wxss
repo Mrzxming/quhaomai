@@ -1,0 +1,155 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 样式保持不变 */
+.label-box.data-v-22c8ed50 {
+  display: flex;
+  font-size: 24rpx;
+  margin-top: 10rpx;
+  overflow: hidden;
+}
+.label-item.data-v-22c8ed50 {
+  margin-right: 8rpx;
+  min-width: -webkit-fit-content;
+  min-width: fit-content;
+}
+.zero-label.data-v-22c8ed50 {
+  color: #09B248;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 12px;
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.05);
+  font-style: normal;
+}
+.zero-tag.data-v-22c8ed50 {
+  color: #FF7705;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 12px;
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.05);
+  font-style: normal;
+}
+.first-label.data-v-22c8ed50 {
+  color: #09B248;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 12px;
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.05);
+  font-style: normal;
+}
+.second-label.data-v-22c8ed50 {
+  color: #A2A2A2;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 12px;
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.05);
+  font-style: normal;
+}
+

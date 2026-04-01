@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "商品搬家记录",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "tui-list-cell": "/components/list-cell/list-cell",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

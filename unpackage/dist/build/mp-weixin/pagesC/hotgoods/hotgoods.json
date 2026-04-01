@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "热销",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-community": "/components/dsc-community/community",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

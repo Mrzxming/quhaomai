@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>首页</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- SVG图标库 -->
+    <div style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg">
+            <symbol id="icon-signal" viewBox="0 0 24 24"><path fill="currentColor" d="M2 22h4V10H2v12zm6-6h4V2h-4v14zm6 6h4V6h-4v16zm6-10v10h4V12h-4z"/></symbol>
+            <symbol id="icon-wifi" viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-7.24 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></symbol>
+            <symbol id="icon-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
+            <symbol id="icon-search" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+            <symbol id="icon-fire" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></symbol>
+            <symbol id="icon-home" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+            <symbol id="icon-message" viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></symbol>
+            <symbol id="icon-vip" viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></symbol>
+            <symbol id="icon-cart" viewBox="0 0 24 24"><path fill="currentColor" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></symbol>
+            <symbol id="icon-user" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+            <symbol id="icon-close" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+        </svg>
+    </div>
+
+    <!-- 首页 -->
+    <div class="page" id="home-page">
+        <div class="status-bar">
+            <span class="time">16:42</span>
+            <div class="status-icons">
+                <svg class="icon"><use href="#icon-signal"/></svg>
+                <svg class="icon"><use href="#icon-wifi"/></svg>
+                <span class="battery">85%</span>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <button class="menu-btn">
+                <svg class="icon"><use href="#icon-menu"/></svg>
+            </button>
+            <div class="search-input-wrapper">
+                <svg class="icon search-icon"><use href="#icon-search"/></svg>
+                <input type="text" placeholder="避孕套" class="search-input">
+            </div>
+            <button class="search-btn">搜索</button>
+        </div>
+
+        <div class="category-tabs">
+            <span class="tab active">推荐</span>
+            <span class="tab">避孕套</span>
+            <span class="tab">情趣内衣</span>
+            <span class="tab">震动棒</span>
+            <span class="tab">润滑液</span>
+            <span class="tab">全部分类</span>
+        </div>
+
+        <div class="product-grid">
+            <!-- 商品卡片1 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/160x160" alt="商品" class="card-image">
+                <h3 class="card-title">爽避孕套3只装男用成人...</h3>
+                <div class="card-price">
+                    <span class="price">¥0.85</span>
+                    <span class="original">运费¥2元</span>
+                    <span class="tag-new">新人价</span>
+                </div>
+                <div class="card-info">
+                    <span>回头率79% 24小时发货</span>
+                </div>
+                <div class="card-sold">已售478件</div>
+            </div>
+
+            <!-- 商品卡片2 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/160x160" alt="商品" class="card-image">
+                <h3 class="card-title">震动棒3只装男用成人...</h3>
+                <div class="card-price">
+                    <span class="price">¥0.68</span>
+                    <span class="original">运费¥2元</span>
+                    <span class="tag-new">新人价</span>
+                </div>
+                <div class="card-info">
+                    <span>回头率75% 24小时发货</span>
+                </div>
+                <div class="card-sold">已售1000+件</div>
+            </div>
+
+            <!-- 商品卡片3 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/160x200" alt="商品" class="card-image">
+                <div class="card-badges">
+                    <span class="badge">3片装</span>
+                    <span class="badge">进口货</span>
+                </div>
+                <h3 class="card-title">来乐奶茶口交男用催酸便携自慰器名器倒模飞机...</h3>
+                <div class="card-price">
+                    <span class="price">¥8.6</span>
+                    <span class="original">运费¥2元</span>
+                    <span class="tag-new">新人价</span>
+                </div>
+                <div class="card-info">
+                    <span>回头率100% 24小时发货</span>
+                </div>
+                <div class="card-sold">已售204件</div>
+            </div>
+
+            <!-- 商品卡片4 -->
+            <div class="product-card">
+                <div class="card-badge-top">
+                    <svg class="icon fire-icon"><use href="#icon-fire"/></svg>
+                    <span>首单减1元</span>
+                </div>
+                <img src="https://via.placeholder.com/160x200" alt="商品" class="card-image">
+                <h3 class="card-title">【咨询客服有优惠】冈本纯粹孕套3只装超薄男用...</h3>
+                <div class="card-price">
+                    <span class="price">¥8.83</span>
+                    <span class="original">运费¥2元</span>
+                    <span class="tag-new">新人价</span>
+                </div>
+                <div class="card-info">
+                    <span>回头率61% 24小时发货</span>
+                </div>
+                <div class="card-sold">已售6000+件</div>
+            </div>
+
+            <!-- 商品卡片5 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/160x200" alt="商品" class="card-image">
+                <h3 class="card-title">超薄金真超薄</h3>
+                <div class="card-price">
+                    <span class="price">¥9.9</span>
+                </div>
+            </div>
+
+            <!-- 商品卡片6 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/160x200" alt="商品" class="card-image">
+                <h3 class="card-title">私处润滑剂</h3>
+                <div class="card-price">
+                    <span class="price">¥12.8</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <svg class="icon"><use href="#icon-home"/></svg>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <svg class="icon"><use href="#icon-message"/></svg>
+                <span>消息</span>
+            </div>
+            <div class="nav-item">
+                <svg class="icon"><use href="#icon-vip"/></svg>
+                <span>黑卡</span>
+            </div>
+            <div class="nav-item">
+                <svg class="icon"><use href="#icon-cart"/></svg>
+                <span>采购车</span>
+            </div>
+            <div class="nav-item">
+                <svg class="icon"><use href="#icon-user"/></svg>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

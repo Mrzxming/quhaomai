@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "支付密码",
+  "usingComponents": {
+    "verification-code-style2": "/components/verification-code-style2",
+    "captcha": "/components/captcha4/index"
+  }
+}

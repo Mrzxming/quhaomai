@@ -1,0 +1,14 @@
+
+.community-box.data-v-49439524{}
+.community-box .selects.data-v-49439524{ background: #FFFFFF; padding: 20rpx; display: flex; flex-direction: row;
+}
+.community-box .community-box-con.data-v-49439524{ background:#FFFFFF;
+}
+.community-box .community-box-con .com-input-title.data-v-49439524{ padding: 20rpx; border-bottom: 2rpx solid #F6F6F9;}
+.community-box .community-box-con .com-textarea.data-v-49439524{ padding: 20rpx;
+}
+.community-box .community-box-con .com-textarea .text-area1.data-v-49439524{ width: 100%;}
+.community-box .community-box-con .com-textarea text.data-v-49439524{ text-align: right; display: block; color: #999;
+}
+.btn-bar .btn.data-v-49439524{ margin: 30rpx 20rpx;}
+

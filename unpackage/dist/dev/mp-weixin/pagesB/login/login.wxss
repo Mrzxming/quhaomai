@@ -1,0 +1,469 @@
+@charset "UTF-8";
+/* 禁止页面横向拖动，只一屏显示 */
+page {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100%;
+}
+@charset "UTF-8";
+/* 禁止整页横向拖动，只一屏显示 */
+.container-bwg.data-v-1b1aba80 {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+/* app端样式 */
+.container-login.data-v-1b1aba80 {
+  /* 顶部 #FFD4C8，以下尽早过渡为 #F8F8F8，避免 APP 底部出现偏粉黄 */
+  background: linear-gradient(180deg, #FFD4C8 0%, #F8F8F8 22%, #F8F8F8 100%);
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+.container-login .back-btn.data-v-1b1aba80 {
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: #333;
+  font-size: 24px;
+}
+.container-login .login-header.data-v-1b1aba80 {
+  padding: 60px 30px 24px;
+  text-align: center;
+}
+.container-login .login-header .page-title.data-v-1b1aba80 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+.container-login .login-form.data-v-1b1aba80 {
+  background: #F8F8F8;
+  border-radius: 24px 24px 0 0;
+  padding: 32px 24px 20px;
+  position: relative;
+}
+.container-login .login-form .input-group.data-v-1b1aba80 {
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+.container-login .login-form .input-group .input.data-v-1b1aba80 {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+}
+.container-login .login-form .input-group .input.data-v-1b1aba80::-webkit-input-placeholder {
+  color: #BFBFBF;
+}
+.container-login .login-form .input-group .input.data-v-1b1aba80::placeholder {
+  color: #BFBFBF;
+}
+.container-login .login-form .password-group.data-v-1b1aba80 {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* 与参考 quhaoma-account-login.html 一致：24x24；APP 用 iconfont 兜底 */
+}
+.container-login .login-form .password-group .input.data-v-1b1aba80 {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+}
+.container-login .login-form .password-group .input.data-v-1b1aba80::-webkit-input-placeholder {
+  color: #BFBFBF;
+}
+.container-login .login-form .password-group .input.data-v-1b1aba80::placeholder {
+  color: #BFBFBF;
+}
+.container-login .login-form .password-group .eye-icon.data-v-1b1aba80 {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 22px;
+}
+.container-login .login-form .password-group .eye-icon svg.data-v-1b1aba80 {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.container-login .login-form .code-input-group.data-v-1b1aba80 {
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.container-login .login-form .code-input-group .input.data-v-1b1aba80 {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+}
+.container-login .login-form .code-input-group .input.data-v-1b1aba80::-webkit-input-placeholder {
+  color: #BFBFBF;
+}
+.container-login .login-form .code-input-group .input.data-v-1b1aba80::placeholder {
+  color: #BFBFBF;
+}
+.container-login .login-form .code-input-group .get-code-btn.data-v-1b1aba80 {
+  font-size: 14px;
+  color: #D23328;
+  background: none;
+  border: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.container-login .login-form .forgot-password.data-v-1b1aba80 {
+  text-align: right;
+  margin-bottom: 16px;
+}
+.container-login .login-form .forgot-password .forgot-link.data-v-1b1aba80 {
+  color: #D23328;
+  font-size: 13px;
+  text-decoration: none;
+}
+.container-login .login-form .login-btn.data-v-1b1aba80 {
+  width: 100%;
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  padding: 0 !important;
+  line-height: 56px !important;
+  background: #D23328;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.container-login .login-form .login-btn.data-v-1b1aba80:active {
+  opacity: 0.9;
+}
+.container-login .login-form .login-btn.btn-disabled.data-v-1b1aba80 {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.container-login .login-form .login-btn.one-click-btn.data-v-1b1aba80 {
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  line-height: 56px !important;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+.container-login .login-form .register-link.data-v-1b1aba80 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.container-login .login-form .register-link .register-link-text.data-v-1b1aba80 {
+  color: #666;
+  font-size: 14px;
+  text-decoration: none;
+}
+.container-login .login-form .register-link .register-link-text .register-link-red.data-v-1b1aba80 {
+  color: #D23328;
+}
+.container-login .login-form .switch-login-mode.data-v-1b1aba80 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.container-login .login-form .switch-login-mode .switch-btn.data-v-1b1aba80 {
+  display: block;
+  width: 100%;
+  height: 56px !important;
+  min-height: 56px !important;
+  line-height: 56px !important;
+  padding: 0 !important;
+  color: #D23328;
+  font-size: 16px;
+  font-weight: 500;
+  background: #fff;
+  border: 1px solid #D23328;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.container-login .login-form .privacy-agreement.data-v-1b1aba80 {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.container-login .login-form .privacy-agreement .privacy-checkbox.data-v-1b1aba80 {
+  margin-right: 6px;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container-login .login-form .privacy-agreement .privacy-checkbox.checked.data-v-1b1aba80 {
+  background: #D23328;
+  border-color: #D23328;
+}
+.container-login .login-form .privacy-agreement .privacy-checkbox.checked .checkbox-icon-wrapper .checkbox-checked.data-v-1b1aba80 {
+  width: 6px;
+  height: 10px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  box-sizing: border-box;
+  position: relative;
+  top: -3px;
+  left: 0;
+}
+.container-login .login-form .privacy-agreement .privacy-checkbox .checkbox-icon-wrapper.data-v-1b1aba80 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container-login .login-form .privacy-agreement .privacy-text.data-v-1b1aba80 {
+  flex: 1;
+  color: #999;
+}
+.container-login .login-form .privacy-agreement .privacy-text .privacy-link.data-v-1b1aba80 {
+  color: #4b89dc;
+  text-decoration: none;
+}
+.container-login .bottom.data-v-1b1aba80 {
+  padding: 12px 24px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background: #F8F8F8;
+}
+.container-login .quick-login.data-v-1b1aba80 {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+}
+.container-login .quick-login .quick-login-title.data-v-1b1aba80 {
+  font-size: 14px;
+  text-align: center;
+  color: #666;
+  margin-bottom: 12px;
+}
+.container-login .quick-login .quick-login-items.data-v-1b1aba80 {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.container-login .quick-login .quick-login-item.data-v-1b1aba80 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+}
+.container-login .quick-login .quick-login-item .method-icon.data-v-1b1aba80 {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+.container-login .quick-login .quick-login-item .method-icon-font.data-v-1b1aba80 {
+  font-size: 28px;
+  color: #999;
+  line-height: 32px;
+  text-align: center;
+}
+.container-login .quick-login .quick-login-item .method-label.data-v-1b1aba80 {
+  font-size: 12px;
+  line-height: 1.4;
+}
+.container-login .quick-login .quick-login-item .method-label.label-weixin.data-v-1b1aba80 {
+  color: #07c160;
+}
+.container-login .quick-login .quick-login-item .method-label.label-apple.data-v-1b1aba80 {
+  color: #1a1a1a;
+}
+.container-login .quick-login .quick-login-item .method-label.label-grey.data-v-1b1aba80 {
+  color: #666;
+}
+/* 服务协议及隐私保护弹窗 */
+.agreement-popup-mask.data-v-1b1aba80 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+.agreement-popup.data-v-1b1aba80 {
+  width: 100%;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 20px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.agreement-popup-title.data-v-1b1aba80 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.agreement-popup-content.data-v-1b1aba80 {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.agreement-popup-btns.data-v-1b1aba80 {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.agreement-btn.data-v-1b1aba80 {
+  flex: 1;
+  height: 44px;
+  line-height: 44px;
+  padding: 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+}
+.agreement-btn-cancel.data-v-1b1aba80 {
+  background: #fff;
+  color: #666;
+  border: 1px solid #ddd;
+}
+.agreement-btn-confirm.data-v-1b1aba80 {
+  background: #D23328;
+  color: #fff;
+}
+/* 隐私协议 */
+.show-popup-privacy .title.data-v-1b1aba80 {
+  position: relative;
+  justify-content: center;
+}
+.show-popup-privacy .title .iconfont.data-v-1b1aba80 {
+  position: absolute;
+  right: 30rpx;
+}
+.show-popup-privacy .article-content.data-v-1b1aba80 {
+  height: calc(100% - 50px);
+  padding: 0 20rpx;
+  overflow-y: auto;
+}
+.show-popup-privacy .footer .btn.data-v-1b1aba80 {
+  height: 40px;
+  padding: 0;
+  border-radius: 20px;
+  line-height: 40px;
+  background: linear-gradient(-88deg, #ff4f2e, #f91f28);
+  font-size: 28rpx;
+}
+.show-popup-privacy .footer .btn.btn-disabled.data-v-1b1aba80 {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+/* 小程序登录 */
+.login-section.data-v-1b1aba80 {
+  padding: 40% 0 0;
+}
+.login-section .header.data-v-1b1aba80 {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 100%;
+  overflow: hidden;
+  margin: 0 auto 10rpx;
+  border: 3px solid #eee;
+}
+.login-section .user-name.data-v-1b1aba80 {
+  text-align: center;
+  font-size: 32rpx;
+  margin: 0 60rpx 0;
+  padding-bottom: 50rpx;
+}
+.login-section .user-name.data-v-1b1aba80:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 1px;
+  border-bottom: 1px solid #e5e5e5;
+  color: #e5e5e5;
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
+  -webkit-transform: scaleY(0.5);
+  transform: scaleY(0.5);
+  z-index: 1;
+}
+.login-section .cont.data-v-1b1aba80 {
+  padding: 40rpx 60rpx;
+  font-size: 30rpx;
+  color: #999;
+  text-align: center;
+}
+.login-section .btn.data-v-1b1aba80 {
+  margin: 30rpx 60rpx 50rpx 60rpx;
+}
+.login-section .btn button.data-v-1b1aba80 {
+  padding: 0;
+  font-size: 32rpx;
+  color: #fff;
+  border-radius: 50rpx;
+  border: 0 !important;
+}
+.login-section .btn button.data-v-1b1aba80::after {
+  content: " ";
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  border-radius: 0;
+}

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "红包领取",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

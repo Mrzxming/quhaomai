@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "分销入驻",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav"
+  }
+}

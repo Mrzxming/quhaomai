@@ -1,0 +1,2 @@
+.header{display:flex;flex-direction:row;justify-content:space-between;padding:20rpx}.header .tit{color:#999}.header .tit text{color:#666;margin:0 10rpx 0 5rpx}.header .more,
+.product-row text{color:#0095d3}

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "绑定会员",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons"
+  }
+}

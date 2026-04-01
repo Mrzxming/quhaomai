@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "社区贴子",
+  "usingComponents": {
+    "discover-list": "/components/dsc-discover/list",
+    "discover-nav": "/components/dsc-discover/nav",
+    "dsc-community": "/components/dsc-community/community"
+  }
+}

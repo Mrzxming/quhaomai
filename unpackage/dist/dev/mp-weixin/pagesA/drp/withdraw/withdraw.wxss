@@ -1,0 +1,107 @@
+
+.container.data-v-1d9dbf84 {
+	height: 100vh;
+}
+.drp-withdraw.data-v-1d9dbf84{ background: #FFFFFF;
+}
+.drp-withdraw .title.data-v-1d9dbf84{ font-size: 35rpx;
+}
+.drp-withdraw .sub.data-v-1d9dbf84{ padding: 0 25rpx; color: #999999;}
+.drp-withdraw .btn-bar.data-v-1d9dbf84{ margin: 25rpx;
+}
+.main.data-v-1d9dbf84 {
+	height: calc(100% - 100rpx);
+}
+.dsc_swiper.data-v-1d9dbf84 {
+	height: 100%;
+}
+.tip-fee.data-v-1d9dbf84 {
+	font-size: 22rpx;
+	text-align: center;
+	color: #fff;
+	padding: 20rpx 0;
+    background-color: #1989fa;
+}
+.field_box.data-v-1d9dbf84 {
+	display: flex;
+	align-items: center;
+	padding: 25rpx;
+	border-bottom: 1rpx solid #f4f4f4;
+}
+.dsc_field.data-v-1d9dbf84 {
+	flex: auto;
+	margin-left: 30rpx;
+}
+.selece_bank.data-v-1d9dbf84 {
+	position: relative;
+}
+.selece_bank.data-v-1d9dbf84::after {
+	position: absolute;
+	display: inline-block;
+	content: '';
+	top: 50%;
+	right: 0;
+	-webkit-transform: translateY(-50%);
+	        transform: translateY(-50%);
+	-webkit-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	width: 16rpx;
+	height: 16rpx;
+	border-top: 2rpx solid #888;
+	border-right: 2rpx solid #888;
+}
+.bankName.data-v-1d9dbf84 {
+	color: #888;
+}
+.picker_view_main.data-v-1d9dbf84 {
+		width: 100%;
+		background-color: #fff;
+}
+.picker_view_menu.data-v-1d9dbf84 {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100rpx;
+		background-color: #fff;
+		z-index: 99999;
+		/* border-bottom: 1px solid #EEEEEE; */
+}
+.cancel_picker_btn.data-v-1d9dbf84,
+	.confirm_picker_btn.data-v-1d9dbf84 {
+		width: 160rpx;
+		height: 100rpx;
+		line-height: 100rpx;
+		text-align: center;
+		font-size: 30rpx;
+}
+.cancel_picker_btn.data-v-1d9dbf84 {
+		color: #9A9A9A;
+}
+.confirm_picker_btn.data-v-1d9dbf84 {
+		color: #FA2A2A;
+}
+.picker_view_content.data-v-1d9dbf84 {
+		width: 100%;
+		height: calc(100% - 100rpx);
+}
+.picker_item.data-v-1d9dbf84 {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+}
+.dsc_lable.data-v-1d9dbf84 {
+		font-size: 44rpx;
+		margin-right: 30rpx;
+}
+.dsc_input.data-v-1d9dbf84 {
+		flex: auto;
+		font-size: 40rpx;
+}
+.tixian_btn.data-v-1d9dbf84 {
+		width: 100%;
+}
+

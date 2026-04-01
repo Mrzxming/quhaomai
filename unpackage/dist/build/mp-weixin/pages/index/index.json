@@ -1,0 +1,16 @@
+{
+  "backgroundColorTop": "#F5F5F5",
+  "backgroundColorBottom": "#F5F5F5",
+  "backgroundColor": "#F5F5F5",
+  "navigationStyle": "custom",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-product-list": "/components/dsc-product-list",
+    "dsc-filter": "/components/dsc-filter",
+    "uni-drawer": "/components/uni-drawer",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-popup": "/components/uni-popup",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

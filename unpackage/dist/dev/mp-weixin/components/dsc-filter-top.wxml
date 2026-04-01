@@ -1,0 +1,1 @@
+<view class="{{['commom-nav-warp','data-v-c5818698',(scrollState)?'show':'']}}"><view class="{{['commom-nav','data-v-c5818698',(outerClass)?'commom-nav-outer':'',(scrollState)?'show':'']}}" id="commom-nav" data-event-opts="{{[['tap',[['backTop',['$event']]]]]}}" bindtap="__e"><view class="iconfont icon-dingbu _i data-v-c5818698"></view></view></view>

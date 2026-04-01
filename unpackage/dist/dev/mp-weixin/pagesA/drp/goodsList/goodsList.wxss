@@ -1,0 +1,6 @@
+
+.bl{ display: flex; flex-direction: row;
+}
+.bl .num{ height: 46rpx; line-height: 46rpx; border: 2rpx solid #f92028; color: #f92028; padding: 0 10rpx;border-radius: 6rpx 0  0 6rpx; font-size: 25rpx;}
+.bl .cont-tag{height: 50rpx; line-height: 50rpx; background: #f92028; color: #FFFFFF; border-radius: 0 6rpx 6rpx 0; padding: 0 10rpx;font-size: 25rpx;}
+

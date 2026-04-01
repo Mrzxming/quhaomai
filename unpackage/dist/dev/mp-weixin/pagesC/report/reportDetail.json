@@ -1,0 +1,8 @@
+{
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true,
+  "navigationBarTitleText": "举报详情",
+  "onReachBottomDistance": 1500,
+  "navigationStyle": "custom",
+  "usingComponents": {}
+}

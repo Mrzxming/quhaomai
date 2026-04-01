@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "分销店铺",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-product-list": "/components/dsc-product-list",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content",
+    "uni-popups": "/components/uni-popup/uni-popup_1"
+  }
+}

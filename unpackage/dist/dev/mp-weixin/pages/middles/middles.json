@@ -1,0 +1,24 @@
+{
+  "enablePullDownRefresh": false,
+  "backgroundColorTop": "#F5F5F5",
+  "backgroundColorBottom": "#F5F5F5",
+  "backgroundColor": "#F5F5F5",
+  "navigationStyle": "custom",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "x-skeleton": "/uni_modules/x-skeleton/components/x-skeleton/x-skeleton",
+    "goods-service-label": "/components/goods-service-label/goods-service-label",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "uni-popup": "/components/uni-popup",
+    "custom-tabbar": "/components/custom-tabbar/custom-tabbar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "service": "/components/customer-service/customer-service",
+    "dsc-filter-top": "/components/dsc-filter-top",
+    "waterfall": "/pagesD/components/waterfall",
+    "dsc-region": "/components/dsc-region",
+    "dsc-count-down": "/pagesD/components/visualization/count-down/Frontend",
+    "uni-popups": "/components/uni-popup/uni-popup_1",
+    "sys-coupon": "/components/sys-coupon",
+    "image-cropper": "/pagesD/components/invinbg-image-cropper/invinbg-image-cropper"
+  }
+}

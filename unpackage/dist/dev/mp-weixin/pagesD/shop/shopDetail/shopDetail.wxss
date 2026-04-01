@@ -1,0 +1,65 @@
+
+.shopping-info-nums{ display: flex; flex-direction: row; align-items: center; justify-content:center; background: #FFFFFF; border-top: 2rpx solid #f6f6f9; padding: 10rpx 0;}
+.shopping-info-nums .item{ flex: 1; width: 33.3%; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+.shopping-info-nums .item .tit{ font-size: 35rpx; font-weight: 600;}
+.shopping-info-nums .item .text{ font-size: 25rpx; color: #999999;}
+.uni-card .uni-list-cell .title{ font-size: 30rpx; color: #333333;
+}
+.uni-card .uni-list-cell .value .iconfont{ font-size: 36rpx;}
+.uni-card .uni-list-cell .title image{ width: 40rpx; height: 40rpx;}
+.shop-detail .uni-popup-middle{ width: 74%; padding: 0; height: auto; border-radius: 0; background: #f7f7f7;
+}
+.shop-detail .code-popup{ width: 100%;}
+.shop-detail .code-popup .tit{ padding: 20rpx; color: #444444; border-bottom: 2rpx solid #eee; text-align: center; font-size: 30rpx;
+}
+.shop-detail .code-popup .qrode{ width: 450rpx; height: 450rpx; padding: 20rpx; background: #FFFFFF; margin: 20rpx auto;}
+.shop-detail .code-popup text{ color: #777777; text-align: center; padding: 15rpx; border-top: 2rpx solid #eee; display: block;}
+.shop-detail .license-popup .tit{ padding: 20rpx; font-size: 30rpx; display: flex; justify-content: space-between; align-items: center;}
+.shop-detail .license-popup .tit .iconfont{ margin-right: 20rpx; font-size: 14px;
+}
+.shop-detail .license-popup .license-content{ padding: 0 20rpx;
+}
+.shop-detail .license-popup .license-content .help{ margin-top: 20rpx; font-weight: 600;}
+.shop-detail .license-popup .uni-icon{ margin: 50rpx auto; display: flex; justify-content: center; align-items: center;
+}
+.shop-detail  .uni-popup{ border-radius: 10rpx;}
+.shop-detail .tel-popup{ padding: 30rpx 0 50rpx; text-align: center;}
+.shop-detail .tip{ font-size: 32rpx; line-height: 60rpx;}
+.shop-detail .desc{ font-size: 30rpx; margin-bottom: 20rpx;line-height: 60rpx;}
+.shop-detail .btn{ color: #e93b3d; font-size: 30rpx;}
+.shop-detail .uni-popup-middle .close{
+	width: 20rpx;
+	height: 20rpx;
+	line-height: 20rpx;
+	position: absolute;
+	top: -20rpx;
+	right: -15rpx;
+	border-radius: 50%;
+	background: rgba(0,0,0,.3);
+	padding: 10rpx;
+}
+.close_img {
+	position: absolute;
+	top: 30rpx;
+	right: 30rpx;
+	width: 44rpx;
+	height: 44rpx;
+}
+.pop_content {
+	border-top-left-radius: 20rpx;
+	border-top-right-radius: 20rpx;
+	background-color: #fff;
+}
+.license-popup .license-content .img-list {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 10rpx;
+	gap: 10rpx;
+}
+.license-popup .license-content .img-list .img {
+	width: 100%;
+	max-width: 100%;
+	margin-bottom: 10rpx;
+	border-radius: 8rpx;
+}
+

@@ -1,0 +1,10 @@
+{
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true,
+  "navigationBarTitleText": "举报",
+  "onReachBottomDistance": 1500,
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "date-selector": "/components/dengrq-datetime-picker/dateSelector/index"
+  }
+}

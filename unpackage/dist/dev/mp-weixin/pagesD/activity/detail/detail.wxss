@@ -1,0 +1,34 @@
+
+.activity-datail .pic{ width: 100%; background: #FFFFFF;}
+.activity-datail .title{ background: #FFFFFF; display: flex; padding: 20rpx; justify-content: flex-start; align-items: center;}
+.activity-datail .title .tag{ color: #fff; font-size: 25rpx; padding: 5rpx 20rpx; border-radius: 30rpx; margin-right: 20rpx;}
+.section{ margin-top: 20rpx; padding: 20rpx; background: #FFFFFF;
+}
+.section .tit{ font-size: 30rpx; padding: 0 0 20rpx; display: flex; justify-content: flex-start; align-items: center;
+}
+.section .p{ color: #999; line-height: 1.5;
+}
+.section .p text{ font-size: 26rpx;
+}
+.section .p .text{ color: #333333;
+}
+.section .p .text2{ color: #f92028;
+}
+.section .goods-list{ margin: 0;
+}
+.section .goods-list .goods-item{ margin-bottom: 10rpx; padding: 20rpx 0 0 0;
+}
+.section .goods-list .goods-item:last-child{ margin-bottom: 0;}
+.section .goods-list .goods-item .price .market{ color: #999; text-decoration: line-through; font-size: 25rpx; margin-left: 10rpx;}
+.section2{ padding: 0; background: none; margin-bottom: 20rpx;}
+.section2 .tit{ background: #FFFFFF; padding: 20rpx;}
+.goods-list.goods-list-lie{ display: flex; flex-direction: row; justify-content: space-between; padding: 0 20rpx; flex-wrap: wrap; border-radius: 10rpx;}
+.goods-list.goods-list-lie .goods-item{ width: 50%; padding: 0; margin: 20rpx 0 0; background: none; box-sizing: border-box; display: flex; flex-direction: column;}
+.goods-list.goods-list-lie .goods-item:nth-child(2n-1){ padding-right: 10rpx;
+}
+.goods-list.goods-list-lie .goods-item:nth-child(2n){ padding-left: 10rpx;
+}
+.goods-list.goods-list-lie .goods-item .goods-img{ width: 100%; background: #FFFFFF;}
+.goods-list.goods-list-lie .goods-item .goods-info{ padding: 10rpx; background: #FFFFFF;}
+.goods-list.goods-list-lie .goods-item .goods-info .price{ font-size: 30rpx; color: #f92028; margin: 10rpx 0;}
+

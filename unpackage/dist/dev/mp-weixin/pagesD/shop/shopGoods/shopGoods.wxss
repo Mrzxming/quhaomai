@@ -1,0 +1,660 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*header*/
+.header .uni-navbar {
+	border-bottom: solid 1px #e6e6e6;
+}
+.header .uni-navbar view {
+	line-height: 50px;
+}
+.header .uni-navbar-header {
+	height: 50px;
+}
+.header .uni-navbar-header .uni-navbar-header-btns {
+	padding: 0;
+}
+.header .uni-navbar-container {
+	margin: 0 20rpx;
+}
+.header .uni-navbar .input-view {
+	background-color: #FFFFFF;
+	border: 1px solid #e6e6e6;
+	margin: 9px 0;
+}
+.header .uni-navbar .input-view .right-icon {
+	line-height: 1.5;
+}
+.header .uni-navbar .input-view .uni-icon {
+	display: block;
+}
+/*popop*/
+.con-filter-div {
+	padding-bottom: 50px;
+}
+.mod_list {
+	background: #ffffff;
+	margin-bottom: 20rpx;
+}
+.mod_list .item .li_line {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20rpx;
+}
+.mod_list .item.radio-switching {
+	padding: 20rpx;
+}
+.mod_list .item.radio-switching .li_line {
+	padding: 0;
+}
+.tags_selection {
+	background: #FFFFFF;
+	margin-bottom: 20rpx;
+	padding: 20rpx 0 0 20rpx;
+	display: flex;
+	flex-direction: row;
+}
+.tags_selection text {
+	padding: 5rpx 30rpx;
+	background: #f7f7f7;
+	border-radius: 10rpx;
+	margin: 0 20rpx 20rpx 0;
+	border: 1px solid #f7f7f7;
+}
+.tags_selection .active {
+	background: #FFFFFF;
+	border: 1px solid #e93b3d;
+	color: #e93b3d;
+}
+.filterlayer_price {
+	padding: 20rpx;
+	position: relative;
+}
+.filterlayer_price:before {
+	content: "";
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
+	background-color: #e5e5e5;
+	height: 1px;
+	left: 0;
+	right: 0;
+	top: 0;
+}
+.filterlayer_price .filterlayer_price_area {
+	display: flex;
+}
+.filterlayer_price_area_input {
+	flex: 1;
+	background: #f7f7f7;
+	color: #333333;
+	padding: 10rpx;
+	text-align: center;
+}
+.filterlayer_price_hang {
+	width: 50rpx;
+	position: relative;
+}
+.filterlayer_price_hang:before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -5px;
+	width: 10px;
+	height: 1px;
+	background-color: #f1f1f1;
+}
+.filterlayer_bottom_buttons {
+	display: flex;
+	flex-direction: row;
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	background: #FFFFFF;
+	z-index: 9;
+}
+.filterlayer_bottom_button {
+	height: 49px;
+	line-height: 49px;
+	flex: 1;
+	text-align: center;
+	box-shadow: 0 -1px 2px 0 rgba(0, 0, 0, 0.07);
+}
+.filterlayer_bottom_button.active {
+	background-color: #e93b3d;
+	color: #ffffff;
+}
+.sf_layer {
+	background: #FFFFFF;
+	height: 100%;
+}
+.sf_layer .sf_layer_sub_title {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 20rpx;
+	background-color: #FFFFFF;
+}
+.sf_layer .sf_layer_sub_title .tit {
+	width: 150rpx;
+}
+.sf_layer .sf_layer_sub_title text {
+	flex: 1 1 0%;
+}
+.center-box {
+	width: 100%;
+	background: #FFFFFF;
+}
+

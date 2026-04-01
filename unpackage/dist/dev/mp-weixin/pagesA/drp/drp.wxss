@@ -1,0 +1,30 @@
+
+.header.data-v-0cf32431{color: #FFFFFF; position: relative; height: 320rpx;}
+.header .header-warp.data-v-0cf32431{ display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; padding: 30rpx 0 0 0;}
+.header .header-warp .header-img.data-v-0cf32431{ width: 120rpx; height: 120rpx; overflow: hidden; border-radius: 100%; border:5rpx solid rgba(255,255,255,.3);
+}
+.header .header-warp .header-img image.data-v-0cf32431{ width: 100%; height: 100%;}
+.header .header-warp .header-time.data-v-0cf32431{ margin-top: 10rpx; display: flex; justify-content: center; font-size: 28rpx;}
+.header .header-bg.data-v-0cf32431{ position: absolute; top: 0; left: 0; right: 0; width: 750rpx; height: 320rpx; z-index: 1;}
+.header .header-bg image.data-v-0cf32431{width: 750rpx; height: 320rpx;}
+.drp-money-list.data-v-0cf32431{ position: relative; z-index: 3; background: #FFFFFF; margin:-70rpx 30rpx 0; border-radius: 30rpx; padding: 40rpx 30rpx; box-shadow: 0 20rpx 30rpx 0 rgba(68, 79, 90, 0.11);}
+.drp-money-list .money-bottom.data-v-0cf32431{ padding: 20rpx 10rpx;}
+.drp-money-list .money-bottom button.data-v-0cf32431{ background: linear-gradient(-88deg, #ff4f2e, #f91f28); border-radius: 50rpx;}
+.drp-money-list .drp-items.data-v-0cf32431{ display: flex; flex-direction: row; flex-wrap: wrap; background: #FFFFFF;}
+.drp-money-list .drp-items .drp-item.data-v-0cf32431{ width: 25%; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; padding: 20rpx 0;}
+.drp-money-list .drp-items .drp-item .icon.data-v-0cf32431,
+.drp-money-list .drp-items .drp-item .icon image.data-v-0cf32431{ width: 60rpx; height: 60rpx;}
+.drp-money-list .drp-items .drp-item text.data-v-0cf32431{ color: #777777; font-size: 25rpx; margin-top: 10rpx;}
+.goods-list .title.data-v-0cf32431{ background: none; display: flex; flex-direction: row; justify-content: center; align-items: center;padding: 30rpx 20rpx;}
+.goods-list .title .icon.data-v-0cf32431{ width: 40rpx; height: 24rpx;}
+.goods-list .title text.data-v-0cf32431{ font-size: 40rpx; margin: 0 20rpx;
+}
+.goods-list .goods-item.data-v-0cf32431{ background: none;
+}
+.goods-list .goods-item .goods-left.data-v-0cf32431,
+.goods-list .goods-item .goods-left image.data-v-0cf32431{ width: 230rpx; height: 230rpx;}
+.ectouch-notcont.data-v-0cf32431{ padding: 100rpx 0 150rpx; text-align: center;}
+.ectouch-notcont .img.data-v-0cf32431{ width: 280rpx; height: 280rpx; margin: 0 auto;}
+.ectouch-notcont .img image.data-v-0cf32431{ width: 100%;}
+.ectouch-notcont .cont.data-v-0cf32431{ color: #999999; font-size: 30rpx; display: block; flex-direction: row;}
+

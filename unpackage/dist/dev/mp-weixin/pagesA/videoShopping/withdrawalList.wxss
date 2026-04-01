@@ -1,0 +1,64 @@
+.vs-withdraw.data-v-3ad31e9a {
+  height: 100vh;
+  background: #FFFFFF;
+  padding: 0 40rpx;
+}
+.vs-withdraw .withdraw-header.data-v-3ad31e9a {
+  padding-top: 40rpx;
+}
+.vs-withdraw .withdraw-header .txt.data-v-3ad31e9a {
+  display: flex;
+  font-size: 36rpx;
+  padding-bottom: 20rpx;
+  margin: 0 10rpx;
+}
+.vs-withdraw .withdraw-header .txt .total.data-v-3ad31e9a {
+  color: #F2041A;
+}
+.vs-withdraw .withdraw-header .withdraw-box.data-v-3ad31e9a {
+  display: flex;
+  flex-direction: row;
+}
+.vs-withdraw .withdraw-header .withdraw-box .dsc_input.data-v-3ad31e9a {
+  flex: auto;
+  font-size: 36rpx;
+  height: 28px;
+  padding: 20rpx;
+  border: 1px solid #F5F5F5;
+  border-radius: 10rpx 0 0 10rpx;
+  border-right: 0;
+}
+.vs-withdraw .withdraw-header .withdraw-box .txBtn.data-v-3ad31e9a {
+  background-color: #F2041A;
+  color: #FFFFFF;
+  padding: 0 30rpx;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32rpx;
+  border-radius: 0 10rpx 10rpx 0;
+}
+.vs-withdraw .withdraw-list.data-v-3ad31e9a {
+  margin-top: 20px;
+}
+.vs-withdraw .withdraw-list .item.data-v-3ad31e9a {
+  border-bottom: 1px solid #F5F5F5;
+  padding: 20rpx 0;
+}
+.vs-withdraw .withdraw-list .item .row.data-v-3ad31e9a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vs-withdraw .withdraw-list .item .row .money.data-v-3ad31e9a {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.vs-withdraw .withdraw-list .item .row .text.data-v-3ad31e9a {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.vs-withdraw .withdraw-list .item .row .time.data-v-3ad31e9a {
+  color: #999999;
+}

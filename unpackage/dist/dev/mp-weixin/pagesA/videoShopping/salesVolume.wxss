@@ -1,0 +1,52 @@
+.sv-container.data-v-c066d994 {
+  height: 100vh;
+  background: #FFFFFF;
+}
+.sv-container .sv-header.data-v-c066d994 {
+  background-color: #fff1c8;
+  font-size: 36rpx;
+  padding: 20px 30px;
+}
+.sv-container .sv-header .total.data-v-c066d994 {
+  color: #F2041A;
+}
+.sv-container .sv-list.data-v-c066d994 {
+  margin-top: 30rpx;
+}
+.sv-container .sv-list .item.data-v-c066d994 {
+  display: flex;
+  flex-direction: row;
+  padding: 20rpx 0;
+  margin: 0 30rpx;
+  border-bottom: 1px solid #F5F5F5;
+}
+.sv-container .sv-list .item .image.data-v-c066d994 {
+  width: 60px;
+  height: 60px;
+}
+.sv-container .sv-list .item .image .img.data-v-c066d994 {
+  border-radius: 10rpx;
+}
+.sv-container .sv-list .item .sv-item-con.data-v-c066d994 {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 20rpx;
+  flex: 1;
+}
+.sv-container .sv-list .item .sv-item-con .left.data-v-c066d994 {
+  width: 70%;
+}
+.sv-container .sv-list .item .sv-item-con .left .change-desc.data-v-c066d994 {
+  font-size: 32rpx;
+}
+.sv-container .sv-list .item .sv-item-con .right.data-v-c066d994 {
+  flex: 1;
+  text-align: right;
+}
+.sv-container .sv-list .item .sv-item-con .right .money.data-v-c066d994 {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.sv-container .sv-list .item .sv-item-con .time.data-v-c066d994 {
+  color: #999999;
+}

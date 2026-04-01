@@ -1,0 +1,264 @@
+/* 订单页面订单筛选适配修改源文件 */
+/* .date-selector {
+  width: 90%;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+      z-index: 9999;
+      position: fixed;
+}
+
+.select-date-wrapper {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.select-date {
+  padding: 5px;
+  flex: 1;
+  border-radius: 5px;
+  border: 1px solid rgba(6, 7, 46, 0.05);
+  font-size: 12px;
+  
+    
+}
+
+.select-date.active {
+  border-color: #6a7bff;
+}
+
+.select-date-placeholder {
+  color: rgba(6, 7, 46, 0.3);
+}
+
+.btn-group {
+  display: flex;
+  margin: 48rpx 0;
+  gap:20rpx;
+  justify-content: space-between;
+}
+
+.btn-confirm {
+  width: 180px;
+  height: 40px;
+  line-height: 40px;
+  background: rgba(33, 58, 255, 0.85);
+  border-radius: 4px;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+}
+
+.btn-cancel {
+  width: 144px;
+  height: 40px;
+  line-height: 38px;
+  text-align: center;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #979797;
+  font-size: 14px;
+  color: #06072e;
+} */
+
+
+
+/* 日期选择器样式修复 */
+/* .date-selector {
+  width: 100%;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+  position: relative;
+  z-index: 10;
+  margin: 20rpx 0; 
+}
+
+.select-date-wrapper {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx; 
+}
+
+.select-date {
+  padding: 20rpx;
+  flex: 1;
+  border-radius: 8rpx;
+  border: 1px solid rgba(6, 7, 46, 0.15);
+  font-size: 28rpx;
+  text-align: center;
+  background: #f8f9fa;
+  min-height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.select-date.active {
+  border-color: #6a7bff;
+  background: #f0f4ff;
+}
+
+.select-date-placeholder {
+  color: rgba(6, 7, 46, 0.5);
+  font-size: 28rpx;
+}
+
+.select-date-value {
+  color: #1d2129;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.btn-group {
+  display: flex;
+  margin: 30rpx 0 20rpx 0;
+  gap: 20rpx;
+  justify-content: space-between;
+}
+
+.btn-confirm {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: rgba(33, 58, 255, 0.85);
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 80rpx;
+  line-height: 78rpx;
+  text-align: center;
+  background: #fff;
+  border-radius: 8rpx;
+  border: 1px solid #979797;
+  font-size: 32rpx;
+  color: #06072e;
+}
+
+
+.date-selector >>> .date-time-picker-popup {
+  position: fixed !important;
+  z-index: 99999 !important;
+}
+
+
+@media (max-width: 750px) {
+  .select-date {
+    padding: 15rpx;
+    font-size: 24rpx;
+  }
+  
+  .btn-confirm,
+  .btn-cancel {
+    height: 70rpx;
+    line-height: 70rpx;
+    font-size: 28rpx;
+  }
+} */
+
+
+
+
+
+
+/* 订单页面订单筛选适配修改源文件 */
+.date-selector {
+  width: 100%;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+  position: relative;
+  z-index: 10;
+}
+
+/* 日期选择器弹出层 - 悬浮定位 */
+.date-selector .date-time-picker-popup {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  top: auto !important;
+  background: white;
+  z-index: 10000 !important;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 确保选择器包装器正常显示 */
+.select-date-wrapper {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.select-date {
+  padding: 10rpx;
+  flex: 1;
+  border-radius: 8rpx;
+  border: 1px solid rgba(6, 7, 46, 0.15);
+  font-size: 28rpx;
+  text-align: center;
+  background: #f8f9fa;
+  min-height: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.select-date.active {
+  border-color: #6a7bff;
+  background: #f0f4ff;
+}
+
+.select-date-placeholder {
+  color: rgba(6, 7, 46, 0.5);
+  font-size: 28rpx;
+}
+
+.select-date-value {
+  color: #1d2129;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.btn-group {
+  display: flex;
+  margin: 30rpx 0 20rpx 0;
+  gap: 20rpx;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-confirm {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: rgba(33, 58, 255, 0.85);
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 80rpx;
+  line-height: 78rpx;
+  text-align: center;
+  background: #fff;
+  border-radius: 8rpx;
+  border: 1px solid #979797;
+  font-size: 32rpx;
+  color: #06072e;
+}

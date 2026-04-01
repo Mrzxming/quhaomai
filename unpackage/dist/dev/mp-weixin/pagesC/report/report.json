@@ -1,0 +1,11 @@
+{
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true,
+  "navigationBarTitleText": "举报中心",
+  "onReachBottomDistance": 1500,
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "uni-nav-bar": "/components/uni-nav-bar",
+    "uni-icons": "/components/uni-icons/uni-icons"
+  }
+}

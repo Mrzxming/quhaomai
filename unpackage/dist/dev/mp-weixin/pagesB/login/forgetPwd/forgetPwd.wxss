@@ -1,0 +1,199 @@
+@charset "UTF-8";
+/* 与登录/注册一致：顶部背景、内容区圆角、输入框与按钮样式 */
+.container-bwg.data-v-4ad681e8 {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+.container-forget.data-v-4ad681e8 {
+  background: linear-gradient(180deg, #FFD4C8 0%, #F8F8F8 22%, #F8F8F8 100%);
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+.back-btn.data-v-4ad681e8 {
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: #333;
+  font-size: 24px;
+}
+/* 与登录/注册一致：标题在渐变区内，内容区紧接下方 */
+.forget-header.data-v-4ad681e8 {
+  padding: 60px 30px 24px;
+  text-align: center;
+}
+.forget-header .page-title.data-v-4ad681e8 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+.login-form.data-v-4ad681e8 {
+  flex: 1;
+  background: #F8F8F8;
+  border-radius: 24px 24px 0 0;
+  padding: 32px 24px 20px;
+  position: relative;
+  /* 与注册页 phone-input-group 完全一致 */
+  /* 与注册页 password-group 完全一致 */
+}
+.login-form .phone-input-group.data-v-4ad681e8 {
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.login-form .phone-input-group .phone-prefix.data-v-4ad681e8 {
+  font-size: 15px;
+  color: #333;
+  padding-right: 12px;
+  border-right: 1px solid #E5E5E5;
+  flex-shrink: 0;
+}
+.login-form .phone-input-group .phone-prefix .iconfont.data-v-4ad681e8 {
+  font-size: 20px;
+  color: #666;
+}
+.login-form .phone-input-group .input.data-v-4ad681e8 {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+}
+.login-form .phone-input-group .input.data-v-4ad681e8::-webkit-input-placeholder {
+  color: #BFBFBF;
+}
+.login-form .phone-input-group .input.data-v-4ad681e8::placeholder {
+  color: #BFBFBF;
+}
+.login-form .phone-input-group .input-suffix.data-v-4ad681e8 {
+  flex-shrink: 0;
+}
+.login-form .phone-input-group .input-suffix .iconfont.data-v-4ad681e8 {
+  font-size: 14px;
+  color: #999;
+}
+.login-form .password-group.data-v-4ad681e8 {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.login-form .password-group .input.data-v-4ad681e8 {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+}
+.login-form .password-group .input.data-v-4ad681e8::-webkit-input-placeholder {
+  color: #BFBFBF;
+}
+.login-form .password-group .input.data-v-4ad681e8::placeholder {
+  color: #BFBFBF;
+}
+.login-form .password-group .eye-icon.data-v-4ad681e8 {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 22px;
+}
+.login-form .password-group .eye-icon.active.data-v-4ad681e8,
+.login-form .password-group .eye-icon .active.data-v-4ad681e8 {
+  color: #D23328;
+}
+.login-form .signup-button.data-v-4ad681e8 {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+.login-form .signup-button .btn.data-v-4ad681e8 {
+  width: 100%;
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  padding: 0 !important;
+  line-height: 56px !important;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.login-form .signup-button .btn.btn-lg-red.data-v-4ad681e8 {
+  background: #D23328;
+  box-shadow: 0 4px 12px rgba(210, 51, 40, 0.35);
+}
+.login-form .signup-button .btn.btn-bor-red.data-v-4ad681e8 {
+  border: 1px solid #D23328;
+  color: #D23328;
+  background: transparent;
+  font-weight: 600;
+}
+.login-form .signup-button .btn.btn-disabled.data-v-4ad681e8 {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.login-form .signup-button .tips.data-v-4ad681e8 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: #333;
+}
+.login-form .signup-button .tips .go-register.data-v-4ad681e8 {
+  margin-left: 5px;
+  color: #D23328;
+}
+.login-form .tip.data-v-4ad681e8 {
+  margin-top: 12px;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+}
+.send-yzm.data-v-4ad681e8 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.send-yzm .text.data-v-4ad681e8 {
+  font-size: 24px;
+  color: #1a1a1a;
+}
+.send-yzm .text.text-email.data-v-4ad681e8 {
+  font-size: 16px;
+}
+.send-yzm .send.data-v-4ad681e8 {
+  height: 35px;
+  line-height: 35px;
+  padding: 0 20px;
+  border: 1px solid #dcdcdc;
+  border-radius: 18px;
+  font-size: 12px;
+  color: #D23328;
+  margin-left: 10px;
+}

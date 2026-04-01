@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "商家入驻",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-popup": "/components/uni-popup",
+    "basic-info": "/pagesB/merchants/components/basicInfo",
+    "enter-type": "/pagesB/merchants/components/enterType",
+    "main-info": "/pagesB/merchants/components/mainInfo",
+    "store-info": "/pagesB/merchants/components/storeInfo"
+  }
+}

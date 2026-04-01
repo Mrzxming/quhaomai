@@ -1,0 +1,292 @@
+{
+  "pages": [
+    "pages/middles/middles",
+    "pages/index/index",
+    "pages/user/user",
+    "pages/cart/cart",
+    "pages/chat/chat"
+  ],
+  "subPackages": [
+    {
+      "root": "pagesA",
+      "pages": [
+        "giftcard/giftcard",
+        "giftcard/address/address",
+        "giftcard/order/order",
+        "giftcard/result/result",
+        "seckill/seckill",
+        "seckill/detail/detail",
+        "team/team",
+        "team/rank/rank",
+        "team/order/order",
+        "team/detail/detail",
+        "team/wait/wait",
+        "drp/drp",
+        "drp/drpinfo/drpinfo",
+        "drp/register/register",
+        "drp/finish/finish",
+        "drp/set/set",
+        "drp/category/category",
+        "drp/order/order",
+        "drp/orderDetail/orderDetail",
+        "drp/team/team",
+        "drp/teamDetail/teamDetail",
+        "drp/card/card",
+        "drp/rank/rank",
+        "drp/list/list",
+        "drp/goodsList/goodsList",
+        "drp/shop/shop",
+        "drp/log/log",
+        "drp/new/new",
+        "drp/withdraw/withdraw",
+        "drp/withdrawLog/withdrawLog",
+        "drp/purchase/purchase",
+        "drp/done/done",
+        "drp/apply/apply",
+        "drp/protection/protection",
+        "bargain/bargain",
+        "bargain/mylist/mylist",
+        "bargain/detail/detail",
+        "bonus/bonus",
+        "coupon/coupon",
+        "topic/topic",
+        "topic/detail/detail",
+        "presale/presale",
+        "presale/detail/detail",
+        "presale/list/list",
+        "exchange/exchange",
+        "exchange/detail/detail",
+        "groupbuy/groupbuy",
+        "groupbuy/detail/detail",
+        "auction/auction",
+        "auction/detail/detail",
+        "auction/log/log",
+        "crowdfunding/crowd",
+        "crowdfunding/user/user",
+        "crowdfunding/user/order",
+        "crowdfunding/user/orderdetail",
+        "crowdfunding/user/buy",
+        "crowdfunding/user/focus",
+        "crowdfunding/detail/detail",
+        "crowdfunding/topic/topic",
+        "crowdfunding/checkout/checkout",
+        "team/list/list",
+        "package/package",
+        "videoShopping/index",
+        "videoShopping/commerceProfit",
+        "videoShopping/profit",
+        "videoShopping/order",
+        "videoShopping/goods",
+        "videoShopping/withdrawalList",
+        "videoShopping/commission",
+        "videoShopping/income",
+        "videoShopping/salesVolume",
+        "drp/drpinfoCenter/drpinfoCenter"
+      ]
+    },
+    {
+      "root": "pagesB",
+      "pages": [
+        "login/login",
+        "register/register",
+        "login/bindUser/bindUser",
+        "login/loginMobile/loginMobile",
+        "login/forget/forget",
+        "login/forgetPwd/forgetPwd",
+        "login/reset/reset",
+        "profile/profile",
+        "address/address",
+        "address/addresspick",
+        "address/addressEdit",
+        "address/communityPost",
+        "realname/realname",
+        "realname/realnameFace",
+        "accountsafe/accountsafe",
+        "accountsafe/paypwd/paypwd",
+        "accountsafe/bindphone/bindphone",
+        "accountsafe/relationphone/relationphone",
+        "accountsafe/resetphone/resetphone",
+        "help/help",
+        "account/account",
+        "account/webview/webview",
+        "order/order",
+        "orderDetail/orderDetail",
+        "express/pickupDoor",
+        "express/expressWait",
+        "express/expressCancel",
+        "express/expressLog",
+        "collectionGoods/collectionGoods",
+        "collectionShop/collectionShop",
+        "history/history",
+        "affiliate/affiliate",
+        "affiliate/index/index",
+        "affiliate/team/team",
+        "affiliate/protection/protection",
+        "comment/comment",
+        "commentDetail/commentDetail",
+        "bonus/bonus",
+        "bonus/addBonus/addBonus",
+        "valueCard/valueCard",
+        "valueCard/detail/detail",
+        "valueCard/add/add",
+        "coupon/coupon",
+        "account/detail/detail",
+        "account/log/log",
+        "account/integra/integra",
+        "invoice/invoice",
+        "account/deposit/deposit",
+        "account/raply/raply",
+        "message/message",
+        "messagelist/messagelist",
+        "afterSales/afterSales",
+        "afterSales/applyReturn/applyReturn",
+        "afterSales/detail/detail",
+        "growthvalue/growthvalue",
+        "accountsafe/operationlog/operationlog",
+        "merchants/merchants",
+        "merchants/reviewProgress",
+        "merchants/applyInfo",
+        "messages/messages",
+        "webviews/webviews",
+        "kefu_center/kefu_center",
+        "kefu_center/kefu_platform"
+      ]
+    },
+    {
+      "root": "pagesC",
+      "pages": [
+        "article/article",
+        "article/detail/detail",
+        "article/commentlist/commentlist",
+        "brand/brand",
+        "brand/list/list",
+        "brand/detail/detail",
+        "discover/index",
+        "discover/listType/listType",
+        "discover/detail/detail",
+        "discover/me/me",
+        "discover/list/list",
+        "kefu/kefu",
+        "live/live",
+        "privacy/privacy",
+        "scan/scan",
+        "splash/splash",
+        "store/store",
+        "web-view/web-view",
+        "checkoutone/checkoutone",
+        "goodsDetail/goodsDetail",
+        "goodsDetail/setmeal",
+        "comment/comment",
+        "tracker/tracker",
+        "shouqianba/invoiceDetail",
+        "shouqianba/invoiceReapply",
+        "newgoods/newgoods",
+        "hotgoods/hotgoods",
+        "movingGoods/movingGoods",
+        "waimaibinding/waimaibinding",
+        "movingGoods/viewTasks",
+        "movingGoods/movingrecord",
+        "movingGoods/movingGoodsTwo",
+        "canvas/canvas"
+      ]
+    },
+    {
+      "root": "pagesD",
+      "pages": [
+        "search/search",
+        "goodslist/goodslist",
+        "checkout/checkout",
+        "done/done",
+        "cart/coudan/coudan",
+        "paypwd/paypwd",
+        "activity/activity",
+        "activity/detail/detail",
+        "shop/shop",
+        "shop/shopHome/shopHome",
+        "shop/shopDetail/shopDetail",
+        "shop/shopGoods/shopGoods",
+        "integration/integration",
+        "comment/commentList",
+        "video/list",
+        "video/detail",
+        "goodslist/goodslistTake",
+        "middles/index",
+        "retail/isretail"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "庆趣供货",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#6e6d6b",
+    "selectedColor": "#f23030",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/middles/middles",
+        "text": "首页",
+        "iconPath": "/static/tabBar/tabBarnew.png",
+        "selectedIconPath": "/static/tabBar/tabBarnew1.png"
+      },
+      {
+        "pagePath": "pages/chat/chat",
+        "text": "消息",
+        "iconPath": "/static/tabBar/tabBar_2.png",
+        "selectedIconPath": "/static/tabBar/tabBar_cur_2.png"
+      },
+      {
+        "pagePath": "pages/cart/cart",
+        "text": "货单",
+        "iconPath": "/static/tabBar/tabBar_3.png",
+        "selectedIconPath": "/static/tabBar/tabBar_cur_3.png"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "我的",
+        "iconPath": "/static/tabBar/tabBar_4.png",
+        "selectedIconPath": "/static/tabBar/tabBar_cur_4.png"
+      }
+    ]
+  },
+  "preloadRule": {
+    "pagesA/seckill/seckill": {
+      "network": "all",
+      "packages": [
+        "pagesA"
+      ]
+    },
+    "pagesB/profile/profile": {
+      "network": "all",
+      "packages": [
+        "pagesB"
+      ]
+    },
+    "pagesC/kefu/kefu": {
+      "network": "all",
+      "packages": [
+        "pagesC"
+      ]
+    }
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "将获取您的位置信息，用于为您展示周边的店铺等"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation",
+    "chooseAddress"
+  ],
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "currency-price": "/components/currency-price/CurrencyPrice",
+    "zdy-tabbar": "/components/zdy-tabbar/zdy-tabbar",
+    "dsc-loading": "/components/dsc-loading"
+  }
+}

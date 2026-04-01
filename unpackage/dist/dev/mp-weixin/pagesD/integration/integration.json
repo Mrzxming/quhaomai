@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "发现",
+  "navigationBarBackgroundColor": "#FFFFFF",
+  "usingComponents": {
+    "dsc-nav-bar": "/components/dsc-nav-bar/nav-bar",
+    "dsc-community": "/components/dsc-community/community",
+    "dsc-live": "/components/dsc-live/DscLive",
+    "shop": "/pagesD/shop/shop",
+    "video-list": "/pagesD/video/list",
+    "dsc-not-content": "/components/dsc-not-content",
+    "search": "/pagesD/search/search"
+  }
+}

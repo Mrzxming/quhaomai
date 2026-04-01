@@ -1,0 +1,9 @@
+
+.uni-list-cell-navigate .receipt{
+	flex-direction: column;
+	align-items: flex-end;
+}
+.uni-list-cell-navigate .receipt .txt{
+	margin: 0 10rpx;
+}
+

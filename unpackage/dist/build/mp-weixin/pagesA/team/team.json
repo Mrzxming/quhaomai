@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "拼团活动",
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-tabbar": "/components/dsc-tabbar"
+  }
+}

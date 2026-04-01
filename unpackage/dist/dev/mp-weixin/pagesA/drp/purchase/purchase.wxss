@@ -1,0 +1,160 @@
+.bg-color-write.data-v-29c113c4 {
+  background: #fff;
+}
+.vip-buy .head.data-v-29c113c4 {
+  background: linear-gradient(0deg, #696969 0%, #151515 30%);
+  overflow: hidden;
+}
+.vip-buy .head .title.data-v-29c113c4 {
+  color: #EBD6BA;
+  text-align: center;
+  font-size: 30rpx;
+  line-height: 82rpx;
+}
+.vip-buy .head .title.data-v-29c113c4:before, .vip-buy .head .title.data-v-29c113c4:after {
+  content: "";
+  width: 52.6rpx;
+  height: 8.4rpx;
+  margin: 0 12rpx;
+  vertical-align: middle;
+  display: inline-block;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.vip-buy .head .title.data-v-29c113c4:before {
+  background-image: url(https://images.eqingqu.com/attachs/photo/202404/20240416_02F62ABB9E78DDB004A040D7E1920AE7.png);
+}
+.vip-buy .head .title.data-v-29c113c4:after {
+  background-image: url(https://images.eqingqu.com/attachs/photo/202404/20240416_6B3B97EE45BD6EBE5961FB6B843C8B5E.png);
+}
+.vip-buy .head .notice.data-v-29c113c4 {
+  background: #FCF3E7;
+  margin: 0 25rpx 25rpx;
+  border-radius: 20rpx;
+  padding: 25rpx;
+}
+.vip-buy .head .notice ._h3.data-v-29c113c4 {
+  margin-bottom: 20rpx;
+}
+.vip-buy .head .notice ._h3 ._b.data-v-29c113c4 {
+  font-size: 36rpx;
+}
+.vip-buy .head .notice ._h3 ._a.data-v-29c113c4 {
+  float: right;
+}
+.vip-buy .head .notice ._h3 ._a .iconfont.data-v-29c113c4 {
+  font-size: 20rpx;
+  margin-left: 2rpx;
+}
+.vip-buy .head .notice ._p.data-v-29c113c4 {
+  color: #805223;
+  line-height: 1.6;
+}
+.cell-box.data-v-29c113c4 {
+  padding: 20rpx;
+  border-bottom: 1px solid #f6f6f9;
+  display: flex;
+}
+.cell-box.data-v-29c113c4:last-child {
+  border-bottom: 0 none;
+}
+.cell-box .cell-title.data-v-29c113c4 {
+  font-size: 28rpx;
+  line-height: 40rpx;
+  flex: 1;
+  display: block !important;
+  width: 100%;
+}
+.cell-box .cell-content.data-v-29c113c4 {
+  text-align: right;
+  line-height: 40rpx;
+}
+.vip-fixed-bottom.data-v-29c113c4 {
+  background-color: #fff;
+  height: 94rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 1px 0 5px rgba(100, 100, 100, 0.1);
+  display: flex;
+}
+.vip-fixed-bottom .item.data-v-29c113c4 {
+  flex: 1;
+  display: block !important;
+  width: 100%;
+}
+.vip-fixed-bottom .item.vip-btn.data-v-29c113c4 {
+  text-align: center;
+  line-height: 94rpx;
+  font-size: 28rpx;
+  color: #463015;
+  background: linear-gradient(118deg, #ecd8be, #dbb280);
+}
+.vip-fixed-bottom .item.vip-btn .number.data-v-29c113c4 {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-left: 4rpx;
+}
+.vip-fixed-bottom .item.article-confirm.data-v-29c113c4 {
+  text-align: center;
+}
+.vip-fixed-bottom .item.article-confirm .radio-wrap.data-v-29c113c4 {
+  line-height: 36rpx;
+  margin-top: 10rpx;
+  margin-bottom: 8rpx;
+}
+.vip-fixed-bottom .item.article-confirm .radio-wrap .radio-icon.data-v-29c113c4 {
+  position: relative;
+  margin-right: 4rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 36rpx;
+  display: inline-block;
+  vertical-align: bottom;
+  background: linear-gradient(118deg, #ecd8be, #dbb280);
+  border-radius: 50%;
+}
+.vip-fixed-bottom .item.article-confirm .radio-wrap .radio-icon.data-v-29c113c4:before {
+  content: "";
+  position: absolute;
+  width: 18rpx;
+  height: 10rpx;
+  border-width: 1px;
+  border-color: transparent transparent #fff #fff;
+  border-style: solid;
+  left: 10rpx;
+  top: 10rpx;
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+  opacity: 0;
+  transition: all 0.2s;
+}
+.vip-fixed-bottom .item.article-confirm .radio-wrap .radio-icon.data-v-29c113c4:after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  right: 3px;
+  background: #fff;
+  transition: all 0.2s;
+  border-radius: 100%;
+}
+.vip-fixed-bottom .item.article-confirm .radio-wrap .radio-icon.active.data-v-29c113c4:before {
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+  opacity: 1;
+}
+.vip-fixed-bottom .item.article-confirm .radio-wrap .radio-icon.active.data-v-29c113c4:after {
+  -webkit-transform: scale(0);
+          transform: scale(0);
+  opacity: 0;
+}
+.vip-fixed-bottom .item.article-confirm .a.data-v-29c113c4 {
+  color: #C79557;
+  font-size: 20rpx;
+}

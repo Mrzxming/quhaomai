@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "导入日志",
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "tui-list-cell": "/components/list-cell/list-cell",
+    "dsc-filter-top": "/components/dsc-filter-top",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

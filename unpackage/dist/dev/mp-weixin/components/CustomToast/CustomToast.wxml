@@ -1,0 +1,1 @@
+<block wx:if="{{show}}"><view class="custom-toast data-v-c9ed249c"><view class="{{['toast-content','data-v-c9ed249c',(icon==='error')?'error':'']}}"><block wx:if="{{icon==='error'}}"><view class="error-icon data-v-c9ed249c">!</view></block><text class="toast-text data-v-c9ed249c">{{title}}</text></view></view></block>

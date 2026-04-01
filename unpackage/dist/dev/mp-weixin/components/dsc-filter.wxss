@@ -1,0 +1,104 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*filter*/
+.filter-tab{ background: #FFFFFF;}
+.filter-items{ display: flex; align-items: center;flex-direction: row; height: 80rpx;}
+.filter-items .item{
+	display: flex; flex: 1 1 0%; justify-content: center; align-items: center;
+	font-weight: 400;
+	font-size: 32rpx;
+	color: #626262;
+}
+.filter-items .item .iconfont{ font-size: 20rpx; margin-left: 5rpx;}
+.filter-items .item .icon-filter{ margin: 3px 8rpx 0 0;}
+.filter-items .item.active,.filter-items .item.active .iconfont{ color: #1B1B1B; font-weight: bold;}
+.filter-items .item.easy_choose_active,.filter-items .item.easy_choose_active .iconfont{ 
+	font-weight: 500;
+	font-size: 31rpx;
+	color: #FFFFFF;
+	background: #DCAB6C;
+	border-radius: 10rpx;
+}
+.filter-items .item.a-change .iconfont{ -webkit-transform: rotate(-180deg); transform: rotate(-180deg);
+}
+

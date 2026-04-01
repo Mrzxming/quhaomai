@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "店铺列表",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-popup": "/components/uni-popup/uni-popup_1",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-region": "/components/dsc-region",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

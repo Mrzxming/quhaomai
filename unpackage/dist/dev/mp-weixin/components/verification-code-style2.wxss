@@ -1,0 +1,40 @@
+.acqui_verification_code {
+  position: relative;
+}
+.acqui_verification_code .verification_code_continor {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+.acqui_verification_code .verification_code_continor .verification_code_item {
+  width: 60rpx;
+  height: 60rpx;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.acqui_verification_code .verification_code_continor .verification_code_item:not(:first-child) {
+  margin-left: 20rpx;
+}
+.acqui_verification_code .verification_code_continor .point {
+  width: 10rpx;
+  height: 10rpx;
+  background-color: black;
+  border-radius: 200px;
+}
+.acqui_verification_code .input_info {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 8;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+}
+.acqui_verification_code .input_info > input {
+  width: 80%;
+  height: 100%;
+}
+

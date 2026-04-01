@@ -1,0 +1,1 @@
+<view><custom-camera class="vue-ref" bind:back="__e" bind:getImage="__e" vue-id="4e4a3174-1" data-ref="CustomCamera" data-event-opts="{{[['^back',[['back']]],['^getImage',[['getImage']]]]}}" bind:__l="__l"></custom-camera></view>

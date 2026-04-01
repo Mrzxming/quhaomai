@@ -1,0 +1,20 @@
+
+.community { background: #FFFFFF; display: flex; flex-direction: row; flex-wrap: wrap; margin-bottom: 15rpx;}
+.community .item{ width: 50%; padding: 20rpx; display: flex; flex-direction: row; box-sizing: border-box; border-right: 2rpx solid #f6f6f9; border-bottom: 2rpx solid #f6f6f9;}
+.community .item .theme-left{ width: 120rpx; height: 120rpx; display: flex; justify-content: center; align-items: center; border-radius: 10rpx; margin-right: 20rpx;}
+.community .item .theme-left .iconfont{ font-size: 80rpx; color: #FFFFFF;
+}
+.community .item .theme-right{ display: flex; flex-direction: column; justify-content: center;
+}
+.community .item .theme-right .tit{ font-size: 32rpx;
+}
+.community .item .theme-right .span{ font-size: 25rpx; color: #999999;}
+.tm-ns{ background: #fc295b;
+}
+.tm-zs{ background: #f85bd1;
+}
+.tm-ls{ background: #25d081;
+}
+.tm-hs{ background: #fc6e29;
+}
+

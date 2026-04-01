@@ -1,0 +1,14 @@
+{
+  "enablePullDownRefresh": false,
+  "backgroundColorTop": "#F5F5F5",
+  "backgroundColorBottom": "#F5F5F5",
+  "backgroundColor": "#F5F5F5",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-not-content": "/components/dsc-not-content",
+    "tabbar": "/components/zdy-tabbar/zdy-tabbar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

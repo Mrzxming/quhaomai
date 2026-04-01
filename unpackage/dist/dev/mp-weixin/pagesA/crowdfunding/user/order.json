@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "微筹订单",
+  "usingComponents": {
+    "dsc-tabbar": "/components/dsc-tabbar",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

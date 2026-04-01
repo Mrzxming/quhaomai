@@ -1,0 +1,20 @@
+
+.countdown.data-v-6cbd820c {
+  color: #ff5555; /* 可根据设计调整颜色、字体 */
+  background: #FFEDED;
+  border-radius: 8rpx;
+  width: -webkit-fit-content;
+  width: fit-content;
+  padding: 0 10rpx;
+}
+.time.data-v-6cbd820c {
+	font-family: PingFangSC, PingFang SC;
+	font-weight: 400;
+	font-size: 28rpx;
+	color: #FE2F02;
+	line-height: 28rpx;
+	text-align: center;
+	font-style: normal; 
+	margin-left: 10rpx;
+} 
+

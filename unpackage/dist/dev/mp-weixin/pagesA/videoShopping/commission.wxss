@@ -1,0 +1,35 @@
+.commission.data-v-a120f2aa {
+  height: 100vh;
+  background: #FFFFFF;
+}
+.commission .commission-header.data-v-a120f2aa {
+  background-color: #fff1c8;
+  font-size: 36rpx;
+  padding: 20px 30px;
+}
+.commission .commission-header .total.data-v-a120f2aa {
+  color: #F2041A;
+}
+.commission .withdraw-list.data-v-a120f2aa {
+  margin-top: 20px;
+  padding: 0 20px;
+}
+.commission .withdraw-list .item.data-v-a120f2aa {
+  border-bottom: 1px solid #F5F5F5;
+  padding: 20rpx 0;
+}
+.commission .withdraw-list .item .row.data-v-a120f2aa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.commission .withdraw-list .item .row .money.data-v-a120f2aa {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.commission .withdraw-list .item .row .text.data-v-a120f2aa {
+  font-size: 28rpx;
+}
+.commission .withdraw-list .item .row .time.data-v-a120f2aa {
+  color: #999999;
+}

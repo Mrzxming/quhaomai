@@ -1,0 +1,42 @@
+
+.wrap.data-v-4e4880a4 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 9998;
+  overflow: hidden;
+}
+.chiaroscuro.data-v-4e4880a4 {
+  -webkit-animation-duration: 1s;
+          animation-duration: 1s;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-name: placeHolderShimmer-data-v-4e4880a4;
+          animation-name: placeHolderShimmer-data-v-4e4880a4;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  background: #f6f7f8;
+  background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+  background-size: 800px 104px;
+  height: 40px;
+  position: relative;
+}
+@-webkit-keyframes placeHolderShimmer-data-v-4e4880a4{
+0% {
+    background-position: -468px 0
+}
+100% {
+    background-position: 468px 0
+}
+}
+@keyframes placeHolderShimmer-data-v-4e4880a4{
+0% {
+    background-position: -468px 0
+}
+100% {
+    background-position: 468px 0
+}
+}
+

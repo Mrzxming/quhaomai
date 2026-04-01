@@ -1,0 +1,84 @@
+page {
+  height: 100%;
+}
+.container {
+  background: #F6F6F6;
+}
+.title {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 32rpx;
+  color: #1B1B1B;
+  line-height: 32rpx;
+  text-align: left;
+  font-style: normal;
+  padding-left: 34rpx;
+}
+.content {
+  background: #ffffff;
+  margin: 32rpx 0rpx 50rpx;
+  padding: 32rpx 36rpx;
+}
+.aaa {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 16rpx;
+  border: 1rpx solid #979797;
+  padding: 26rpx;
+  font-size: 28rpx;
+  color: #1B1B1B;
+}
+.conlen {
+  position: absolute;
+  bottom: 5%;
+  right: 8%;
+  color: #999;
+}
+.itempic {
+  width: 176rpx;
+  height: 176rpx;
+  border-radius: 13rpx;
+  border: 1rpx solid #979797;
+}
+.icon-content {
+  background: #ffffff;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin: 32rpx 0rpx 50rpx;
+  padding: 32rpx 16rpx;
+}
+.icon-item {
+  width: 176rpx;
+  height: 176rpx;
+  border-radius: 13rpx;
+  border: 1rpx solid #979797;
+  margin: 10rpx;
+}
+.itemlist {
+  position: relative;
+}
+.radios {
+  z-index: 999;
+  position: absolute;
+  top: -10%;
+  right: -10%;
+}
+.submit {
+  width: 72%;
+  height: 88rpx;
+  background: #FE0302;
+  box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(192, 192, 192, 0.15);
+  border-radius: 44rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 14%;
+}
+.subtext {
+  font-size: 36rpx;
+  color: #FFFFFF;
+  line-height: 88rpx;
+  text-align: center;
+}

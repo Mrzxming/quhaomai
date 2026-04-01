@@ -1,0 +1,25 @@
+{
+    "id": "edwin-time",
+    "name": "预约时间、自定义时间区间、预约时间段自选、自动描点",
+    "scripts": {
+        "h5-proxy": "node h5-proxy.js"
+    },
+    "displayName": "预约时间、自定义时间区间、预约时间段自选、自动描点",
+    "version": "1.12",
+    "description": "不用引入其他插件即可完成，简单日期组件",
+    "keywords": [
+        "预约时间",
+        "自定义时间区间",
+        "预约时间段自选"
+    ],
+    "dcloudext": {
+        "category": [
+            "前端组件",
+            "通用组件"
+        ]
+    },
+    "dependencies": {
+        "uview-ui": "^2.0.38",
+        "vuex-persistedstate": "^4.1.0"
+    }
+}

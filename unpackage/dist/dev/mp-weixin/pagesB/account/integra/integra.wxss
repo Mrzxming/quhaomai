@@ -1,0 +1,56 @@
+
+.main.data-v-6470ca8c {
+	height: 100%;
+	background: #FFFFFF;
+}
+.growth_time.data-v-6470ca8c {
+	display: flex;
+	justify-content: space-between;
+}
+.main_box.data-v-6470ca8c {
+	background: linear-gradient(to right, #6A7ED5, #83A9F1, #83A9F1, #6A7ED5);
+	padding-top: 50rpx;
+	padding-bottom: 30rpx;
+}
+.integral_t.data-v-6470ca8c {
+	text-align: center;
+	color: #FFFFFF;
+}
+.integral_t text.data-v-6470ca8c {
+	font-size: 35rpx;
+	font-weight: 500;
+}
+.integral_n.data-v-6470ca8c {
+	font-size: 24rpx;
+	text-align: center;
+	color: #fff;
+	margin-top: 20rpx;
+}
+.integral_title.data-v-6470ca8c {
+	font-size: 28rpx;
+	text-align: center;
+	margin: 0 30rpx;
+	padding: 20rpx;
+	border-bottom: 1px solid #f6f6f9;
+}
+.ny-item.data-v-6470ca8c {
+	padding: 20rpx 30rpx;
+	margin: 0 20rpx;
+	border-bottom: 1px solid #f6f6f9;
+}
+.ny-item view.data-v-6470ca8c {
+	margin-top: 6rpx;
+}
+.time_price.data-v-6470ca8c {
+	display: flex;
+	justify-content: space-between;
+}
+.red.data-v-6470ca8c {
+	color: red;
+	font-weight: 600;
+}
+.green.data-v-6470ca8c {
+	color: #33CC66;
+	font-weight: 600;
+}
+

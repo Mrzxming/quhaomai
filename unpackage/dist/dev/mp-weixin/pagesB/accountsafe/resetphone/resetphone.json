@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "修改手机号",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "captcha": "/components/captcha4/index"
+  }
+}

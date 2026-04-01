@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

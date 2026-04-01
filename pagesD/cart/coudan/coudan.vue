@@ -1,0 +1,280 @@
+<template>
+	<view class="container">
+		<view class="header">
+			<uni-nav-bar color="#333333" background-color="#FFFFFF" shadow="false" :statusBar="false" fixed="false" leftState="false" @click-right="rightClick">
+				<view class="input-view">
+					<input confirm-type="search" disabled="true" @click="searchFocus" class="input" type="text" :placeholder="placeholder" />
+					<uni-icons type="search" size="22" color="#666666" class="right-icon" @click="searchFocus"></uni-icons>
+				</view>
+				<!-- <view slot="right"><text class="iconfont" @click="handleViewSwitch" :class="[mode === 'grid' ? 'icon-grid' : 'icon-list']"></text></view> -->
+			</uni-nav-bar>
+			<dsc-filter :filter="filter" :filterStyle="filterStyle" :isPopupVisible="isPopupVisible" v-on:getFilter='handleFilter' @setPopupVisible="setPopupVisible"></dsc-filter>
+		</view>
+		<view class="product-list-lie">
+			<dsc-product-list :list="coudanGoodsList" :mode="mode" :status="loadMoreStatus" v-if="coudanGoodsList"></dsc-product-list>
+			<uni-load-more :status="loadMoreStatus" :content-text="contentText" v-if="page > 0 && showLoadMore" />
+		</view>
+		<!--返回顶部-->
+		<dsc-filter-top :scrollState="scrollState" outerClass="true"></dsc-filter-top>
+	</view>
+</template>
+
+<script>
+	import { mapState } from 'vuex'
+	
+	import uniNavBar from '@/components/uni-nav-bar.vue'
+	import uniIcons from '@/components/uni-icons/uni-icons.vue'
+	import uniDrawer from '@/components/uni-drawer.vue'
+	import dscFilter from '@/components/dsc-filter.vue'
+	import dscProductList from '@/components/dsc-product-list.vue'
+	import dscCommonNav from '@/components/dsc-common-nav.vue';
+	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
+	//返回顶部
+	import dscFilterTop from '@/components/dsc-filter-top'
+	
+	export default {
+		components: {
+			uniNavBar,
+			uniIcons,
+			uniDrawer,
+			dscFilter,
+			dscProductList,
+			dscCommonNav,
+			uniLoadMore,
+			dscFilterTop
+		},
+		data() {
+			return {
+				mode:'grid',
+				isFilter:true,
+				filter:{
+					sort:'goods_id',
+					order:'desc',
+					goods_num:'0',
+					promote:'0',
+					min:'',
+					max:'',
+					brand_id:[],
+					brandResult:[],
+					brandResultName:'',
+					self:'0',
+				},
+				filterStyle:'coudan',
+				isPopupVisible:false,
+				routerName:'goods',
+				act_id:0,
+				page:1,
+				size:10,
+				placeholder:this.$t('lang.enter_search_keywords'),
+			scrollState:false,
+			loadMoreStatus:'more', // 初始状态为 'more'，表示可以加载更多
+			contentText: {
+					contentdown: this.$t('lang.view_more'),
+					contentrefresh: this.$t('lang.loading'),
+					contentnomore: this.$t('lang.no_more')
+				},
+				showLoadMore: false,
+			}
+		},
+		computed:{
+			coudanGoodsList:{
+				get(){
+					return this.$store.state.shopping.coudanGoodsList
+				},
+				set(val){
+					this.$store.state.shopping.coudanGoodsList = val
+				}
+			},
+			coudanInfo:{
+				get(){
+					return this.$store.state.shopping.coudanInfo
+				},
+				set(val){
+					this.$store.state.shopping.coudanInfo = val
+				}
+			}
+		},
+		methods: {
+			getGoodsList(page){
+				let sort = 0
+	
+				if(page){
+					this.page = page
+					this.size = Number(page) * 10
+				}
+	
+				if(this.filter.sort == 'goods_id'){
+					sort = 0
+				}else if(this.filter.sort == 'shop_price'){
+					sort = 1
+				}else if(this.filter.sort == 'sales_volume'){
+					sort = 2
+				}
+				
+				// 【关键修复】如果状态不是 'loading'，设置为 'loading'（首次加载或从 'more' 状态触发）
+				if (this.loadMoreStatus !== 'loading') {
+					this.loadMoreStatus = 'loading'
+				}
+				
+				// 【关键修复】等待数据返回后，检查返回的数据量来判断是否还有更多数据
+				this.$store.dispatch('setCoudanGoodsList',{
+					act_id:this.act_id,
+					page:this.page,
+					size:this.size,
+					sort:sort,
+					order:this.filter.order
+				}).then(res => {
+					// 检查返回的数据量
+					const returnedDataLength = res && res.data ? res.data.length : 0
+					const pageSize = 10 // 每页固定10条
+					
+					// 如果返回的数据量小于每页数量，说明没有更多数据了
+					if (returnedDataLength < pageSize) {
+						this.loadMoreStatus = 'noMore'
+					} else {
+						// 返回的数据量等于每页数量，可能还有更多数据，设置为 'more' 状态
+						this.loadMoreStatus = 'more'
+					}
+				}).catch(err => {
+					// 请求失败时，设置为没有更多数据
+					console.error('获取商品列表失败:', err)
+					this.loadMoreStatus = 'noMore'
+				})
+				
+				this.showLoadMore = true
+			},
+			onCoudanInfo(){
+				this.$store.dispatch('setCoudan',{
+					act_id:this.act_id
+				})
+			},
+			handleFilter(o){
+				this.filter.sort = o.sort
+				this.filter.order = o.order
+	
+				this.getGoodsList(1)
+			},
+			setPopupVisible(val){
+				this.isPopupVisible = val;
+			},
+			handleViewSwitch(val){
+				this.mode = this.mode === 'grid' ? 'list' : 'grid';
+			},
+			searchFocus(){
+				//全局变量integration赋值
+				//getApp().globalData.integration = 0;
+				
+				uni.navigateTo({
+					url: '/pagesD/search/search'
+				});
+			},
+			leftClick(){
+				
+			},
+			rightClick(){
+				
+			},
+			confirm(){
+				
+			}
+		},
+		onLoad(e){
+			this.act_id = e.act_id
+			this.getGoodsList()
+			this.onCoudanInfo()
+		},
+		onPageScroll(e) {
+			var that = this
+
+			that.scrollState = e.scrollTop > 800 ? true : false
+
+			let to_scroll_top = e.scrollTop + 20
+
+			uni.createSelectorQuery().select('.product-list-lie').boundingClientRect((res) => {
+				let a = uni.getSystemInfoSync()
+				let t_height = res.height - a.screenHeight
+
+				if (t_height <= to_scroll_top) {
+					// 【关键修复】如果已经设置为没有更多数据，不再处理
+					if (that.loadMoreStatus === 'noMore') {
+						return
+					}
+					// 【关键修复】如果正在加载中，不再重复调用
+					if (that.loadMoreStatus === 'loading') {
+						return
+					}
+					// 【关键修复】只有在状态为 'more' 时才加载下一页
+					if (that.loadMoreStatus === 'more' && that.page * that.size == that.coudanGoodsList.length) {
+						that.loadMoreStatus = 'loading';
+						that.page++
+						that.getGoodsList()
+					}
+				}
+			}).exec()
+		},
+		onReachBottom() {
+			var that = this
+			console.log("111")
+			console.log(that.page * that.size)
+			console.log(that.coudanGoodsList.length)
+			console.log(that.page * that.size == that.coudanGoodsList.length)
+			// 【关键修复】如果已经设置为没有更多数据，不再处理
+			if (that.loadMoreStatus === 'noMore') {
+				return
+			}
+			// 【关键修复】如果正在加载中，不再重复调用
+			if (that.loadMoreStatus === 'loading') {
+				return
+			}
+			// 【关键修复】只有在状态为 'more' 且满足条件时才加载下一页
+			if (that.loadMoreStatus === 'more' && that.page * that.size == that.coudanGoodsList.length) {
+				that.loadMoreStatus = 'loading';
+				that.page++
+				that.getGoodsList()
+			} else if (that.page * that.size != that.coudanGoodsList.length) {
+				// 如果数据量不匹配，说明没有更多数据了
+				that.loadMoreStatus = "noMore"
+			}
+		},
+	}
+</script>
+
+<style scoped>
+
+	/*header*/
+	.header .uni-navbar { border-bottom: solid 1px #e6e6e6;}
+	.header .uni-navbar view{ line-height: 50px;}
+	.header .uni-navbar-header{ height: 50px;}
+	.header .uni-navbar-header .uni-navbar-header-btns{ padding: 0;}
+	.header .uni-navbar-container{ margin: 0 20upx;}
+	.header .uni-navbar .input-view{background-color: #FFFFFF; border:1px solid #e6e6e6; margin: 0px 0; display: flex; flex-direction: row; align-items: center;}
+	
+	/*popop*/
+	.con-filter-div{ padding-bottom: 50px; }
+	.mod_list{ background: #ffffff; margin-bottom: 20upx;}
+	.mod_list .item .li_line{ display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 20upx;}
+	.mod_list .item.radio-switching{ padding: 20upx; }
+	.mod_list .item.radio-switching .li_line{ padding: 0;}
+	.tags_selection{ background: #FFFFFF; margin-bottom: 20upx; padding: 20upx 0 0 20upx; display: flex; flex-direction:row;}
+	.tags_selection text{  padding: 5upx 30upx; background: #f7f7f7; border-radius: 10upx; margin: 0 20upx 20upx 0; border:1px solid #f7f7f7;}
+	.tags_selection .active{ background: #FFFFFF; border:1px solid #e93b3d; color: #e93b3d;}
+	
+	.filterlayer_price{ padding: 20upx; position: relative;}
+	.filterlayer_price:before{ content: "";position: absolute;z-index: 1;pointer-events: none;background-color: #e5e5e5;height: 1px;left: 0;right: 0;top: 0;}
+	.filterlayer_price .filterlayer_price_area{ display: flex;}
+	.filterlayer_price_area_input{ flex: 1; background: #f7f7f7; color: #333333; padding: 10upx; text-align: center; }
+	.filterlayer_price_hang{ width: 50upx; position: relative;}
+	.filterlayer_price_hang:before{ content: "";position: absolute;top: 50%;left: 50%;margin-left: -5px;width: 10px;height: 1px;background-color: #f1f1f1;}
+	
+	.filterlayer_bottom_buttons{ display: flex; flex-direction: row; position:absolute; bottom: 0; width: 100%; background: #FFFFFF; z-index: 9;}
+	.filterlayer_bottom_button{ height: 49px; line-height: 49px; flex: 1; text-align: center; box-shadow: 0 -1px 2px 0 rgba(0, 0, 0, 0.07);}
+	.filterlayer_bottom_button.active{ background-color: #e93b3d; color: #ffffff;}
+	
+	.sf_layer{ background: #FFFFFF; height: 100%;}
+	.sf_layer .sf_layer_sub_title{ display: flex; flex-direction: row; align-items: center; padding: 20upx; background-color: #FFFFFF;}
+	.sf_layer .sf_layer_sub_title .tit{ width: 150upx;}
+	.sf_layer .sf_layer_sub_title text{ flex: 1 1 0%;}
+	
+	.center-box{ width: 100%; background: #FFFFFF;}
+</style>
+

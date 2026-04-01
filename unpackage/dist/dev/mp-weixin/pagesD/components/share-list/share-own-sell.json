@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "navigationStyle": "custom",
+  "onReachBottomDistance": 1500,
+  "usingComponents": {
+    "x-skeleton": "/uni_modules/x-skeleton/components/x-skeleton/x-skeleton",
+    "skeleton": "/components/skeleton/skeleton",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-notice-bar": "/components/uni-notice-bar/uni-notice-bar",
+    "jyf-parser": "/components/jyf-parser/jyf-parser",
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "dsc-copyright": "/components/dsc-copyright/dsc-copyright",
+    "uni-popup": "/components/uni-popup",
+    "uni-popups": "/components/uni-popup/uni-popup_1",
+    "uni-countdown": "/components/uni-countdown",
+    "dsc-filter-top": "/components/dsc-filter-top",
+    "dsc-product-list": "/components/dsc-product-list",
+    "sys-coupon": "/components/sys-coupon"
+  }
+}

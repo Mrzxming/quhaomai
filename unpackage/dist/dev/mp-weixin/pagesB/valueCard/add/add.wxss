@@ -1,0 +1,10 @@
+
+.btn-bar{ margin: 30rpx;
+}
+.right_icon {
+	width: 10%;
+}
+.color_red {
+	color: red;
+}
+

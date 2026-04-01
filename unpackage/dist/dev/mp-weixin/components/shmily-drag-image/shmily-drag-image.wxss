@@ -1,0 +1,39 @@
+.con.data-v-345cb730 {
+  padding: 10rpx;
+}
+.con .area.data-v-345cb730 {
+  width: 100%;
+}
+.con .area .view.data-v-345cb730 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.con .area .view .area-con.data-v-345cb730 {
+  position: relative;
+  overflow: hidden;
+}
+.con .area .view .area-con .pre-image.data-v-345cb730 {
+  width: 100%;
+  height: 100%;
+}
+.con .area .view .area-con .del-con.data-v-345cb730 {
+  position: absolute;
+  top: 0rpx;
+  right: 0rpx;
+}
+.con .area .view .area-con .del-con .del-image.data-v-345cb730 {
+  width: 50rpx;
+  height: 50rpx;
+}
+.con .area .add.data-v-345cb730 {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.con .area .add .add-wrap.data-v-345cb730 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

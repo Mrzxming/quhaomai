@@ -1,0 +1,93 @@
+@charset "UTF-8";
+/* 与登录/注册一致：头部背景、内容区背景、按钮 input 样式 */
+.container-bwg.data-v-763de4b4 {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+.container-reset.data-v-763de4b4 {
+  background: linear-gradient(180deg, #FFD4C8 0%, #F8F8F8 22%, #F8F8F8 100%);
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+.reset-header.data-v-763de4b4 {
+  padding: 60px 30px 24px;
+}
+.user-lr-form.data-v-763de4b4 {
+  flex: 1;
+  background: #F8F8F8;
+  border-radius: 24px 24px 0 0;
+  padding: 32px 24px 20px;
+  position: relative;
+}
+.user-lr-form .item-inputs.data-v-763de4b4 {
+  margin-bottom: 12px;
+  background: transparent;
+}
+.user-lr-form .item-inputs .label.data-v-763de4b4 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  background: transparent;
+}
+.user-lr-form .item-inputs .item-input.data-v-763de4b4 {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-lr-form .item-inputs .item-input .input.data-v-763de4b4 {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+}
+.user-lr-form .item-inputs .item-input .input.data-v-763de4b4::-webkit-input-placeholder {
+  color: #BFBFBF;
+}
+.user-lr-form .item-inputs .item-input .input.data-v-763de4b4::placeholder {
+  color: #BFBFBF;
+}
+.user-lr-form .item-inputs .item-input .icon.data-v-763de4b4 {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-lr-form .btn-bar.data-v-763de4b4 {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+.user-lr-form .submit-btn.data-v-763de4b4 {
+  width: 100%;
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  padding: 0 !important;
+  line-height: 56px !important;
+  background: #D23328;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(210, 51, 40, 0.35);
+}
+.user-lr-form .submit-btn.data-v-763de4b4:active {
+  opacity: 0.9;
+}
+.user-lr-form .tips.data-v-763de4b4 {
+  font-size: 12px;
+  color: #999;
+  line-height: 1.5;
+}

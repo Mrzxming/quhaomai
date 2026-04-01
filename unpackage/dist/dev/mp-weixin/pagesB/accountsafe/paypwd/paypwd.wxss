@@ -1,0 +1,27 @@
+.header-title.data-v-50be2a77 {
+  padding: 20rpx 30rpx;
+  border-bottom: 1px solid #DDDDDD;
+  font-size: 30rpx;
+}
+.input-lists.data-v-50be2a77 {
+  display: flex;
+  align-items: center;
+}
+.input-lists .input-items.data-v-50be2a77 {
+  width: 0rpx;
+}
+.input-lists .code-list.data-v-50be2a77 {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.input-lists .code-list .code-item.data-v-50be2a77 {
+  width: 60rpx;
+  height: 60rpx;
+  text-align: center;
+  line-height: 60rpx;
+  border: 1rpx solid #eee;
+  border-radius: 10rpx;
+  margin-right: 20rpx;
+}

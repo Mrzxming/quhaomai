@@ -1,0 +1,12 @@
+
+.section-list .list.data-v-5d201e3e{ padding: 20rpx; display: flex; flex-direction: row; justify-content: center; align-items: center; background-color: #FFFFFF; margin-top: 20rpx;}
+.section-list .list .left.data-v-5d201e3e{ width: 120rpx; margin-right: 20rpx; display: flex; flex-direction: row; justify-content: center; align-items: center;}
+.section-list .list .left image.data-v-5d201e3e{ width: 100%;
+}
+.section-list .list .con.data-v-5d201e3e{ flex: 1 1 0%;}
+.section-list .list .con .name.data-v-5d201e3e{ font-size: 28rpx;
+}
+.section-list .list .con .time.data-v-5d201e3e{ font-size: 25rpx; color: #999999;}
+.section-list .list .right.data-v-5d201e3e{ display: flex; flex-direction: row; justify-content: center; align-items: center;}
+.section-list .list .right .price.data-v-5d201e3e{ color: #f92028; font-size: 24rpx;}
+

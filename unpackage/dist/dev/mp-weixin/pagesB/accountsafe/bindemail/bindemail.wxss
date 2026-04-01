@@ -1,0 +1,78 @@
+
+.container-bwg {
+	height: 100vh;
+	overflow: hidden;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+.user-lr-form {
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 防止输入法弹出时页面滚动 */
+page {
+	overflow: hidden !important;
+	height: 100vh !important;
+}
+.user-lr-form .item-input label {
+	width: auto;
+	height: 1.4rem;
+	line-height: 1.4rem;
+}
+.tips {
+	font-size: 25rpx;
+	color: #888888;
+	margin-top: 10rpx;
+}
+
+/* 竖杠分隔线 */
+.key-divider {
+	width: 1px;
+	height: 30rpx;
+	background-color: #d7d7d7;
+	margin-right: 20rpx;
+}
+
+/* 获取验证码按钮样式 */
+.get-code-btn {
+	display: inline-block;
+	padding: 8rpx 24rpx;
+	border-radius: 8rpx;
+	font-size: 28rpx;
+	text-align: center;
+	min-width: 160rpx;
+	transition: all 0.3s;
+}
+.get-code-btn.btn-disabled {
+	background-color: #e0e0e0;
+	color: #999999;
+}
+.get-code-btn.btn-active {
+	background-color: #1D94FF;
+	color: #FFFFFF !important;
+	font-weight: 500;
+}
+.get-code-btn.btn-active text {
+	color: #FFFFFF !important;
+}
+.key {
+	display: flex;
+	align-items: center;
+}
+
+/* 去掉 .key 内 uni-text 的边框 */
+.user-lr-form .item-input .key uni-text {
+	border-left: none !important;
+	border-right: none !important;
+	border-top: none !important;
+	border-bottom: none !important;
+	padding: 0 !important;
+}
+

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "礼品卡商品列表",
+  "usingComponents": {
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

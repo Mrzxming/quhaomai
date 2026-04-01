@@ -1,0 +1,8 @@
+
+.goods-list.data-v-69abadcf{ margin-top: 20rpx;}
+.goods-list .goods-item.data-v-69abadcf{ margin-bottom: 20rpx; flex-direction: column; padding: 0; position: relative;}
+.item-bd.data-v-69abadcf{ display: flex; flex-direction: row; padding: 20rpx;}
+.item-fd.data-v-69abadcf{ border-top: 1px solid #f4f4f4;
+}
+.icon.data-v-69abadcf{ position: absolute; width: 250rpx; height: 180rpx; top: 20rpx; right: 0;}
+

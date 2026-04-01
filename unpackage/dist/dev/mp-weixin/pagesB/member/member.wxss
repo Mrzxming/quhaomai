@@ -1,0 +1,714 @@
+@charset "UTF-8";
+/* 抖动动画 */
+@-webkit-keyframes shake-data-v-26e4f5ec {
+0%, 100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+}
+10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translateX(-10rpx);
+            transform: translateX(-10rpx);
+}
+20%, 40%, 60%, 80% {
+    -webkit-transform: translateX(10rpx);
+            transform: translateX(10rpx);
+}
+}
+@keyframes shake-data-v-26e4f5ec {
+0%, 100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+}
+10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translateX(-10rpx);
+            transform: translateX(-10rpx);
+}
+20%, 40%, 60%, 80% {
+    -webkit-transform: translateX(10rpx);
+            transform: translateX(10rpx);
+}
+}
+.privacy.shake.data-v-26e4f5ec {
+  -webkit-animation: shake-data-v-26e4f5ec 0.6s ease-in-out;
+          animation: shake-data-v-26e4f5ec 0.6s ease-in-out;
+}
+/* 完全重置uni-button样式 */
+.custom-button.data-v-26e4f5ec {
+  position: static !important;
+  display: flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  font-size: inherit !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  line-height: normal !important;
+  border-radius: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+  overflow: visible !important;
+  color: inherit !important;
+  background-color: transparent !important;
+  cursor: pointer !important;
+  border: none !important;
+  outline: none !important;
+}
+/* 移除按钮的默认边框和背景 */
+.custom-button.data-v-26e4f5ec::after {
+  display: none !important;
+  border: none !important;
+}
+.top-bot.data-v-26e4f5ec {
+  position: fixed;
+  bottom: 0%;
+  left: 0%;
+  width: 750rpx;
+  max-height: 280rpx;
+  /* min-height值通过动态样式设置 */
+  background: #FFFFFF;
+  border-radius: 40rpx 40rpx 0rpx 0rpx;
+  padding-bottom: 80rpx;
+  max-height: 440rpx;
+  min-height: 400rpx;
+  z-index: 9;
+  /* 初始状态：隐藏在底部，无动画 */
+  -webkit-transform: translateY(100%);
+          transform: translateY(100%);
+  transition: none;
+  /* 初始无动画 */
+  /* 显示状态：滑出，带iOS风格动画 */
+}
+.top-bot.show.data-v-26e4f5ec {
+  -webkit-transform: translateY(0);
+          transform: translateY(0);
+  transition: -webkit-transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), -webkit-transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.top-bot .noopen.data-v-26e4f5ec {
+  margin: 0rpx 32rpx;
+  padding: 20rpx 0;
+}
+.top-bot .noopen .fee-btn.data-v-26e4f5ec {
+  width: 180rpx;
+  height: 60rpx;
+  box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(192, 192, 192, 0.15);
+  border-radius: 44rpx;
+  border: 1rpx solid #272727;
+  margin-bottom: 1rpx;
+}
+.top-bot .bot-btn.data-v-26e4f5ec {
+  width: 688rpx;
+  margin-top: 26rpx;
+  position: relative;
+}
+.top-bot .bot-btn .yellow-brage.data-v-26e4f5ec {
+  position: absolute;
+  top: -60rpx;
+  right: 0;
+  padding: 4rpx 20rpx;
+  font-size: 24rpx;
+  color: #FE2F02;
+  background: #FAEF89;
+  border-radius: 24rpx 24rpx 24rpx 0rpx;
+}
+.top-bot .bot-btn .left.data-v-26e4f5ec {
+  width: 344rpx;
+  height: 88rpx;
+  background: #FFEDED;
+  border-radius: 44rpx 0rpx 0rpx 44rpx;
+}
+.top-bot .bot-btn .right.data-v-26e4f5ec {
+  width: 344rpx;
+  height: 88rpx;
+  background: #FE2F02;
+  box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(192, 192, 192, 0.15);
+  border-radius: 0rpx 44rpx 44rpx 0rpx;
+}
+.bottom-section.data-v-26e4f5ec {
+  position: relative;
+  z-index: 9;
+}
+/* 自定义指示器样式 */
+.custom-indicator.data-v-26e4f5ec {
+  margin: 20rpx 0;
+  height: 40rpx;
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  /* 相对于父容器左移50% */
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  /* 基于自身宽度向左偏移50%，实现精准居中 */
+  max-width: 200rpx;
+}
+.indicator-dot.data-v-26e4f5ec {
+  width: 40rpx;
+  height: 10rpx;
+  background-color: #fff;
+  margin: 0 10rpx;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.indicator-dot.active.data-v-26e4f5ec {
+  background-color: #773E0F;
+  width: 40rpx;
+  border-radius: 10rpx;
+}
+/* 按钮容器 */
+.rights.data-v-26e4f5ec {
+  margin: 0rpx 24rpx 20rpx;
+  position: relative;
+  /* 调整轮播图容器的 padding */
+  /* 确保轮播图在正确层级 */
+}
+.rights .rights-title.data-v-26e4f5ec {
+  width: 486rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  background: linear-gradient(180deg, #FEF5DF 0%, #E6D3A2 100%, #E6D3A2 100%);
+  border-radius: 0rpx 0rpx 52rpx 52rpx;
+  position: absolute;
+  top: 0%;
+  left: 15%;
+}
+.rights .rights-title ._span.data-v-26e4f5ec {
+  font-weight: 600;
+  font-size: 36rpx;
+  color: #773E0F;
+  line-height: 36rpx;
+  text-align: justify;
+  font-style: normal;
+}
+.rights .rights-two.data-v-26e4f5ec {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F1E6C7 100%);
+  border-radius: 44rpx;
+  padding: 10px 10px 0px 8px;
+  margin-bottom: 24rpx;
+  /* 关键修改：背景只覆盖到轮播图部分 */
+  background-clip: padding-box;
+}
+.rights .right-bora.data-v-26e4f5ec {
+  min-width: 100%;
+  border-radius: 44rpx;
+  border: 2rpx solid #E6D3A2;
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
+  /* 移除 padding-top，让背景图自然衔接 */
+}
+.rights .seemores.data-v-26e4f5ec {
+  width: 100%;
+  height: 200rpx;
+  background-image: url(https://images.eqingqu.com/attachs/photo/202509/20250924_6A7AF56AF15ED2A825972427E1D1FA59.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  border: none;
+  /* 关键：负 margin 让背景图向上移动覆盖背景色 */
+  margin-top: -44rpx;
+  /* 根据实际效果调整 */
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+  left: -10px;
+  left: 0px;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 24px;
+  color: #773E0F;
+  line-height: 24px;
+  text-align: justify;
+  font-style: normal;
+}
+.rights .seemores .brown-arrows.data-v-26e4f5ec {
+  width: 28px;
+  height: 28px;
+}
+.rights .coupon-swiper.data-v-26e4f5ec {
+  position: relative;
+  z-index: 1;
+}
+.rights .rights-one.data-v-26e4f5ec {
+  background: #FFFFFF;
+  border-radius: 44rpx;
+  padding: 10px 10px 10px 8px;
+  margin-bottom: 24rpx;
+}
+.rights .rights-one .right-bora.data-v-26e4f5ec {
+  min-width: 100%;
+  border-radius: 44rpx;
+  border: 2rpx solid #E6D3A2;
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
+}
+.goodslist.data-v-26e4f5ec {
+  margin: 0rpx 26rpx 20rpx;
+}
+.goodslist .item.data-v-26e4f5ec {
+  padding-bottom: 10rpx;
+}
+.goodslist .bgprice.data-v-26e4f5ec {
+  width: 330rpx;
+  height: 88rpx;
+  background-image: url("https://images.eqingqu.com/attachs/photo/202505/20250506_34FA64FE0A5C585AD7E3EC45C2B3EB17.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.coupon-top.data-v-26e4f5ec {
+  display: flex;
+  padding: 0 40rpx;
+  gap: 20rpx;
+}
+.coupon-top .coupon-top-title.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 40rpx;
+  color: #1B1B1B;
+  line-height: 36rpx;
+  text-align: justify;
+  font-style: normal;
+  line-height: 1.2;
+}
+.coupon-top .coupon-top-brage.data-v-26e4f5ec {
+  background: linear-gradient(90deg, #585858 0%, #181613 100%);
+  border-radius: 12rpx;
+  color: #fff;
+  padding: 6rpx 12rpx;
+  font-size: 24rpx;
+}
+.right-two.data-v-26e4f5ec {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-left: 18rpx;
+}
+.right-two .item.data-v-26e4f5ec {
+  margin: 5px 5px 10px;
+  width: 29%;
+  height: 190rpx;
+  background-image: url(https://images.eqingqu.com/attachs/photo/202504/20250429_13BC10385F944284DEAE86B74054A691.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.right-two .item .packet.data-v-26e4f5ec {
+  font-size: 28rpx;
+  color: #FFE2B5;
+  margin-top: 11px;
+}
+.right-three.data-v-26e4f5ec {
+  height: 148rpx;
+  background: #F8F6F7;
+  border-radius: 18rpx;
+  padding: 36rpx 48rpx;
+  margin: 0rpx 34rpx 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.seemore.data-v-26e4f5ec {
+  width: 596rpx;
+  height: 90rpx;
+  background: linear-gradient(90deg, #FEF5DF 0%, #FFD97E 0%, #FE2F02 100%);
+  border-radius: 45rpx;
+}
+.page-container.data-v-26e4f5ec {
+  position: relative;
+  padding-bottom: 440rpx;
+  width: 100%;
+  background-size: 101% 115%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #FDE6B9;
+}
+.topbg.data-v-26e4f5ec {
+  background-image: url(https://images.eqingqu.com/attachs/photo/202510/20251024_21BE2F65B1793C6D36E13302A2ED70C5.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 700rpx;
+}
+.page-content.data-v-26e4f5ec {
+  z-index: 1;
+  text-align: center;
+}
+.top-tab.data-v-26e4f5ec {
+  height: 228rpx;
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.top-tab .top-img.data-v-26e4f5ec {
+  width: 80rpx;
+  height: 80rpx;
+  background: #FFF1D9;
+}
+.top-onetitle.data-v-26e4f5ec {
+  width: 530rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  background: linear-gradient(180deg, #FEF5DF 0%, #E6D3A2 100%, #E6D3A2 100%);
+  border-radius: 38rpx;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.top-onetitle .title text.data-v-26e4f5ec {
+  padding: 0 20rpx;
+  position: relative;
+}
+.top-onetitle text.data-v-26e4f5ec:after, .top-onetitle text.data-v-26e4f5ec:before {
+  content: "";
+  width: 42rpx;
+  height: 2px;
+  background: #272727;
+  position: absolute;
+  top: 50%;
+}
+.top-onetitle text.data-v-26e4f5ec:after {
+  left: -42rpx;
+}
+.top-onetitle text.data-v-26e4f5ec:before {
+  right: -42rpx;
+}
+scroll-view.data-v-26e4f5ec {
+  white-space: nowrap;
+}
+.data-v-26e4f5ec::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+.privacy.data-v-26e4f5ec {
+  /* 对号样式 */
+}
+.privacy .checkbox.data-v-26e4f5ec {
+  margin-right: 0;
+}
+.privacy .checkbox .checkbox-icon.data-v-26e4f5ec {
+  width: 24rpx;
+  height: 24rpx;
+  margin-top: -6rpx;
+  transition: all 0.3s;
+}
+.privacy .checkbox .txt.data-v-26e4f5ec {
+  color: #a2a2a2;
+  font-size: 25rpx;
+}
+.privacy .checkbox .href.data-v-26e4f5ec {
+  color: #a2a2a2;
+  font-size: 25rpx;
+}
+.privacy .checkbox.checked .checkbox-icon.data-v-26e4f5ec::after {
+  content: "";
+  position: absolute;
+  left: 2rpx;
+  top: 0rpx;
+  width: 20rpx;
+  height: 10rpx;
+  border-left: 2rpx solid #fff;
+  border-bottom: 2rpx solid #fff;
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+}
+/* 未登录 */
+.no-container.data-v-26e4f5ec {
+  height: 100vh;
+}
+.not-content.data-v-26e4f5ec {
+  width: 100%;
+  padding: 50px 0;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.not-content .notimg.data-v-26e4f5ec {
+  width: 144px;
+  height: 124px;
+  margin: 0 auto 20px;
+}
+.not-content .cont.data-v-26e4f5ec {
+  text-align: center;
+  color: #999999;
+}
+.not-content .conts.data-v-26e4f5ec {
+  text-align: center;
+  color: #f23030;
+}
+.textc.data-v-26e4f5ec {
+  width: 100%;
+  overflow-y: auto;
+  margin: 24px 0px 16px;
+  background: #FFF6DD;
+  box-shadow: inset 0px 0px 20px 0px #fffffd;
+  border-radius: 22px;
+}
+.tab-scroll-container.data-v-26e4f5ec {
+  width: 100%;
+  display: flex;
+  /* 开启Flex */
+  flex-wrap: wrap;
+  /* 超出自动换行（确保每行5个） */
+  justify-content: center;
+  align-items: flex-start;
+  margin: 48rpx 0 32rpx;
+}
+.tab-item.data-v-26e4f5ec {
+  margin-bottom: 14rpx;
+  /* 垂直间距 */
+  box-sizing: border-box;
+  padding: 0 10rpx;
+  /* 水平间距的一半 */
+  width: calc((100% - 80rpx) / 5);
+  flex-shrink: 0;
+  text-align: center;
+}
+.tab-item--last.data-v-26e4f5ec {
+  /* 如果需要特殊样式可以在这里添加 */
+}
+.top-img.data-v-26e4f5ec {
+  width: 80rpx;
+  height: 80rpx;
+  margin: 0 auto;
+}
+.fs24.data-v-26e4f5ec {
+  font-size: 24rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pop_content.data-v-26e4f5ec {
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top-left-radius: 30rpx;
+  border-top-right-radius: 30rpx;
+  background-color: #fff;
+}
+.pop_content .pop_header.data-v-26e4f5ec {
+  position: relative;
+  padding: 0 30rpx;
+  text-align: center;
+  height: 90rpx;
+  line-height: 90rpx;
+}
+.pop_content .pop_header .pop_title.data-v-26e4f5ec {
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 90rpx;
+  color: #282828;
+}
+.pop_content .pop_header .close_img.data-v-26e4f5ec {
+  position: absolute;
+  top: 50%;
+  right: 30rpx;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  width: 44rpx;
+  height: 44rpx;
+}
+.pop_content .member-content.data-v-26e4f5ec {
+  margin: 36rpx;
+}
+.pop_content .member-content .frist.active.data-v-26e4f5ec {
+  border-color: #e54d42;
+}
+.pop_content .member-content .frist.data-v-26e4f5ec {
+  display: flex;
+  min-height: 176rpx;
+  position: relative;
+  background-image: url(https://images.eqingqu.com/attachs/photo/202509/20250925_3CD98D5C9E1F512D531CA60018A84637.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 1px solid #fff;
+  border-radius: 24rpx;
+}
+.pop_content .member-content .frist .red-brage.data-v-26e4f5ec {
+  position: absolute;
+  top: -10%;
+  left: 5%;
+  width: 226rpx;
+  height: 42rpx;
+  background-image: url(https://images.eqingqu.com/attachs/photo/202509/20250925_7FD1CC5ECBAC81F1B2683C2B3BF44A84.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  line-height: 30rpx;
+  text-align: justify;
+  font-style: normal;
+  padding-left: 10rpx;
+}
+.pop_content .member-content .frist .yellow-diamond.data-v-26e4f5ec {
+  width: 140rpx;
+  height: 120rpx;
+  margin-top: 20rpx;
+}
+.pop_content .member-content .frist .price.data-v-26e4f5ec {
+  margin-top: 40rpx;
+  margin-left: 40rpx;
+}
+.pop_content .member-content .frist .price .dollar.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 28rpx;
+  color: #FE2F02;
+  line-height: 24rpx;
+  text-align: left;
+  font-style: normal;
+}
+.pop_content .member-content .frist .price .red-price.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 60rpx;
+  color: #FE2F02;
+  line-height: 48rpx;
+  text-align: left;
+  font-style: normal;
+}
+.pop_content .member-content .frist .price .gray-price.data-v-26e4f5ec {
+  text-decoration: line-through;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 24rpx;
+  color: #A2A2A2;
+  line-height: 24rpx;
+  text-align: justify;
+  font-style: normal;
+}
+.pop_content .member-content .frist .member-name.data-v-26e4f5ec {
+  margin-top: 40rpx;
+  margin-left: 40rpx;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 36rpx;
+  color: #773E0F;
+  line-height: 36rpx;
+  text-align: justify;
+  font-style: normal;
+}
+.pop_content .member-content .member-button.data-v-26e4f5ec {
+  margin-top: 40rpx;
+  padding: 0 20rpx;
+  background: #FE2F02;
+  box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(192, 192, 192, 0.15);
+  border-radius: 44rpx;
+}
+.pop_content .member-content .button-content.data-v-26e4f5ec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+}
+.pop_content .member-content .button-main-text.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 44rpx;
+  color: #FFFFFF;
+  line-height: 36rpx;
+  text-align: left;
+  font-style: normal;
+}
+.pop_content .member-content .button-dollar.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 28rpx;
+  color: #FFFFFF;
+  line-height: 24rpx;
+  text-align: left;
+  font-style: normal;
+  margin-top: 10rpx;
+}
+.pop_content .member-content .button-original-price.data-v-26e4f5ec {
+  text-decoration: line-through;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 300;
+  font-size: 32rpx;
+  color: #FFFFFF;
+  line-height: 28rpx;
+  text-align: left;
+  font-style: normal;
+}
+.pop_content .member-content .button-action.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 36rpx;
+  color: #FFFFFF;
+  line-height: 36rpx;
+  text-align: left;
+  font-style: normal;
+}
+.pop_content .member-content .sub_btn.data-v-26e4f5ec {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  justify-content: center;
+}
+.pop_content .member-content .second.data-v-26e4f5ec {
+  display: flex;
+  justify-content: space-around;
+  gap: 26rpx;
+  margin: 24rpx 0;
+}
+.pop_content .member-content .second .second-item.active.data-v-26e4f5ec {
+  border-color: #e54d42;
+  background: #fff5f5;
+}
+.pop_content .member-content .second .second-item.data-v-26e4f5ec {
+  flex: 1;
+  padding: 32rpx;
+  text-align: center;
+  background: linear-gradient(90deg, #FCFBFC 0%, #F8F6F7 100%);
+  border-radius: 24rpx;
+  border: 2rpx solid #EDEDED;
+}
+.pop_content .member-content .second .second-item .second-name.data-v-26e4f5ec {
+  text-align: center;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 36rpx;
+  color: #1B1B1B;
+  line-height: 36rpx;
+  text-align: center;
+  font-style: normal;
+  margin-bottom: 20rpx;
+}
+.pop_content .member-content .second .second-item .second-dollar.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 28rpx;
+  color: #1B1B1B;
+  line-height: 24rpx;
+  text-align: left;
+  font-style: normal;
+  margin-right: 8rpx;
+}
+.pop_content .member-content .second .second-item .second-price-num.data-v-26e4f5ec {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 500;
+  font-size: 60rpx;
+  color: #1B1B1B;
+  line-height: 48rpx;
+  text-align: left;
+  font-style: normal;
+}
+.pop_content .member-content .second .second-item .second-dollar.active.data-v-26e4f5ec {
+  color: #FE2F02;
+}
+.pop_content .member-content .second .second-item .second-price-num.active.data-v-26e4f5ec {
+  color: #FE2F02;
+}

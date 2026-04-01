@@ -1,0 +1,14 @@
+
+.header.data-v-64fbbcac{ background: #FFFFFF; padding: 15rpx 10rpx;}
+.tit.data-v-64fbbcac{ overflow: hidden;line-height: 1.5;}
+.tit .name.data-v-64fbbcac{ font-size: 28rpx; color: #000000; font-weight: 500;}
+.tit .name .tit.data-v-64fbbcac{ display: inline-block;}
+.tit .name .link.data-v-64fbbcac{ font-size: 25rpx; color: #464c5b;display: inline-block;}
+.tit .name .link .heng.data-v-64fbbcac{ margin: 0 10rpx;}
+.tit .name .link .url.data-v-64fbbcac{ color: #007AFF;}
+.simplify.data-v-64fbbcac{ display: flex; flex-direction: row; justify-content: space-between; align-items: center;}
+.suptit.data-v-64fbbcac{line-height: 1.2;}
+.suptit .text.data-v-64fbbcac{ font-size: 25rpx; color: #999999;}
+.wx-header .link.data-v-64fbbcac{ margin-left: 15rpx;}
+.wx-header .link2.data-v-64fbbcac{ font-size: 25rpx; color: #3eb1fa;}
+

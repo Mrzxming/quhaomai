@@ -1,0 +1,62 @@
+
+.cont-box .title .goods-price.data-v-92ea005e{ padding: 0;}
+.goods_outer.data-v-92ea005e{ padding: 0; margin-top: 10rpx;}
+.uni-list-cell-navigate.data-v-92ea005e{ justify-content: flex-start;
+}
+.uni-list-cell-navigate .title.data-v-92ea005e{ min-width: 100rpx; color: #999999; margin-right: 15rpx;}
+.uni-list-cell .iconfont.data-v-92ea005e{ color: #f92028; margin-right: 10rpx;}
+.uni-list-cell-title .uni-list-cell-navigate.data-v-92ea005e{ flex-direction: column;
+}
+.uni-list-cell-title .uni-list-cell-navigate.uni-navigate-right.data-v-92ea005e:after{ top: 35%;}
+.uni-list-cell-title .uni-list-cell-navigate .title.data-v-92ea005e{ width: 100%; color: #333333; font-size: 30rpx; margin-bottom: 20rpx;}
+.uni-list-cell-title .uni-list-cell-navigate .value.data-v-92ea005e{ display: flex; align-items: center; color: #999999;}
+.steps.data-v-92ea005e{ display: flex; flex-direction: row; width: 100%; justify-content: center; align-items: center;}
+.steps .item.data-v-92ea005e{ position: relative; width: 25%; color: #777; text-align: center; margin: 20rpx 0;}
+.steps .item .num.data-v-92ea005e{ position: relative; width: 40rpx; height: 40rpx; line-height: 40rpx; font-size: 24rpx; border-radius: 50%; border:1px solid #e7e8ef; margin: 0 auto; z-index: 2; background: #FFFFFF;}
+.steps .item .tit.data-v-92ea005e{ font-size: 24rpx; margin-top: 20rpx;}
+.steps .item .n-list-xian.data-v-92ea005e{ position: absolute; border-top: 1px solid #e7e8ef; height: 1px; z-index: 1; width: 100%; top: 22%;}
+.steps .item:first-child .n-list-xian.data-v-92ea005e{ left: 50%; width: 60%;
+}
+.steps .item:last-child .n-list-xian.data-v-92ea005e{ right: 50%; width: 60%;
+}
+.rule.data-v-92ea005e{ padding: 20rpx; border-top: 1px solid #e7e8ef;
+}
+.rule view.data-v-92ea005e{ text-align: left; font-size: 25rpx; color: #999;}
+.team-wait .header.data-v-92ea005e{ display: flex; flex-direction: row; justify-content:flex-start; align-items: center; padding: 20rpx; background: #FFFFFF;}
+.team-wait .header .left.data-v-92ea005e{ width: 100rpx; height: 100rpx;}
+.team-wait .header .left image.data-v-92ea005e{ width: 100%;}
+.team-wait .header .right.data-v-92ea005e{ flex: 1 1 0%; margin-left: 20rpx;}
+.team-wait .header .right .tit.data-v-92ea005e{ font-size: 32rpx;}
+.team-wait .header .right .subtit.data-v-92ea005e{ font-size: 26rpx; color: #888;}
+.time-content.data-v-92ea005e{ background: #FFFFFF;
+}
+.time-content .time-header.data-v-92ea005e{ display: flex; flex-direction: row; justify-content: center; color: #888888; padding: 40rpx 0; position: relative;}
+.time-content .time-header text.data-v-92ea005e{ padding: 0 10rpx; position: relative; z-index: 2; background: #FFFFFF;}
+.time-content .time-header .time.data-v-92ea005e{ position: relative; z-index: 2; background: #FFFFFF;
+}
+.time-content .time-header .hr.data-v-92ea005e{ position: absolute; height: 1px; border-bottom:1px solid #F4F4F4; top: 50%; left: 0; right: 0; z-index: 1;}
+.time-content .title-hrbg-team.data-v-92ea005e{ background: #FFFFFF; padding: 0 10rpx; z-index: 2;
+}
+.time-content .title-hrbg-team.success.data-v-92ea005e{ color: #09BB07;}
+.time-content .title-hrbg-team.error.data-v-92ea005e{ color: #ec5151;}
+.time-warp.data-v-92ea005e{ padding: 20rpx;
+}
+.time-warp .picture.data-v-92ea005e{ display: flex; flex-direction: row;}
+.time-warp .picture .col-box.data-v-92ea005e{ width: 16.6666667%; position: relative; display: inline-block; padding-right: 20rpx; box-sizing: border-box;}
+.time-warp .picture .col-box .img-box.data-v-92ea005e{ width: 50px; height: 50px; border:1px solid #ccc; border-radius: 50%; overflow: hidden; font-size: 0;}
+.time-warp .picture .col-box .img-box image.data-v-92ea005e{ width: 100%; height: 100%;
+}
+.time-warp .picture .col-box .tag-box.data-v-92ea005e{ position: absolute; background: #ec5151; border-radius: 10rpx; color: #FFFFFF; padding: 0 10rpx; font-size: 24rpx; right: -20rpx; z-index: 10;
+}
+.time-warp .progress.data-v-92ea005e{ position: relative; height: 10rpx; border-radius: 5rpx; background: #e5e5e5; margin-top: 30rpx;}
+.time-warp .progress .progress-with-pivot.data-v-92ea005e{ position: absolute; left: 0; height: 100%; width: 0; background: #EC5051; border-radius: 5rpx;}
+.time-warp .progress .progress-pivot.data-v-92ea005e{ position: absolute; right: -20px; width: 60rpx; height: 40rpx; background: #ec5151; border-radius: 20rpx; color: #FFFFFF; padding: 0 10rpx; font-size: 24rpx; top: -18rpx; text-align: center;}
+.scroll-view.data-v-92ea005e { white-space: nowrap;width: 100%; overflow: hidden;}
+.btn-bar.data-v-92ea005e{position:fixed; height: 100rpx; bottom: 0; left: 0; right: 0; z-index: 99; background: #FFFFFF;}
+
+/* 小程序分享  start*/
+.show-popup-shareImg.data-v-92ea005e  .uni-popup-bottom{ height: 80%;
+}
+
+/* 小程序分享 end*/
+

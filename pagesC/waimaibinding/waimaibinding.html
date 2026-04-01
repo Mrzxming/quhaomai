@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>商品搬家</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1B1B1B;
+      overflow: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    :root { --rpx: 0.5px; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 45%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,.75);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 999999;
+      max-width: 80vw;
+      text-align: center;
+      display: none;
+    }
+
+    .cover, .cover1 {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgb(0,0,0);
+      z-index: 999;
+    }
+    .cover { opacity: .5; }
+    .cover1 { opacity: .2; }
+
+    .sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 99999999;
+      display: none;
+    }
+  </style>
+  <style id="page-style"></style>
+</head>
+<body>
+  <div class="container bgf6" style="height: 100%;background-color: #f5f5f5;">
+    <div class="main-title">
+      <div class="status_bar" style="height: 40px;"></div>
+      <div class="chat_1" id="navBar">
+        <div id="backBtn">
+          <img
+            src="https://images.eqingqu.com/attachs/photo/202404/20240416_89BF6904E05EEE5119E0BC3F987C8640.png"
+            style="width: calc(var(--rpx) * 30); height: calc(var(--rpx) * 30);"
+            alt="back"
+          />
+        </div>
+        <div class="banbtn" style="margin-top: calc(var(--rpx) * -20); font-size: calc(var(--rpx) * 32); margin-left: calc(var(--rpx) * 70);">商品搬家</div>
+        <div class="search_submit">
+          <div id="kefuBtn">
+            <img
+              src="https://images.eqingqu.com/attachs/photo/202308/20230822_69383A8470B3DA55EE9570267B558CA2.png"
+              style="width: calc(var(--rpx) * 40); height: calc(var(--rpx) * 40);"
+              alt="kefu"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="banvideo"></div>
+
+    <div class="main-content" id="mainContent" style="height: calc(100vh - 84px); overflow-y: auto; -webkit-overflow-scrolling: touch;">
+      <div class="content-wrapper">
+        <div class="top-video" id="towebBtn">
+          <span class="video-text">因平台接口限制，绑定需同时下载【嘚嘚象】工具，即可获得铺货功能权限。</span>
+          <img class="video-img" src="https://images.eqingqu.com/attachs/photo/202511/20251110_57CEC6CA5DE1CA774E8D5ECF994D8E39.png" style="height: calc(var(--rpx) * 30); width: calc(var(--rpx) * 30);" alt="" />
+          <span style="font-weight: 500; font-size: calc(var(--rpx) * 28); color: #FE2F02;">查看教程</span>
+        </div>
+
+        <div class="account-section" id="accountSection"></div>
+
+        <div class="account-section" id="laylistEntry" style="display:none;">
+          <div style="display:flex; justify-content:center;">
+            <div class="laylist-btn" id="laylistBtn2">
+              <img src="https://images.eqingqu.com/attachs/photo/202510/20251028_1C3EBB790BB1D09B15F63A3D4A112485.png" class="btn-icon" alt="" />
+              铺货单
+              <div class="badge" id="huodanBadge2" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="third-platform-section" id="thirdPlatform" style="display:none;">
+          <div class="section-header">
+            <div class="section-title-wrapper">
+              <div class="title-line left-line"></div>
+              <div class="section-title">支持铺货第三方平台</div>
+              <div class="title-line right-line"></div>
+            </div>
+          </div>
+          <div class="platform-scroll-container">
+            <div class="platform-scroll">
+              <div class="platform-list" id="platformList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:100%; position:relative; top:0;">
+          <div style="width:94%; margin: calc(var(--rpx) * 36) calc(var(--rpx) * 30);">
+            <p class="fs32 co1b" style="position:relative;">铺货流程</p>
+            <div class="process-container">
+              <div class="process-step-wrapper">
+                <div class="step-title-row">
+                  <div class="step-left-title">
+                    <div class="step-number">①</div>
+                    <div class="step-number-text">步骤一</div>
+                  </div>
+                </div>
+                <div class="step-content-row">
+                  <div class="step-left-column">
+                    <div class="dashed-line-container">
+                      <div class="dashed-line-extend"></div>
+                      <div class="arrow-down-icon"></div>
+                    </div>
+                  </div>
+                  <div class="step-content-card">
+                    <div class="step-header">
+                      <div class="step-title">下载嘚嘚象APP</div>
+                      <div class="step-download" id="downloadBtn1">立即下载</div>
+                    </div>
+                    <img
+                      src="https://images.eqingqu.com/attachs/photo/202511/20251125_1710FFDF54550F55D2B10DE94EE0248F.png"
+                      class="step-image"
+                      alt=""
+                      id="downloadImg1"
+                    />
+                    <div class="step-desc-wrapper">
+                      <div class="step-desc-black">免费注册后在【运营-店铺绑定】绑定要铺货的三方店铺</div>
+                      <div class="step-desc-red">（美团、抖音、饿了么、拼多多、京东秒送等店铺）</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="process-step-wrapper">
+                <div class="step-title-row">
+                  <div class="step-left-title">
+                    <div class="step-number">②</div>
+                    <div class="step-number-text">步骤二</div>
+                  </div>
+                </div>
+                <div class="step-content-row">
+                  <div class="step-left-column">
+                    <div class="dashed-line-container">
+                      <div class="dashed-line-extend"></div>
+                      <div class="arrow-down-icon"></div>
+                    </div>
+                  </div>
+                  <div class="step-content-card">
+                    <div class="step-header">
+                      <div class="step-title">在趣好卖（本页顶部）绑定嘚嘚象APP帐号</div>
+                    </div>
+                    <img
+                      src="https://images.eqingqu.com/attachs/photo/202511/20251125_AE5FE3F95DC1C42A410D0546023E4E66.png"
+                      class="step-image"
+                      style="width: calc(var(--rpx) * 350); height: auto;"
+                      alt=""
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="process-step-wrapper">
+                <div class="step-title-row">
+                  <div class="step-left-title">
+                    <div class="step-number">③</div>
+                    <div class="step-number-text">步骤三</div>
+                  </div>
+                </div>
+                <div class="step-content-row">
+                  <div class="step-left-column"></div>
+                  <div class="step-content-card" style="padding: 0;">
+                    <div class="step-desc full-width">
+                      在趣好卖【商品详情页】或【订单列表】订单信息内，点击【去铺货】按钮把商品加入本页顶部的【铺货单】内，之后在【铺货单】内操作铺货到【嘚嘚象】，然后到嘚嘚象【运营-百宝箱-商品搬家】操作铺货到三方店铺。
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="instruction-section">
+          <div class="instruction-title">说明</div>
+          <div class="instruction-card">
+            <div class="instruction-text">
+              在【嘚嘚象】操作商品搬家可能需要操作点数，可以在商品搬家功能页面【兑换-输入趣好卖订单号】免费兑换搬家点数，也可以自行充值购买。如有疑问可咨询在线客服。
+            </div>
+            <img
+              src="https://images.eqingqu.com/attachs/photo/202511/20251118_1CD38B6A0F106477F15A156C617318AB.png"
+              class="instruction-image"
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="maskRoot"></div>
+
+    <div class="sheet" id="bindSheet">
+      <div class="cover" id="bindSheetMask" style="opacity:.4;"></div>
+      <div class="bind-popup-container" style="position:relative;">
+        <div class="popup-header">
+          <div class="popup-title">嘚嘚象帐号绑定</div>
+        </div>
+        <div class="popup-form">
+          <div class="form-item">
+            <div class="item-label">手机号</div>
+            <div class="item-input">
+              <input class="input-field" id="mobileInput" type="text" placeholder="请输入手机号" />
+            </div>
+          </div>
+          <div class="form-item">
+            <div class="item-label">验证码</div>
+            <div class="item-input">
+              <input class="input-field" id="codeInput" type="text" placeholder="请填写验证码" />
+            </div>
+            <div class="code-btn" id="sendCodeBtn">获取验证码</div>
+          </div>
+        </div>
+        <div class="popup-footer">
+          <div class="confirm-btn" id="confirmBindBtn">确定绑定</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      function updateRpx() {
+        var w = Math.min(window.innerWidth, 750);
+        var rpx = w / 750;
+        document.documentElement.style.setProperty('--rpx', rpx + 'px');
+      }
+      updateRpx();
+      window.addEventListener('resize', updateRpx);
+
+      var rawCss = String.raw`
+page { overflow-x: hidden; }
+.search-tab { margin: 30rpx 20rpx 10rpx 10rpx; font-size: 32rpx; color: #000000; display:flex; flex-direction:row; justify-content:space-between; text-align:center; align-items:center; }
+.search_submit { display:flex; flex-direction:row; align-items:center; }
+.tui-content { text-align:left; }
+.placeholders { color:#C0C0C0; font-size:28rpx; }
+.swiper-boxs { filter: blur(5px); width:100%; }
+.swiper-box { width:100%; height:100%; overflow-x:hidden; }
+.wxshare { text-align:center; border-radius:20rpx; width:87%; background: linear-gradient(to bottom, #ffffff 10%, #ffffff 40%, #ffffff 50%); position: fixed; top:30%; left:6%; z-index:9999; }
+.wxshare_3_1 { font-size:38rpx; margin-bottom:20rpx; margin-top:50rpx; }
+.add_box3_a { width:50%; height:90rpx; text-align:center; line-height:90rpx; color:#000000; border:2rpx solid #e5e5e5; border-radius:0 0 20rpx 0; font-size:30rpx; }
+.add_box3_1_a { width:50%; height:90rpx; border:2rpx solid #e5e5e5; border-radius:0 0 0 20rpx; text-align:center; line-height:90rpx; color:#888888; font-size:30rpx; }
+.inputclass { width:46%; } .inputclass_1 { height:80rpx; line-height:80rpx; }
+.main-title { position:fixed; top:0; left:0; width:100%; z-index:120; background-color:#f5f5f5; }
+.status_bar { background-color:#f5f5f5; width:100%; }
+.chat_1 { display:flex; flex-direction:row; align-items:center; justify-content:space-between; width:92%; padding:0rpx 20rpx 10rpx 30rpx; }
+.wxshare1 { text-align:center; border-radius:20rpx; z-index:9999; width:75%; position:fixed; top:9%; left:25%; }
+.wximg { width:560rpx; height:1350rpx; }
+.banbtn { margin-top:-20rpx; font-size:32rpx; margin-left:70rpx; }
+.banvideo { margin-top:144rpx; background-color:#f5f5f5; }
+.top-video { display:flex; padding:16rpx 24rpx; align-items:center; background-color:#FFEDED; justify-content:space-around; }
+.top-video .video-text { width:75%; font-weight:400; font-size:24rpx; color:#1B1B1B; line-height:32rpx; text-align:left; }
+.top-video .video-img { width:20%; }
+.account-section { margin:30rpx 30rpx; }
+.unbind-state .bind-card { background-color:#ffffff; border-radius:16rpx; padding:60rpx 40rpx; box-shadow:0 4rpx 20rpx rgba(0,0,0,.05); text-align:center; }
+.bind-text { margin-bottom:50rpx; }
+.text-center { text-align:center; }
+.bind-title { font-weight:500; font-size:40rpx; color:#626262; line-height:40rpx; margin-bottom:20rpx; }
+.bind-subtitle { font-weight:400; font-size:28rpx; color:#626262; line-height:28rpx; }
+.bind-actions.vertical { display:flex; flex-direction:column; align-items:center; gap:30rpx; }
+.bind-btn { background-color:#FE0302; color:#fff; border-radius:44rpx; height:88rpx; line-height:88rpx; text-align:center; font-size:32rpx; width:100%; max-width:500rpx; }
+.laylist-btn { background:#fff; color:#FE2F02; border:1px solid #FE2F02; border-radius:44rpx; height:84rpx; line-height:36rpx; font-weight:500; text-align:center; font-size:36rpx; width:100%; max-width:500rpx; display:flex; align-items:center; justify-content:center; position:relative; }
+.btn-icon { width:36rpx; height:36rpx; margin-right:12rpx; }
+.badge { background-color:red; width:16rpx; height:16rpx; border-radius:50%; position:absolute; right:140rpx; top:20rpx; }
+.binded-state .binded-card { background-color:#ffffff; border-radius:16rpx; margin-bottom:30rpx; overflow:hidden; box-shadow:0 4rpx 20rpx rgba(0,0,0,.05); }
+.card-header { display:flex; justify-content:space-between; align-items:center; background-color:#f0eeef; padding:20rpx 30rpx; }
+.platform-tag { font-size:28rpx; font-weight:bold; color:#333; }
+.action-btn .switch-btn, .action-btn .unbind-btn { color:#FE0302; font-size:26rpx; border:1rpx solid #f9ada3; border-radius:24rpx; padding:8rpx 20rpx; text-align:center; }
+.action-btn .default-tag { color:#999; font-size:26rpx; }
+.card-content { display:flex; align-items:flex-start; padding:30rpx; }
+.store-info { margin-left:20rpx; flex:1; }
+.info-item { font-size:28rpx; color:#333; margin-bottom:20rpx; }
+.info-item:last-child { margin-bottom:0; }
+.third-platform-section { margin:40rpx 30rpx 20rpx; background-color:#ffffff; border-radius:16rpx; padding:40rpx 30rpx; box-shadow:0 4rpx 20rpx rgba(0,0,0,.05); }
+.section-header { margin-bottom:30rpx; }
+.section-title-wrapper { display:flex; align-items:center; justify-content:center; position:relative; }
+.section-title { font-size:32rpx; font-weight:bold; color:#333; padding:0 30rpx; white-space:nowrap; }
+.title-line { flex:1; height:2rpx; background: linear-gradient(90deg, transparent, #e5e5e5); }
+.left-line { max-width:100rpx; background: linear-gradient(270deg, transparent, #e5e5e5); }
+.right-line { max-width:100rpx; background: linear-gradient(90deg, transparent, #e5e5e5); }
+.platform-scroll-container { width:100%; overflow:hidden; }
+.platform-scroll { width:100%; white-space:nowrap; text-align:center; }
+.platform-list { display:inline-flex; padding:10rpx 0; padding-left:30rpx; padding-right:30rpx; }
+.platform-item { display:inline-block; margin-right:20rpx; width:90rpx; height:80rpx; border-radius:12rpx; overflow:hidden; flex-shrink:0; }
+.platform-item:last-child { margin-right:0; }
+.platform-image { width:100%; height:100%; }
+.container { height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+.main-content { width:100%; flex:1; }
+.content-wrapper { padding-top:40rpx; padding-bottom:20rpx; }
+.bind-popup-container {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 30rpx 30rpx 0 0;
+  padding: 0;
+  box-sizing: border-box;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+}
+.popup-header { padding:40rpx 30rpx 30rpx; border-bottom:1rpx solid #F0F0F0; }
+.popup-title { font-size:36rpx; font-weight:600; color:#333333; text-align:center; }
+.popup-form { padding:40rpx 30rpx; }
+.form-item { display:flex; align-items:center; margin-bottom:40rpx; position:relative; }
+.item-label { font-size:32rpx; color:#333333; width:140rpx; flex-shrink:0; }
+.item-input { flex:1; margin-right:20rpx; }
+.input-field { width:100%; height:80rpx; font-size:32rpx; color:#333333; border:1rpx solid #E5E5E5; border-radius:40rpx; padding:0 20rpx; box-sizing:border-box; }
+.code-btn { width:180rpx; height:80rpx; background:#FE0302; border-radius:40rpx; font-size:28rpx; color:#FFFFFF; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.code-btn.disabled { background:#CCCCCC; }
+.popup-footer { padding:30rpx; background:#F8F8F8; border-radius:0 0 30rpx 30rpx; }
+.confirm-btn { width:100%; height:88rpx; background:#FE0302; border-radius:44rpx; font-size:36rpx; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-weight:600; }
+.process-container { margin-top:30rpx; padding:0; }
+.process-step-wrapper { display:flex; flex-direction:column; margin-bottom:0; position:relative; }
+.step-title-row { display:flex; align-items:flex-start; margin-bottom:20rpx; margin-left:-8rpx; margin-top:20rpx; }
+.step-left-title { display:flex; flex-direction:row; align-items:center; margin-right:20rpx; }
+.step-content-row { display:flex; position:relative; }
+.step-left-column { display:flex; flex-direction:column; align-items:center; margin-right:20rpx; flex-shrink:0; width:20rpx; position:relative; }
+.step-number { font-size:36rpx; font-weight:bold; color:#1B1B1B; line-height:1; margin-right:10rpx; }
+.step-number-text { font-size:32rpx; color:#1B1B1B; line-height:1; }
+.dashed-line-container { display:flex; flex-direction:column; align-items:center; width:100rpx; position:absolute; top:0; bottom:0; justify-content:flex-end; }
+.dashed-line-extend { width:2rpx; flex:1; background: repeating-linear-gradient(to bottom, #CCCCCC 0, #CCCCCC 8rpx, transparent 8rpx, transparent 16rpx); min-height:200rpx; }
+.arrow-down-icon { width:0; height:0; border-left:8rpx solid transparent; border-right:8rpx solid transparent; border-top:12rpx solid #666666; margin-top:10rpx; flex-shrink:0; }
+.step-content-card { flex:1; background-color:#ffffff; border-radius:16rpx; padding:30rpx; box-shadow:0 4rpx 20rpx rgba(0,0,0,.05); margin-bottom:30rpx; position:relative; z-index:1; }
+.step-header { display:flex; align-items:center; margin-bottom:20rpx; gap:20rpx; }
+.step-title { font-size:28rpx; font-weight:500; color:#1B1B1B; line-height:44rpx; }
+.step-download { font-size:28rpx; color:#007AFF; text-decoration:underline; flex-shrink:0; }
+.step-image { width:110rpx; height:110rpx; margin:20rpx 0; border-radius:12rpx; display:block; }
+.step-desc-black { font-size:24rpx; color:#1B1B1B; line-height:40rpx; }
+.step-desc-red { font-size:24rpx; color:#FE0302; line-height:40rpx; margin-top:8rpx; }
+.step-desc { font-weight:400; font-size:28rpx; color:#1B1B1B; line-height:40rpx; }
+.step-desc.full-width { width:95%; padding:20rpx; border-radius:12rpx; }
+.instruction-section { width:94%; margin:36rpx 30rpx; }
+.instruction-card { background-color:#FFFFFF; border-radius:16rpx; padding:30rpx; box-shadow:0 2rpx 10rpx rgba(0,0,0,.05); }
+.instruction-title { font-weight:400; font-size:32rpx; color:#1B1B1B; margin-bottom:20rpx; }
+.instruction-text { font-weight:400; font-size:28rpx; color:#1B1B1B; line-height:40rpx; margin-bottom:20rpx; }
+.instruction-image { width:100%; height:396rpx; border-radius:12rpx; display:block; }
+      `;
+
+      function sanitizeCss(css) {
+        css = css.replace(/\bpage\b/g, 'html, body');
+        css = css.replace(/\/\/.*$/gm, '');
+        css = css.replace(/([0-9]+(?:\.[0-9]+)?)rpx/g, function (_, n) {
+          return 'calc(var(--rpx) * ' + n + ')';
+        });
+        return css;
+      }
+      document.getElementById('page-style').textContent = sanitizeCss(rawCss);
+
+      var state = {
+        // B: 通过 node h5-proxy.js 访问 http://localhost:9000/... 时同源 /api/* 走代理
+        // A: 部署到服务器同域（如 https://www.ok9288.com）时同源 /api/* 直连
+        websiteUrl: (function () {
+          var o = window.location.origin || '';
+          if (o === 'http://localhost:9000' || o.indexOf('ok9288.com') !== -1) return '';
+          return 'https://www.ok9288.com';
+        })(),
+        waimaiList: [],
+        huodan: [],
+        code_url: [],
+        download_url: '',
+        sync_intro_url: '',
+        urls: '',
+        type: '',
+        poi_code: '',
+        mobile: '',
+        noClick: true,
+        btnText: '获取验证码',
+        countdown: null,
+        aliCaptchaResult: null,
+        aliPlatform: 'H5',
+        h5Captcha: null
+      };
+
+      var toastEl = document.getElementById('toast');
+      var toastTimer = null;
+      function toast(msg) {
+        if (!msg) return;
+        toastEl.textContent = String(msg);
+        toastEl.style.display = 'block';
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.style.display = 'none'; }, 1800);
+      }
+
+      function getToken() { return localStorage.getItem('token') || ''; }
+      function getClientHash() { return localStorage.getItem('client_hash') || ''; }
+      var authWarned = false;
+      function ensureAuthReady(showToastWhenMissing) {
+        var ok = !!getToken();
+        if (!ok && showToastWhenMissing) {
+          if (!authWarned) {
+            authWarned = true;
+            toast('登录信息缺失，请从商品详情页重新进入');
+          }
+        }
+        return ok;
+      }
+      function syncAuthFromUrl() {
+        try {
+          var params = new URLSearchParams(window.location.search || '');
+          var token = params.get('token');
+          var clientHash = params.get('client_hash') || params.get('clientHash');
+          if (token) localStorage.setItem('token', token);
+          if (clientHash) localStorage.setItem('client_hash', clientHash);
+        } catch (e) {}
+      }
+
+      async function request(path, method, data) {
+        // 核心接口依赖登录态；缺失时直接阻断，避免无意义请求与空白失败
+        if (!ensureAuthReady(true)) {
+          throw new Error('auth_missing');
+        }
+        var url = state.websiteUrl + path;
+        var headers = {
+          'Content-Type': 'application/json',
+          'token': getToken(),
+          'X-Client-Hash': getClientHash()
+        };
+        var opts = { method: method || 'GET', headers: headers };
+        if (method && method.toUpperCase() !== 'GET') opts.body = JSON.stringify(data || {});
+        if ((!method || method.toUpperCase() === 'GET') && data) {
+          var q = new URLSearchParams(data).toString();
+          if (q) url += (url.indexOf('?') >= 0 ? '&' : '?') + q;
+        }
+        var res = await fetch(url, opts);
+        var json = await res.json().catch(function () { return {}; });
+        return json;
+      }
+
+      function incrementVersion() {
+        var key = 'bind_app_version_h5';
+        var v = localStorage.getItem(key) || '3.6.8';
+        var parts = v.split('.').map(function (x) { return parseInt(x, 10) || 0; });
+        if (parts.length < 3) parts = [3, 6, 8];
+        parts[2] += 1;
+        var next = parts.join('.');
+        localStorage.setItem(key, next);
+        return next;
+      }
+
+      function clearMaskRoot() {
+        document.getElementById('maskRoot').innerHTML = '';
+      }
+
+      function defaultShowNo() {
+        clearMaskRoot();
+      }
+
+      function showConfirm(title, leftText, rightText, onRight) {
+        clearMaskRoot();
+        var root = document.getElementById('maskRoot');
+        var wrap = document.createElement('div');
+        wrap.innerHTML = `
+          <div class="cover"></div>
+          <div class="wxshare">
+            <div class="wxshare_3_1">${title}</div>
+            <div style="display:flex; flex-direction:row; align-items:center; margin-top: calc(var(--rpx) * 80);">
+              <div class="add_box3_1_a" id="dlgLeft">${leftText}</div>
+              <div class="add_box3_a" id="dlgRight">${rightText}</div>
+            </div>
+          </div>
+        `;
+        root.appendChild(wrap);
+        root.querySelector('.cover').onclick = defaultShowNo;
+        root.querySelector('#dlgLeft').onclick = defaultShowNo;
+        root.querySelector('#dlgRight').onclick = function () {
+          defaultShowNo();
+          onRight && onRight();
+        };
+      }
+
+      function renderAccount() {
+        var root = document.getElementById('accountSection');
+        var layEntry = document.getElementById('laylistEntry');
+        var badge2 = document.getElementById('huodanBadge2');
+        var hasHuodan = Array.isArray(state.huodan) && state.huodan.length > 0;
+
+        root.innerHTML = '';
+        if (!state.waimaiList || state.waimaiList.length === 0) {
+          layEntry.style.display = 'none';
+          var unbind = document.createElement('div');
+          unbind.className = 'unbind-state';
+          unbind.innerHTML = `
+            <div class="bind-card">
+              <div class="bind-text text-center">
+                <div class="bind-title">您还没有绑定嘚嘚象帐号</div>
+                <div class="bind-subtitle">请先下载嘚嘚象APP绑定目标铺货店铺</div>
+              </div>
+              <div class="bind-actions vertical">
+                <div class="bind-btn" id="openBindSheetBtn" style="margin-right:0;">嘚嘚象帐号绑定</div>
+                <div class="laylist-btn" id="laylistBtn1">
+                  <img src="https://images.eqingqu.com/attachs/photo/202510/20251028_1C3EBB790BB1D09B15F63A3D4A112485.png" class="btn-icon" alt="" />
+                  铺货单
+                  <div class="badge" id="huodanBadge1" style="${hasHuodan ? '' : 'display:none;'}"></div>
+                </div>
+              </div>
+            </div>
+          `;
+          root.appendChild(unbind);
+          document.getElementById('openBindSheetBtn').onclick = openBindSheet;
+          document.getElementById('laylistBtn1').onclick = tolaylist;
+        } else {
+          layEntry.style.display = '';
+          badge2.style.display = hasHuodan ? '' : 'none';
+          var binded = document.createElement('div');
+          binded.className = 'binded-state';
+
+          state.waimaiList.forEach(function (item) {
+            var card = document.createElement('div');
+            card.className = 'binded-card';
+            var platformName = item.type == 1 ? '趣好卖平台' : (item.type == 2 ? '美团平台' : (item.type == 3 ? '饿了么平台' : ''));
+            var actionHtml = '';
+            if (item.type != 1 && item.is_bind == false) {
+              actionHtml = '<div class="switch-btn">切换</div>';
+            } else if (item.type != 1 && item.is_bind == true) {
+              actionHtml = '<div class="default-tag">默认店铺</div>';
+            } else {
+              actionHtml = '<div class="unbind-btn">账号解绑</div>';
+            }
+            card.innerHTML = `
+              <div class="card-header">
+                <div class="platform-name">
+                  <div class="platform-tag">${platformName}</div>
+                </div>
+                <div class="action-btn">${actionHtml}</div>
+              </div>
+              <div class="card-content">
+                ${item.type != 1 ? `<input type="radio" ${item.is_bind ? 'checked' : ''} style="transform:scale(0.9); accent-color:#FE0302;" />` : ''}
+                <div class="store-info">
+                  <div class="info-item">门店编号：${item.poi_code || ''}</div>
+                  <div class="info-item">门店名称：${item.poi_name || ''}</div>
+                  <div class="info-item">绑定时间：${item.bind_time || ''}</div>
+                </div>
+              </div>
+            `;
+            card.querySelector('.action-btn').onclick = function () {
+              if (item.type != 1 && item.is_bind == false) return cutCheckeds(item);
+              if (item.type != 1 && item.is_bind == true) return;
+              return gounBind();
+            };
+            card.querySelector('.card-content').onclick = function () {
+              if (item.type != 1) cutCheckeds(item);
+            };
+            binded.appendChild(card);
+          });
+
+          root.appendChild(binded);
+        }
+
+        var third = document.getElementById('thirdPlatform');
+        if (state.code_url && state.code_url.length > 0) {
+          third.style.display = '';
+          var pl = document.getElementById('platformList');
+          pl.innerHTML = '';
+          state.code_url.forEach(function (src) {
+            var it = document.createElement('div');
+            it.className = 'platform-item';
+            it.innerHTML = '<img class="platform-image" src="' + src + '" alt="" />';
+            pl.appendChild(it);
+          });
+        } else {
+          third.style.display = 'none';
+        }
+      }
+
+      function openBindSheet() { document.getElementById('bindSheet').style.display = 'block'; }
+      function closeBindSheet() { document.getElementById('bindSheet').style.display = 'none'; }
+
+      function isMobile(value) {
+        return /^(?:13\d|14\d|15\d|16\d|17\d|18\d|19\d)\d{5}(\d{3}|\*{3})$/.test(value);
+      }
+
+      function updateSendBtn() {
+        var btn = document.getElementById('sendCodeBtn');
+        btn.textContent = state.btnText;
+        btn.className = 'code-btn' + (state.noClick ? '' : ' disabled');
+      }
+
+      function clearH5AliCaptcha() {
+        if (state.h5Captcha) {
+          try { if (state.h5Captcha.destroy) state.h5Captcha.destroy(); } catch (e) {}
+          state.h5Captcha = null;
+        }
+        var captcha = document.getElementById('captcha');
+        if (captcha && captcha.parentNode) captcha.parentNode.removeChild(captcha);
+        state.aliCaptchaResult = null;
+      }
+
+      function loadCt4Script() {
+        return new Promise(function (resolve, reject) {
+          if (window.initAlicom4) return resolve();
+          var candidates = ['../../static/ct4.js', '/static/ct4.js', '/mobile/static/ct4.js'];
+          var i = 0;
+          function next() {
+            if (i >= candidates.length) return reject(new Error('ct4.js load fail'));
+            var s = document.createElement('script');
+            s.src = candidates[i++];
+            s.onload = function () { if (window.initAlicom4) resolve(); else next(); };
+            s.onerror = next;
+            document.body.appendChild(s);
+          }
+          next();
+        });
+      }
+
+      async function initH5AliCaptcha() {
+        clearH5AliCaptcha();
+        var c = document.createElement('div');
+        c.id = 'captcha';
+        c.style.display = 'none';
+        document.body.appendChild(c);
+        await loadCt4Script();
+        return new Promise(function (resolve, reject) {
+          window.initAlicom4({
+            captchaId: '187c68c10b353285aee04ea098810301',
+            product: 'popup',
+            protocol: 'https://',
+            language: 'zh-cn',
+            timeout: 20000,
+            // 显式配置，避免 SDK 默认 http 静态域导致资源失败
+            apiServers: ['captcha.alicaptcha.com', 'captchabak.alicaptcha.com'],
+            staticServers: ['static.alicaptcha.com'],
+            networkError: function () {
+              state.btnText = '获取验证码';
+              state.noClick = true;
+              updateSendBtn();
+              clearH5AliCaptcha();
+              toast('验证码网络异常，请重试');
+              reject(new Error('captcha network error'));
+            },
+            offlineCb: function () {
+              state.btnText = '获取验证码';
+              state.noClick = true;
+              updateSendBtn();
+              clearH5AliCaptcha();
+              toast('验证码服务暂不可用，请稍后重试');
+              reject(new Error('captcha offline'));
+            }
+          }, function (captcha) {
+            state.h5Captcha = captcha;
+            captcha.appendTo('#captcha');
+            var el = document.getElementById('captcha');
+            if (el) el.style.display = 'none';
+            if (!captcha.reset) captcha.reset = function () { this.appendTo('#captcha'); this.verify(); }.bind(captcha);
+            captcha.onSuccess(function () {
+              state.aliCaptchaResult = captcha.getValidate();
+              setTimeout(clearH5AliCaptcha, 50);
+              sendSmsAfterCaptcha();
+            });
+            if (captcha.onError) {
+              captcha.onError(function () {
+                state.btnText = '获取验证码';
+                state.noClick = true;
+                updateSendBtn();
+                clearH5AliCaptcha();
+                toast('验证码校验失败，请重试');
+              });
+            }
+            resolve();
+          });
+        });
+      }
+
+      async function handleSendSmsCode() {
+        try {
+          if (state.h5Captcha) {
+            var captchaEl = document.getElementById('captcha');
+            if (captchaEl) captchaEl.style.display = 'block';
+            try { state.h5Captcha.reset(); } catch (e) {}
+            setTimeout(function () {
+              var btn = document.querySelector('#captcha .captcha4_btn_click');
+              if (btn) btn.click();
+            }, 100);
+          } else {
+            await initH5AliCaptcha();
+            setTimeout(function () {
+              var captchaEl = document.getElementById('captcha');
+              if (captchaEl) captchaEl.style.display = 'block';
+              setTimeout(function () {
+                var btn = document.querySelector('#captcha .captcha4_btn_click');
+                if (btn) btn.click();
+              }, 100);
+            }, 300);
+          }
+        } catch (e) {
+          toast('验证码加载失败，请刷新重试');
+          clearH5AliCaptcha();
+          state.noClick = true;
+          state.btnText = '获取验证码';
+          updateSendBtn();
+        }
+      }
+
+      async function sendSmsAfterCaptcha() {
+        if (!state.aliCaptchaResult) {
+          toast('验证未通过');
+          clearH5AliCaptcha();
+          return;
+        }
+        state.btnText = '请稍候...';
+        state.noClick = false;
+        updateSendBtn();
+        try {
+          var requestData = { mobile: state.mobile, platform: state.aliPlatform };
+          Object.assign(requestData, state.aliCaptchaResult || {});
+          var res = await request('/api/sync/send_sms_bind', 'POST', requestData);
+          if (res && res.status === 'success') {
+            var seconds = 60;
+            state.btnText = seconds + 's后获取';
+            updateSendBtn();
+            clearInterval(state.countdown);
+            state.countdown = setInterval(function () {
+              if (seconds > 0) {
+                state.btnText = seconds + 's后获取';
+                seconds -= 1;
+              } else {
+                state.btnText = '获取验证码';
+                state.noClick = true;
+                clearInterval(state.countdown);
+              }
+              updateSendBtn();
+            }, 1000);
+          } else {
+            toast((res && res.errors && res.errors.message) || '发送失败');
+            state.btnText = '获取验证码';
+            state.noClick = true;
+            updateSendBtn();
+          }
+        } catch (e) {
+          toast('网络错误');
+          state.btnText = '获取验证码';
+          state.noClick = true;
+          updateSendBtn();
+        } finally {
+          clearH5AliCaptcha();
+          state.aliCaptchaResult = null;
+        }
+      }
+
+      async function btnSend() {
+        var mobile = document.getElementById('mobileInput').value.trim();
+        state.mobile = mobile;
+        if (!mobile) return toast('请输入手机号码');
+        if (!isMobile(mobile)) return toast('请输入正确的手机号码');
+        handleSendSmsCode();
+      }
+
+      async function revertShowYes() {
+        var mobile = document.getElementById('mobileInput').value.trim();
+        var code = document.getElementById('codeInput').value.trim();
+        state.mobile = mobile;
+        if (!mobile) return toast('请输入手机号码');
+        if (!isMobile(mobile)) return toast('请输入正确的手机号码');
+        if (!code) return toast('请输入验证码');
+        try {
+          var version = incrementVersion();
+          var res = await request('/api/sync/bind_app', 'POST', { mobile: mobile, code: code, app_version: version });
+          if (res && res.status === 'success') {
+            toast(res.data || '绑定成功');
+            closeBindSheet();
+            setTimeout(jiazai, 500);
+          } else {
+            toast((res && res.errors && res.errors.message) || '绑定失败');
+          }
+        } catch (e) {
+          toast('网络错误');
+        }
+      }
+
+      function cutCheckeds(item) {
+        if (item.type == 1) return;
+        if (item.type != 1 && item.is_bind == true) return;
+        state.type = item.type;
+        state.poi_code = item.poi_code;
+        showConfirm('确定切换默认店铺吗', '返回', '绑定', defaultShowYes);
+      }
+
+      async function defaultShowYes() {
+        try {
+          var res = await request('/api/sync/shop_update_bind', 'POST', { type: state.type, poi_code: state.poi_code });
+          if (res && res.status === 'success') {
+            toast(res.data || '切换成功');
+            await jiazai();
+          } else {
+            toast((res && res.errors && res.errors.message) || '切换失败');
+          }
+        } catch (e) {
+          toast('网络错误');
+        }
+      }
+
+      function gounBind() {
+        showConfirm('确定解除账号绑定吗', '取消', '解绑', unBindYes);
+      }
+
+      async function unBindYes() {
+        try {
+          var res = await request('/api/sync/del_bind_app', 'POST', {});
+          if (res && res.status === 'success') {
+            state.waimaiList = [];
+            state.btnText = '获取验证码';
+            state.mobile = '';
+            clearInterval(state.countdown);
+            state.noClick = true;
+            updateSendBtn();
+            renderAccount();
+          } else {
+            toast((res && res.errors && res.errors.message) || '解绑失败');
+          }
+        } catch (e) {
+          toast('网络错误');
+        }
+      }
+
+      function tolaylist() {
+        var token = encodeURIComponent(getToken() || '');
+        var clientHash = encodeURIComponent(getClientHash() || '');
+        var origin = window.location.origin || '';
+        var isLocalProxy = origin.indexOf('localhost:9000') > -1 || origin.indexOf('127.0.0.1:9000') > -1;
+        var base = isLocalProxy
+          ? (origin + '/pagesC/laylist/laylist.html')
+          : (origin + '/mobile/pagesC/laylist/laylist.html');
+        window.location.href = base + '?token=' + token + '&client_hash=' + clientHash;
+      }
+      function toweb() {
+        var url = state.sync_intro_url || 'https://www.ok9288.com/sync_product_vlog.mp4';
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+      function toOpen() {
+        if (!state.download_url) return toast('下载地址获取中，请稍候');
+        window.open(state.download_url, '_blank', 'noopener,noreferrer');
+      }
+      function linkHrefs(url) {
+        if (!url) return toast('客服链接获取中，请稍候');
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+
+      async function getkefu() {
+        try {
+          var platform = (localStorage.getItem('platform') || 'H5').toLowerCase();
+          var device = platform === 'mp-weixin' || platform === 'wxapp' ? 'wxapp' : platform;
+          var res = await request('/api/user/touch_nav', 'POST', { device: device });
+          if (res && res.data && res.data[0] && res.data[0].child_nav) {
+            res.data[0].child_nav.forEach(function (it) {
+              if (it.name === '官方客服') state.urls = it.url;
+            });
+          }
+        } catch (e) {}
+      }
+
+      async function geturl() {
+        try {
+          var res = await request('/api/sync/getZhuDownUrl', 'POST', {});
+          if (res && res.status === 'success' && res.data) {
+            var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+            state.download_url = isIOS ? res.data.ios_download : res.data.apk_download;
+            state.code_url = res.data.poi_code_url || [];
+            if (res.data.sync_intro_url) state.sync_intro_url = res.data.sync_intro_url;
+            renderAccount();
+          }
+        } catch (e) {}
+      }
+
+      async function getlaylist(page) {
+        try {
+          var res = await request('/api/puhuo/getpuhuogoodslist', 'GET', { page: page || 1 });
+          if (res && res.status === 'success' && res.data) {
+            state.huodan = res.data;
+            renderAccount();
+          }
+        } catch (e) {}
+      }
+
+      async function jiazai() {
+        try {
+          var res = await request('/api/sync/shop_list', 'POST', { app_version: '3.6.8' });
+          if (res && res.status === 'success' && Array.isArray(res.data)) {
+            state.waimaiList = [];
+            if (res.data[0]) state.waimaiList.push(res.data[0]);
+            renderAccount();
+          }
+        } catch (e) {}
+      }
+
+      document.getElementById('backBtn').onclick = function () { history.back(); };
+      document.getElementById('kefuBtn').onclick = function () { linkHrefs(state.urls); };
+      document.getElementById('towebBtn').onclick = toweb;
+      document.getElementById('downloadBtn1').onclick = toOpen;
+      document.getElementById('downloadImg1').onclick = toOpen;
+      document.getElementById('laylistBtn2').onclick = tolaylist;
+      document.getElementById('bindSheetMask').onclick = closeBindSheet;
+      document.getElementById('sendCodeBtn').onclick = function () { if (state.noClick) btnSend(); };
+      document.getElementById('confirmBindBtn').onclick = revertShowYes;
+
+      syncAuthFromUrl();
+      ensureAuthReady(true);
+      updateSendBtn();
+      Promise.all([jiazai(), getkefu(), geturl(), getlaylist(1)]);
+    })();
+  </script>
+</body>
+</html>

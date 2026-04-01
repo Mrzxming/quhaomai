@@ -1,0 +1,1 @@
+<block wx:if="{{$root.g0}}"><view class="label-box data-v-22c8ed50"><block wx:for="{{displayTags}}" wx:for-item="tag" wx:for-index="__i0__" wx:key="name"><view class="{{['label-item','data-v-22c8ed50',tagClasses[tag.value]||'']}}">{{''+tag.name+''}}</view></block></view></block>

@@ -1,0 +1,976 @@
+<template>
+    <view class="camera-container" :style="[{ width: windowWidth + 'px', height: windowHeight + 'px' }]">
+        <view class="preview-wrapper" :style="[{ width: windowWidth + 'px', height: previewHeight + 'px' }]">
+            <live-pusher
+                id="livePusher"
+                ref="livePusher"
+                class="live-preview"
+                mode="FHD"
+                beauty="0"
+                whiteness="0"
+                :device-position="devicePosition"
+                :auto-focus="true"
+                :muted="true"
+                :enable-camera="true"
+                :enable-mic="true"
+                :zoom="true"
+                :style="[{ width: windowWidth + 'px', height: previewHeight + 'px' }]"
+            />
+            <!-- 四个L形角标记 -->
+            <view v-if="maskReady" class="corner-layer">
+                <view class="corner-line corner-h" :style="cornerStyles.topLeft.horizontal"></view>
+                <view class="corner-line corner-v" :style="cornerStyles.topLeft.vertical"></view>
+                <view class="corner-line corner-h" :style="cornerStyles.topRight.horizontal"></view>
+                <view class="corner-line corner-v" :style="cornerStyles.topRight.vertical"></view>
+                <view class="corner-line corner-h" :style="cornerStyles.bottomLeft.horizontal"></view>
+                <view class="corner-line corner-v" :style="cornerStyles.bottomLeft.vertical"></view>
+                <view class="corner-line corner-h" :style="cornerStyles.bottomRight.horizontal"></view>
+                <view class="corner-line corner-v" :style="cornerStyles.bottomRight.vertical"></view>
+            </view>
+            <view v-if="holdTipVisible" class="hold-tip">
+                <text>请保持稳定，正在对准拍摄...</text>
+            </view>
+            <view v-if="isIOS && !cameraReady && !cameraError" class="camera-loading-mask">
+            </view>
+            <!-- 相机错误提示界面 -->
+            <view v-if="cameraError" class="camera-error-mask">
+                <view class="camera-error-content">
+                    <view class="camera-error-icon">⚠️</view>
+                    <view class="camera-error-title">相机启动失败</view>
+                    <view class="camera-error-message">{{ errorMessage || '无法启动相机，请检查相机权限或稍后重试' }}</view>
+                    <view class="camera-error-buttons">
+                        <view class="camera-error-btn camera-error-btn-retry" @click="retryCamera">
+                            <text>重试</text>
+                        </view>
+                        <view class="camera-error-btn camera-error-btn-exit" @click="exitCamera">
+                            <text>退出</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="camera-options" :style="[{ height: toolbarHeight + 'px', width: windowWidth + 'px' }]">
+            <view class="camera-options-left camera-item">
+                <image
+                    class="camera-item-image"
+                    src="https://images.eqingqu.com/attachs/photo/202404/20240416_91B0320810DE026C6AED0552641C3EEC.png"
+                    mode="scaleToFill"
+                    @click="handleInstruct('back')"
+                    style="width: 80rpx;height: 80rpx;"
+                ></image>
+            </view>
+            <view class="camera-options-center camera-item">
+                <view class="shutter-button" @click="handleInstruct('shutter')">
+                    <view class="shutter-button-inner"></view>
+                </view>
+            </view>
+            <view class="camera-options-ritht camera-item">
+                <text
+                    class="camera-item-text"
+                    @click="handleInstruct('album')"
+                >相册</text>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    export default {
+        props: {
+            maskConfig: {
+                type: Object,
+                default: () => ({
+                    widthRatio: 0.68,
+                    heightRatio: 0.5,
+                    borderRadius: 24
+                })
+            }
+        },
+        data() {
+            return {
+                livePusher: null,
+                ready: true,
+                devicePosition: 'back',
+                currentPosition: 'back',
+                desiredPosition: 'back',
+                platform: '',
+                isIOS: false,
+                windowWidth: 0,
+                windowHeight: 0,
+                previewWidth: 0,
+                previewHeight: 0,
+                toolbarHeight: 0,
+                windowResizeListener: null,
+                maskHoleStyle: {},
+                maskBorderStyle: {},
+                maskRectStyles: {
+                    top: {},
+                    bottom: {},
+                    left: {},
+                    right: {}
+                },
+                cornerStyles: {
+                    topLeft: { horizontal: {}, vertical: {} },
+                    topRight: { horizontal: {}, vertical: {} },
+                    bottomLeft: { horizontal: {}, vertical: {} },
+                    bottomRight: { horizontal: {}, vertical: {} }
+                },
+                captureMetrics: null,
+                maskReady: false,
+                holdTipVisible: false,
+                captureTimer: null,
+                cameraEnabled: true,
+                retryCount: 0,
+                maxRetries: 5,
+                cameraReady: false,
+                cameraError: false,
+                errorMessage: ''
+            }
+        },
+        created() {
+            const systemInfo = uni.getSystemInfoSync();
+            this.platform = systemInfo.platform;
+            this.isIOS = (systemInfo.platform || '').toLowerCase() === 'ios';
+            if (this.isIOS) {
+                this.currentPosition = 'front';
+                this.devicePosition = 'back';
+                this.cameraReady = false;
+            } else {
+                this.cameraReady = true;
+            }
+            this.windowWidth = systemInfo.windowWidth || systemInfo.screenWidth;
+            this.windowHeight = systemInfo.windowHeight || systemInfo.screenHeight;
+            this.previewWidth = this.windowWidth;
+            const toolbarBase = uni.upx2px(220);
+            this.toolbarHeight = toolbarBase;
+            this.previewHeight = this.windowHeight - this.toolbarHeight;
+            if (this.previewHeight < toolbarBase * 2) {
+                this.previewHeight = this.windowHeight * 0.78;
+            }
+            console.log('CustomCamera APP system info:', JSON.stringify({
+                platform: this.platform,
+                screenWidth: systemInfo.screenWidth,
+                screenHeight: systemInfo.screenHeight,
+                windowWidth: systemInfo.windowWidth,
+                windowHeight: systemInfo.windowHeight,
+                statusBarHeight: systemInfo.statusBarHeight,
+                safeArea: systemInfo.safeArea,
+                pixelRatio: systemInfo.pixelRatio
+            }));
+            this.calculateMask();
+        },
+        mounted() {
+            // 延迟初始化，确保 live-pusher 组件已完全渲染
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    this.init();
+                }, 200);
+            });
+            this.updatePreviewMetrics();
+            if (uni.onWindowResize) {
+                this.windowResizeListener = () => {
+                    this.updatePreviewMetrics();
+                };
+                uni.onWindowResize(this.windowResizeListener);
+            }
+        },
+        beforeDestroy() {
+            if (this.captureTimer) {
+                clearTimeout(this.captureTimer);
+                this.captureTimer = null;
+            }
+            if (this.windowResizeListener && uni.offWindowResize) {
+                uni.offWindowResize(this.windowResizeListener);
+                this.windowResizeListener = null;
+            }
+        },
+        watch: {
+            maskConfig: {
+                deep: true,
+                handler() {
+                    this.updatePreviewMetrics();
+                }
+            }
+        },
+        methods: {
+            init() {
+                // 重置错误状态
+                this.cameraError = false;
+                this.errorMessage = '';
+                this.retryCount = 0;
+                
+                this.livePusher = uni.createLivePusherContext('livePusher', this);
+                if (!this.livePusher) {
+                    console.error('createLivePusherContext 失败');
+                    this.showCameraError('相机组件初始化失败，请重试');
+                    return;
+                }
+                this.startPreview();
+            },
+            startPreview() {
+                if (!this.livePusher) {
+                    console.error('livePusher未初始化');
+                    this.showCameraError('相机组件未初始化，请重试');
+                    return;
+                }
+                
+                // 先停止预览（如果之前有启动过）
+                try {
+                    this.livePusher.stopPreview();
+                } catch (e) {
+                    // 忽略停止失败的错误
+                }
+                
+                this.livePusher.startPreview({
+                    success: () => {
+                        console.log('相机初始化成功');
+                        this.retryCount = 0;
+                        this.cameraError = false;
+                        if (this.isIOS) {
+                            this.setDevicePosition('back');
+                            setTimeout(() => {
+                                this.ensureBackCamera();
+                            }, 50);
+                        } else {
+                            this.setDevicePosition(this.devicePosition);
+                            this.cameraReady = true;
+                        }
+                    },
+                    fail: (err) => {
+                        console.error('相机初始化失败', err);
+                        this.retryCount++;
+                        if (this.retryCount < this.maxRetries) {
+                            console.log(`相机初始化失败，正在重试 (${this.retryCount}/${this.maxRetries})`);
+                            // 增加重试间隔，给系统更多时间
+                            setTimeout(() => {
+                                this.startPreview();
+                            }, 1000);
+                        } else {
+                            // 重试次数用完，显示错误界面
+                            this.showCameraError('相机启动失败，已重试' + this.maxRetries + '次，请检查相机权限或稍后重试');
+                        }
+                    }
+                });
+            },
+            showCameraError(message) {
+                this.cameraError = true;
+                this.errorMessage = message || '无法启动相机，请检查相机权限或稍后重试';
+                this.cameraReady = false;
+            },
+            retryCamera() {
+                // 重置状态
+                this.cameraError = false;
+                this.errorMessage = '';
+                this.retryCount = 0;
+                this.cameraReady = false;
+                
+                // 重新初始化
+                if (this.livePusher) {
+                    try {
+                        this.livePusher.stopPreview();
+                    } catch (e) {
+                        // 忽略停止失败的错误
+                    }
+                }
+                
+                // 延迟一下再重新初始化
+                setTimeout(() => {
+                    this.init();
+                }, 300);
+            },
+            exitCamera() {
+                this.$emit('back');
+            },
+            ensureBackCamera() {
+                if (!this.livePusher) {
+                    this.showCameraError('相机组件未初始化，请重试');
+                    return;
+                }
+                if (this.currentPosition === 'back') {
+                    this.cameraReady = true;
+                    return;
+                }
+                let switchCount = 0;
+                const maxSwitches = 5;
+                const doSwitch = () => {
+                    if (switchCount >= maxSwitches) {
+                        console.warn('ensureBackCamera 切换次数超限');
+                        // 切换失败，但可能相机已经可用，尝试继续使用
+                        this.cameraReady = true;
+                        // 如果还是前置，显示错误提示
+                        setTimeout(() => {
+                            if (this.currentPosition !== 'back') {
+                                this.showCameraError('无法切换到后置摄像头，请重试');
+                            }
+                        }, 500);
+                        return;
+                    }
+                    this.livePusher.switchCamera({
+                        success: () => {
+                            this.currentPosition = this.currentPosition === 'back' ? 'front' : 'back';
+                            if (this.currentPosition !== 'back') {
+                                switchCount++;
+                                setTimeout(() => {
+                                    doSwitch();
+                                }, 100);
+                            } else {
+                                this.devicePosition = 'back';
+                                console.log('ensureBackCamera 切换成功');
+                                this.cameraReady = true;
+                            }
+                        },
+                        fail: (err) => {
+                            console.warn('ensureBackCamera 切换失败', err);
+                            switchCount++;
+                            if (switchCount < maxSwitches) {
+                                setTimeout(() => {
+                                    doSwitch();
+                                }, 200);
+                            } else {
+                                // 切换失败，显示错误提示
+                                this.showCameraError('无法切换到后置摄像头，请重试');
+                            }
+                        }
+                    });
+                };
+                doSwitch();
+            },
+            setDevicePosition(position) {
+                if (!this.livePusher || !position) return;
+                this.desiredPosition = position;
+                try {
+                    this.livePusher.setOptions({
+                        devicePosition: position
+                    });
+                    this.currentPosition = position;
+                    this.devicePosition = position;
+                } catch (e) {
+                    console.log('setOptions devicePosition 失败，尝试 switchCamera', e);
+                    const trySwitch = () => {
+                        this.livePusher.switchCamera({
+                            success: () => {
+                                this.currentPosition = this.currentPosition === 'back' ? 'front' : 'back';
+                                this.devicePosition = this.currentPosition;
+                                if (this.currentPosition !== this.desiredPosition) {
+                                    trySwitch();
+                                } else {
+                                    console.log('fallback 切换成功至', this.currentPosition);
+                                }
+                            },
+                            fail: (err) => {
+                                console.warn('switchCamera 调整失败', err);
+                            }
+                        });
+                    };
+                    if (this.currentPosition !== this.desiredPosition) {
+                        trySwitch();
+                    }
+                }
+            },
+            updatePreviewMetrics() {
+                this.$nextTick(() => {
+                    const query = uni.createSelectorQuery().in(this);
+                    query.select('.preview-wrapper').boundingClientRect((data) => {
+                        if (!data) {
+                            return;
+                        }
+                        if (data.width) {
+                            this.previewWidth = data.width;
+                        }
+                        if (data.height) {
+                            this.previewHeight = data.height;
+                        }
+                        console.log('camera wrapper rect', data);
+                        this.calculateMask();
+                    }).exec();
+                });
+            },
+            calculateMask() {
+                const widthRatio = this.maskConfig.widthRatio || 0.68;
+                const heightRatio = this.maskConfig.heightRatio || 0.58;
+                const previewWidth = this.previewWidth || this.windowWidth;
+                const previewHeight = this.previewHeight || (this.windowHeight - this.toolbarHeight);
+                if (!previewWidth || !previewHeight) {
+                    return;
+                }
+                const holeWidth = previewWidth * widthRatio;
+                const holeHeight = previewHeight * heightRatio;
+                const left = (previewWidth - holeWidth) / 2;
+                const top = (previewHeight - holeHeight) / 2;
+                const right = previewWidth - left - holeWidth;
+                const bottom = previewHeight - top - holeHeight;
+                const borderRadius = this.maskConfig.borderRadius || 0;
+                const shadowThickness = Math.max(previewWidth, previewHeight);
+                const outlineTop = Math.max(0, top);
+                const outlineLeft = Math.max(0, left);
+                const outlineWidth = Math.max(0, holeWidth);
+                const outlineHeight = Math.max(0, holeHeight);
+                const outlineRight = Math.max(0, right);
+                const outlineBottom = Math.max(0, bottom);
+
+                // 计算四个L形角标记的位置
+                const cornerLength = 30;
+                const cornerWidth = 3;
+                const frameTop = outlineTop;
+                const frameLeft = outlineLeft;
+                const frameRight = outlineLeft + outlineWidth;
+                const frameBottom = outlineTop + outlineHeight;
+
+                // 左上角
+                this.cornerStyles.topLeft = {
+                    horizontal: {
+                        top: frameTop + 'px',
+                        left: frameLeft + 'px',
+                        width: cornerLength + 'px',
+                        height: cornerWidth + 'px'
+                    },
+                    vertical: {
+                        top: frameTop + 'px',
+                        left: frameLeft + 'px',
+                        width: cornerWidth + 'px',
+                        height: cornerLength + 'px'
+                    }
+                };
+
+                // 右上角
+                this.cornerStyles.topRight = {
+                    horizontal: {
+                        top: frameTop + 'px',
+                        left: (frameRight - cornerLength) + 'px',
+                        width: cornerLength + 'px',
+                        height: cornerWidth + 'px'
+                    },
+                    vertical: {
+                        top: frameTop + 'px',
+                        left: (frameRight - cornerWidth) + 'px',
+                        width: cornerWidth + 'px',
+                        height: cornerLength + 'px'
+                    }
+                };
+
+                // 左下角
+                this.cornerStyles.bottomLeft = {
+                    horizontal: {
+                        top: (frameBottom - cornerWidth) + 'px',
+                        left: frameLeft + 'px',
+                        width: cornerLength + 'px',
+                        height: cornerWidth + 'px'
+                    },
+                    vertical: {
+                        top: (frameBottom - cornerLength) + 'px',
+                        left: frameLeft + 'px',
+                        width: cornerWidth + 'px',
+                        height: cornerLength + 'px'
+                    }
+                };
+
+                // 右下角
+                this.cornerStyles.bottomRight = {
+                    horizontal: {
+                        top: (frameBottom - cornerWidth) + 'px',
+                        left: (frameRight - cornerLength) + 'px',
+                        width: cornerLength + 'px',
+                        height: cornerWidth + 'px'
+                    },
+                    vertical: {
+                        top: (frameBottom - cornerLength) + 'px',
+                        left: (frameRight - cornerWidth) + 'px',
+                        width: cornerWidth + 'px',
+                        height: cornerLength + 'px'
+                    }
+                };
+
+                // 清空旧的遮罩样式
+                this.maskHoleStyle = {};
+                this.maskBorderStyle = {};
+                this.maskRectStyles = {
+                    top: {},
+                    bottom: {},
+                    left: {},
+                    right: {}
+                };
+                this.captureMetrics = {
+                    topRatio: previewHeight ? outlineTop / previewHeight : 0,
+                    leftRatio: previewWidth ? outlineLeft / previewWidth : 0,
+                    widthRatio: widthRatio,
+                    heightRatio: heightRatio,
+                    previewWidth,
+                    previewHeight,
+                    outlines: {
+                        top: outlineTop,
+                        left: outlineLeft,
+                        right: outlineRight,
+                        bottom: outlineBottom
+                    }
+                };
+                console.log('camera mask metrics', {
+                    previewWidth,
+                    previewHeight,
+                    holeWidth: outlineWidth,
+                    holeHeight: outlineHeight,
+                    left: outlineLeft,
+                    top: outlineTop,
+                    metrics: this.captureMetrics
+                });
+                this.maskReady = true;
+            },
+            clearCaptureDelay() {
+                if (this.captureTimer) {
+                    clearTimeout(this.captureTimer);
+                    this.captureTimer = null;
+                }
+            },
+            handleInstruct(instruct) {
+                switch (instruct) {
+                    case 'back':
+                        this.clearCaptureDelay();
+                        this.holdTipVisible = false;
+                        this.ready = true;
+                        this.$emit('back');
+                        break;
+                    case 'shutter':
+                        if (this.ready && !this.captureTimer) {
+                            this.ready = false;
+                            this.holdTipVisible = true;
+                            this.captureTimer = setTimeout(() => {
+                                this.captureTimer = null;
+                                this.holdTipVisible = false;
+                                this.$nextTick(() => {
+                                    this.livePusher.snapshot({
+                                        success: (res) => {
+                                            const path = res.tempImagePath || (res.message && res.message.tempImagePath);
+                                            this.processCapturedImage(path);
+                                        },
+                                        fail: (err) => {
+                                            console.error('snapshot fail', err);
+                                            this.holdTipVisible = false;
+                                            this.ready = true;
+                                        }
+                                    });
+                                });
+                            }, 1000);
+                        }
+                        break;
+                    case 'reversal':
+                        this.clearCaptureDelay();
+                        this.holdTipVisible = false;
+                        {
+                            const next = this.currentPosition === 'back' ? 'front' : 'back';
+                            this.setDevicePosition(next);
+                        }
+                        break;
+                    case 'album':
+                        this.clearCaptureDelay();
+                        this.holdTipVisible = false;
+                        this.ready = true;
+                        uni.chooseImage({
+                            count: 1,
+                            sizeType: ['original', 'compressed'],
+                            sourceType: ['album'],
+                            success: (res) => {
+                                const filePath = res.tempFilePaths[0];
+                                this.processCapturedImage(filePath);
+                            }
+                        });
+                        break;
+                }
+            },
+            processCapturedImage(path) {
+                this.ready = false;
+                this.holdTipVisible = false;
+                if (!path) {
+                    this.ready = true;
+                    uni.showToast({
+                        title: '拍摄失败，请重试',
+                        icon: 'none'
+                    });
+                    return;
+                }
+                const localPath = path.startsWith('file://') ? path : ('file://' + path);
+                this.cropImage(localPath)
+                    .then((newPath) => {
+                        this.ready = true;
+                        this.$emit('getImage', newPath);
+                    })
+                    .catch((err) => {
+                        console.error('裁剪失败', err);
+                        this.ready = true;
+                        this.holdTipVisible = false;
+                        uni.showToast({
+                            title: '裁剪失败，请重试',
+                            icon: 'none'
+                        });
+                    });
+            },
+            cropImage(path) {
+                return new Promise((resolve, reject) => {
+                    const metrics = this.captureMetrics || {};
+                    const widthRatio = metrics.widthRatio || this.maskConfig.widthRatio || 0.78;
+                    const heightRatio = metrics.heightRatio || this.maskConfig.heightRatio || 0.62;
+                    const topRatio = metrics.topRatio != null ? metrics.topRatio : (1 - heightRatio) / 2;
+                    const leftRatio = metrics.leftRatio != null ? metrics.leftRatio : (1 - widthRatio) / 2;
+                    const loadPath = path.startsWith('file://') ? path : ('file://' + path);
+                    const dstPath = `_doc/crop_${Date.now()}.jpg`;
+                    console.log('cropImage metrics', {
+                        widthRatio,
+                        heightRatio,
+                        leftRatio,
+                        topRatio,
+                        preview: this.captureMetrics
+                    });
+                    plus.io.getImageInfo({
+                        src: loadPath,
+                        success: (info) => {
+                            const imgWidth = info.width || 0;
+                            const imgHeight = info.height || 0;
+                            console.log('original image size', { imgWidth, imgHeight });
+                            const cropWidthPx = Math.round(imgWidth * widthRatio);
+                            const cropHeightPx = Math.round(imgHeight * heightRatio);
+                            const leftPx = Math.max(0, Math.round(imgWidth * leftRatio));
+                            const topPx = Math.max(0, Math.round(imgHeight * topRatio));
+                            const rightPx = Math.min(imgWidth, leftPx + cropWidthPx);
+                            const bottomPx = Math.min(imgHeight, topPx + cropHeightPx);
+                            const adjWidthPx = rightPx - leftPx;
+                            const adjHeightPx = bottomPx - topPx;
+                            console.log('pixel clip metrics', {
+                                imgWidth,
+                                imgHeight,
+                                cropWidthPx,
+                                cropHeightPx,
+                                leftPx,
+                                topPx,
+                                rightPx,
+                                bottomPx,
+                                adjWidthPx,
+                                adjHeightPx
+                            });
+                            if (!imgWidth || !imgHeight || adjWidthPx <= 0 || adjHeightPx <= 0) {
+                                reject(new Error('Invalid clip area'));
+                                return;
+                            }
+                            plus.zip.compressImage({
+                                src: loadPath,
+                                dst: dstPath,
+                                overwrite: true,
+                                quality: 100,
+                                clip: {
+                                    top: topPx,
+                                    left: leftPx,
+                                    width: adjWidthPx,
+                                    height: adjHeightPx
+                                }
+                            }, () => {
+                                const checkBitmap = new plus.nativeObj.Bitmap('camera-crop-check');
+                                checkBitmap.load(
+                                    dstPath,
+                                    () => {
+                                        console.log('cropped image size', {
+                                            width: checkBitmap.width,
+                                            height: checkBitmap.height
+                                        });
+                                        checkBitmap.clear();
+                                        plus.io.resolveLocalFileSystemURL(
+                                            dstPath,
+                                            (entry) => {
+                                                resolve(entry.toLocalURL());
+                                            },
+                                            () => {
+                                                resolve(dstPath.startsWith('file://') ? dstPath : `file://${dstPath}`);
+                                            }
+                                        );
+                                    },
+                                    () => {
+                                        plus.io.resolveLocalFileSystemURL(
+                                            dstPath,
+                                            (entry) => {
+                                                resolve(entry.toLocalURL());
+                                            },
+                                            () => {
+                                                resolve(dstPath.startsWith('file://') ? dstPath : `file://${dstPath}`);
+                                            }
+                                        );
+                                    }
+                                );
+                            }, (err) => {
+                                console.error('compressImage pixel crop failed', err);
+                                reject(err);
+                            });
+                        },
+                        fail: (err) => {
+                            console.error('getImageInfo failed', err);
+                            reject(err);
+                        }
+                    });
+                });
+            }
+        }
+    }
+</script>
+
+<style>
+    .camera-container {
+        flex: 1;
+        flex-direction: column;
+        background-color: #000;
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    .preview-wrapper {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background-color: #000;
+        flex: 1;
+    }
+
+    .live-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .mask-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .mask-ios-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .mask-rect {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .mask-top,
+    .mask-bottom {
+        left: 0;
+        right: 0;
+    }
+
+    .mask-left,
+    .mask-right {
+        top: 0;
+        bottom: 0;
+    }
+
+    .mask-left {
+        left: 0;
+    }
+
+    .mask-right {
+        right: 0;
+    }
+
+    .mask-top {
+        top: 0;
+    }
+
+    .mask-bottom {
+        bottom: 0;
+    }
+
+    .mask-hole {
+        position: absolute;
+        box-sizing: border-box;
+        pointer-events: none;
+        background-color: transparent;
+    }
+
+    .mask-border {
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .hold-tip {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.35);
+    }
+
+    .hold-tip text {
+        color: #ffffff;
+        font-size: 28rpx;
+    }
+
+    .camera-loading-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #000000;
+        z-index: 999;
+    }
+
+    .camera-error-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .camera-error-content {
+        background-color: #FFFFFF;
+        border-radius: 20px;
+        padding: 60rpx 40rpx;
+        margin: 0 60rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 500rpx;
+    }
+
+    .camera-error-icon {
+        font-size: 80rpx;
+        margin-bottom: 30rpx;
+    }
+
+    .camera-error-title {
+        font-size: 36rpx;
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 20rpx;
+    }
+
+    .camera-error-message {
+        font-size: 28rpx;
+        color: #666666;
+        text-align: center;
+        line-height: 1.6;
+        margin-bottom: 50rpx;
+    }
+
+    .camera-error-buttons {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        gap: 30rpx;
+    }
+
+    .camera-error-btn {
+        flex: 1;
+        height: 80rpx;
+        border-radius: 10rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .camera-error-btn text {
+        font-size: 32rpx;
+        font-weight: 500;
+    }
+
+    .camera-error-btn-retry {
+        background-color: #FE2F02;
+    }
+
+    .camera-error-btn-retry text {
+        color: #FFFFFF;
+    }
+
+    .camera-error-btn-exit {
+        background-color: #F5F5F5;
+    }
+
+    .camera-error-btn-exit text {
+        color: #333333;
+    }
+
+    .camera-options {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 60rpx;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .camera-item {
+        flex: 1;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .camera-item-image {
+        width: 80rpx;
+        height: 80rpx;
+    }
+
+    .camera-item-text {
+        color: #ffffff;
+        font-size: 32rpx;
+    }
+
+    .corner-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+    }
+
+    .corner-line {
+        position: absolute;
+        background-color: #ffffff;
+    }
+
+    .corner-h {
+        height: 3px;
+    }
+
+    .corner-v {
+        width: 3px;
+    }
+
+    .shutter-button {
+        width: 120rpx;
+        height: 120rpx;
+        border-radius: 50%;
+        border: 6rpx solid rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+    }
+
+    .shutter-button-inner {
+        width: 100rpx;
+        height: 100rpx;
+        border-radius: 50%;
+        background-color: #FE2F02;
+    }
+</style>
+

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>趣好卖 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #FFD4C8 0%, #FFF5E8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .header {
+            padding: 100px 30px 40px;
+            position: relative;
+        }
+        
+        .promo-section {
+            margin-bottom: 20px;
+        }
+        
+        .promo-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .promo-label .highlight {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .promo-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        
+        .promo-subtitle {
+            font-size: 13px;
+            color: #999;
+        }
+        
+        .red-envelope {
+            position: absolute;
+            right: 20px;
+            top: 120px;
+            width: 140px;
+            height: 140px;
+        }
+        
+        .container {
+            flex: 1;
+            background: #F8F8F8;
+            border-radius: 24px 24px 0 0;
+            padding: 40px 24px 30px;
+            position: relative;
+        }
+        
+        .phone-input-group {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .phone-prefix {
+            font-size: 15px;
+            color: #333;
+            padding-right: 12px;
+            border-right: 1px solid #E5E5E5;
+        }
+        
+        .phone-input-group input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            background: transparent;
+        }
+        
+        .phone-input-group input::placeholder {
+            color: #BFBFBF;
+        }
+        
+        .code-input-group {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .code-input-group input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            background: transparent;
+        }
+        
+        .code-input-group input::placeholder {
+            color: #BFBFBF;
+        }
+        
+        .get-code-btn {
+            font-size: 14px;
+            color: #D23328;
+            background: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: #D23328;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        
+        .login-btn:active {
+            opacity: 0.9;
+        }
+        
+        .quick-login-text {
+            text-align: center;
+            color: #D23328;
+            font-size: 14px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+        
+        .divider {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin: 40px 0 24px;
+        }
+        
+        .other-login-methods {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 20px;
+        }
+        
+        .login-method {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .method-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .method-label {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .wechat-color {
+            color: #07C160;
+        }
+        
+        .apple-color {
+            color: #000;
+        }
+        
+        .account-color {
+            color: #999;
+        }
+        
+        .register-color {
+            color: #999;
+        }
+        
+        .privacy-agreement {
+            display: flex;
+            align-items: flex-start;
+            font-size: 12px;
+            color: #999;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .privacy-agreement input[type="checkbox"] {
+            margin-right: 6px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            width: 14px;
+            height: 14px;
+        }
+        
+        .privacy-agreement a {
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 320px;
+            width: 85%;
+            text-align: center;
+            animation: slideUp 0.3s;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-content h3 {
+            color: #1a1a1a;
+            font-size: 16px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        
+        .modal-content p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .modal-btn.cancel {
+            background: #F5F5F5;
+            color: #666;
+        }
+        
+        .modal-btn.confirm {
+            background: #D23328;
+            color: white;
+        }
+        
+        .modal-btn:active {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="back-btn" onclick="history.back()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    
+    <div class="header">
+        <div class="promo-section">
+            <div class="promo-label"><span class="highlight">新人特权</span> 最高</div>
+            <div class="promo-title">登录送10元</div>
+            <div class="promo-subtitle">登录后立即领取</div>
+        </div>
+        
+        <div class="red-envelope">
+            <svg viewBox="0 0 140 140" fill="none">
+                <defs>
+                    <linearGradient id="envelopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#D23328;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect x="20" y="35" width="100" height="70" rx="8" fill="url(#envelopeGrad)" transform="rotate(-15 70 70)"/>
+                <circle cx="70" cy="70" r="18" fill="#FFD700" opacity="0.9" transform="rotate(-15 70 70)"/>
+                <text x="70" y="76" text-anchor="middle" fill="#D23328" font-size="14" font-weight="bold" transform="rotate(-15 70 70)">¥</text>
+                <polygon points="25,20 35,30 15,30" fill="#FFD700" opacity="0.8"/>
+                <polygon points="105,95 115,105 105,105" fill="#FFD700" opacity="0.8"/>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="phone-input-group" id="phoneMode" style="display:none;">
+            <span class="phone-prefix">+86</span>
+            <input type="tel" placeholder="请输入手机号" id="phone" maxlength="11">
+        </div>
+        
+        <div class="code-input-group" id="codeMode" style="display:none;">
+            <input type="text" placeholder="请输入验证码" id="code" maxlength="6">
+            <button class="get-code-btn" onclick="getCode()">获取验证码</button>
+        </div>
+        
+        <div style="text-align: center; font-size: 24px; letter-spacing: 4px; color: #333; margin: 30px 0;" id="maskMode">
+            ************
+        </div>
+        
+        <button class="login-btn" onclick="handleLogin()" id="loginBtn">本机号码一键登录</button>
+        
+        <div class="quick-login-text" onclick="switchToPhoneMode()" id="switchText">其他手机号登录</div>
+        
+        <div class="privacy-agreement">
+            <input type="checkbox" id="agreePrivacy">
+            <label for="agreePrivacy">
+                我同意 <a href="#">《趣好卖服务条款》</a>和<a href="#">《隐私政策》</a>
+            </label>
+        </div>
+        
+        <div class="divider">其他方式登录</div>
+        
+        <div class="other-login-methods">
+            <div class="login-method" onclick="handleOtherLogin('wechat')">
+                <div class="method-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M11.5 11C11.5 11 10.5 11 10.5 12C10.5 13 11.5 13 11.5 13C11.5 13 12.5 13 12.5 12C12.5 11 11.5 11 11.5 11Z" fill="#07C160"/>
+                        <path d="M15.5 11C15.5 11 14.5 11 14.5 12C14.5 13 15.5 13 15.5 13C15.5 13 16.5 13 16.5 12C16.5 11 15.5 11 15.5 11Z" fill="#07C160"/>
+                        <path d="M13.5 7C9.5 7 6 9.5 6 13C6 15 7 16.5 8.5 17.5L8 20L10.5 18.5C11 18.7 12 19 13.5 19C17.5 19 21 16.5 21 13C21 9.5 17.5 7 13.5 7Z" fill="#07C160"/>
+                        <path d="M19 13.5C19 13.5 18.2 13.5 18.2 14.2C18.2 14.9 19 14.9 19 14.9C19 14.9 19.8 14.9 19.8 14.2C19.8 13.5 19 13.5 19 13.5Z" fill="#07C160"/>
+                        <path d="M22 13.5C22 13.5 21.2 13.5 21.2 14.2C21.2 14.9 22 14.9 22 14.9C22 14.9 22.8 14.9 22.8 14.2C22.8 13.5 22 13.5 22 13.5Z" fill="#07C160"/>
+                        <path d="M20.5 11C17.5 11 15 12.8 15 15.5C15 18.2 17.5 20 20.5 20C21.2 20 21.8 19.9 22.5 19.7L24.5 21L24 18.8C25.2 18 26 16.8 26 15.5C26 12.8 23.5 11 20.5 11Z" fill="#07C160"/>
+                    </svg>
+                </div>
+                <div class="method-label wechat-color">微信</div>
+            </div>
+            
+            <div class="login-method" onclick="handleOtherLogin('apple')">
+                <div class="method-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M18.5 8C18.5 8 18.8 6.5 20 6C21.2 5.5 22 6 22 6C22 6 21.5 7.5 20.5 8C19.5 8.5 18.5 8 18.5 8Z" fill="#000"/>
+                        <path d="M16 9C17.5 9 18.5 8 18.5 8C18.5 8 19 6 17.5 6C16 6 15 7 15 8.5C15 10 14 11 12.5 11C11 11 10 10 10 10C10 10 9 11 9 13C9 15 10 17 11.5 19C13 21 14.5 22 16 22C17.5 22 19 21 20.5 19C22 17 23 15 23 13C23 11 22 10 22 10C22 10 21 11 19.5 11C18 11 17 10 17 8.5C17 7 16 9 16 9Z" fill="#000"/>
+                    </svg>
+                </div>
+                <div class="method-label apple-color">Apple</div>
+            </div>
+            
+            <div class="login-method" onclick="location.href='quhaoma-account-login.html'">
+                <div class="method-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect x="8" y="10" width="16" height="12" rx="2" stroke="#999" stroke-width="1.5" fill="none"/>
+                        <path d="M12 10V8C12 5.79 13.79 4 16 4C18.21 4 20 5.79 20 8V10" stroke="#999" stroke-width="1.5" fill="none"/>
+                        <circle cx="16" cy="17" r="1.5" fill="#999"/>
+                    </svg>
+                </div>
+                <div class="method-label account-color">账号密码</div>
+            </div>
+            
+            <div class="login-method" onclick="handleRegister()">
+                <div class="method-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="12" r="4" stroke="#999" stroke-width="1.5" fill="none"/>
+                        <path d="M8 24C8 20 11.58 18 16 18C20.42 18 24 20 24 24" stroke="#999" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </div>
+                <div class="method-label register-color">注册</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <h3>服务协议及隐私保护</h3>
+            <p>为了更好地保障您的合法权益，请阅读并同意以下协议《趣好卖服务条款》和《隐私政策》</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">不同意</button>
+                <button class="modal-btn confirm" onclick="agreeAndLogin()">同意</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let isQuickMode = true;
+        
+        function switchToPhoneMode() {
+            isQuickMode = false;
+            document.getElementById('maskMode').style.display = 'none';
+            document.getElementById('phoneMode').style.display = 'flex';
+            document.getElementById('codeMode').style.display = 'flex';
+            document.getElementById('loginBtn').textContent = '登录';
+            document.getElementById('switchText').textContent = '本机号码一键登录';
+            document.getElementById('switchText').onclick = switchToQuickMode;
+        }
+        
+        function switchToQuickMode() {
+            isQuickMode = true;
+            document.getElementById('maskMode').style.display = 'block';
+            document.getElementById('phoneMode').style.display = 'none';
+            document.getElementById('codeMode').style.display = 'none';
+            document.getElementById('loginBtn').textContent = '本机号码一键登录';
+            document.getElementById('switchText').textContent = '其他手机号登录';
+            document.getElementById('switchText').onclick = switchToPhoneMode;
+        }
+        
+        function getCode() {
+            const phone = document.getElementById('phone').value;
+            if (!phone || phone.length !== 11) {
+                alert('请输入正确的手机号');
+                return;
+            }
+            alert('验证码已发送');
+        }
+        
+        function handleLogin() {
+            const agreed = document.getElementById('agreePrivacy').checked;
+            if (!agreed) {
+                document.getElementById('privacyModal').classList.add('show');
+            } else {
+                performLogin();
+            }
+        }
+        
+        function handleOtherLogin(type) {
+            const typeNames = {
+                'wechat': '微信',
+                'apple': 'Apple'
+            };
+            alert(typeNames[type] + '登录');
+        }
+        
+        function handleRegister() {
+            location.href = 'quhaoma-register.html';
+        }
+        
+        function closeModal() {
+            document.getElementById('privacyModal').classList.remove('show');
+        }
+        
+        function agreeAndLogin() {
+            document.getElementById('agreePrivacy').checked = true;
+            closeModal();
+            performLogin();
+        }
+        
+        function performLogin() {
+            alert('登录成功！恭喜获得 10 元新人奖励！');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+@charset "UTF-8";
+.sys-coupon-wrap.data-v-186dc7a1 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  display: flex;
+  height: 80rpx;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15rpx;
+  z-index: 50;
+  /* 高于公告(z-index:2)，但低于弹窗(z-index:99/999) */
+  border-radius: 10px;
+  background-color: #fceee8;
+  box-sizing: border-box;
+  will-change: transform;
+  /* 创建新的 stacking context，确保层级不受父元素影响 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* 确保在滚动时也能正确显示 */
+  pointer-events: auto;
+}
+.sys-coupon-wrap .img-red-envelope.data-v-186dc7a1 {
+  width: 30rpx;
+  height: 40rpx;
+  margin: 0 15rpx;
+}
+.sys-coupon-wrap .sys-coupon-hint.data-v-186dc7a1 {
+  flex: 1;
+  font-weight: 400;
+  font-size: 28rpx;
+  color: #4D4B4B;
+}
+.sys-coupon-wrap .sys-coupon-hint .txt-hint.data-v-186dc7a1 {
+  color: #F44C36;
+}
+.sys-coupon-wrap .uni-flex.data-v-186dc7a1 {
+  height: 100%;
+  align-items: center;
+}
+.sys-coupon-wrap .btn-go-use.data-v-186dc7a1 {
+  display: flex;
+  height: 40rpx;
+  width: 110rpx;
+  justify-content: center;
+  align-items: center;
+  font-size: 22rpx;
+  color: #ed6b40;
+  margin-right: 25rpx;
+  border: 1px solid #ed6b40;
+  border-radius: 20rpx;
+  background-color: #fceee8;
+  background: none;
+}
+.sys-coupon-wrap .img-close.data-v-186dc7a1 {
+  width: 40rpx;
+  height: 40rpx;
+}
+.sys-coupon-wrap .sys-coupon-hint.data-v-186dc7a1 {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  font-size: 24rpx;
+  /* 适当调小字体 */
+  white-space: nowrap;
+  /* 防止换行 */
+  /* 新增以下样式 */
+  font-variant-numeric: tabular-nums;
+  /* 等宽数字 */
+  letter-spacing: 0.5px;
+  /* 保持字符间距稳定 */
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+  /* 避免字体渲染抖动 */
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  /* 硬件加速 */
+}
+.time-layout.data-v-186dc7a1 {
+  position: relative;
+  /* 定位基准 */
+  display: inline-block;
+  vertical-align: bottom;
+}
+.time-wrapper.data-v-186dc7a1 {
+  /* 固定宽度（根据最大时间文本计算） */
+  width: 220rpx;
+  /* 示例：23:59:59.99 的实测宽度 */
+  text-align: right;
+  /* 右对齐避免左侧晃动 */
+  font-variant-numeric: tabular-nums;
+  /* 强制等宽字体（iOS/Android兼容方案） */
+  font-family: Monaco, Consolas, "Courier New", monospace;
+}
+.time-wrapper .time-text.data-v-186dc7a1 {
+  font-weight: bold;
+  font-size: 14px;
+  color: #FE2F02;
+  margin: 0 16rpx;
+  font-variant-numeric: tabular-nums;
+  /* 等宽数字 */
+  min-width: 86rpx;
+  /* 根据最大时间宽度设定 */
+  text-align: right;
+  /* 右对齐保持宽度稳定 */
+}
+.expire-text.data-v-186dc7a1 {
+  position: absolute;
+  /* 脱离文档流 */
+  left: 240rpx;
+  /* 放置在时间文本右侧 */
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  white-space: nowrap;
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+}
+.time-text.data-v-186dc7a1 {
+  display: inline-block;
+  min-width: 180rpx;
+  -webkit-font-feature-settings: "tnum";
+          font-feature-settings: "tnum";
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  will-change: transform;
+}

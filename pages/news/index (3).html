@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>商品优惠</title>
+<style>
+:root{--red:#FF2442;--red-l:#FFF0F0;--red-b:#FFD6D6;--org:#FF6600;--org-l:#FFF5EB;--grn:#00B578;--grn-l:#E8FFF3;--gold:#C8A255;--dk:#222;--g1:#666;--g2:#999;--g3:#ccc;--g5:#f0f0f0;--bg:#F7F8FA;--card:#fff;--r:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC',sans-serif;background:#fff;color:var(--dk);max-width:430px;margin:0 auto;min-height:100vh}
+.page-mock{padding:80px 24px;text-align:center}
+.pm-t{font-size:18px;font-weight:600;margin-bottom:12px}
+.pm-p{font-size:28px;color:var(--red);font-weight:700;margin-bottom:24px}
+.pm-p .y{font-size:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 28px;border:none;border-radius:24px;background:linear-gradient(135deg,#FF2442,#FF5C35);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(255,36,66,.3)}
+.btn:active{transform:scale(.96)}
+.btn svg{width:18px;height:18px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.ov.show{opacity:1;visibility:visible}
+.sh{position:fixed;left:50%;bottom:0;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;max-height:85vh;z-index:101;background:var(--bg);border-radius:20px 20px 0 0;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.32,.72,0,1);overflow:hidden}
+.sh.show{transform:translateX(-50%) translateY(0)}
+#sheetContent{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="page-mock">
+<div class="pm-t">高端智能蓝牙降噪耳机</div>
+<div class="pm-p"><span class="y">¥</span>239.00</div>
+<button class="btn" onclick="openSheet()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+查看优惠</button>
+</div>
+<div class="ov" id="overlay" onclick="closeSheet()"></div>
+<div class="sh" id="sheet"><div id="sheetContent"></div></div>
+<script src="app.js"></script>
+</body>
+</html>

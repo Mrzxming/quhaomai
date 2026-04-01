@@ -1,0 +1,1 @@
+<view class="content"><web-view src="{{jumpUrl}}" update-title="{{updateTitle}}"></web-view></view>

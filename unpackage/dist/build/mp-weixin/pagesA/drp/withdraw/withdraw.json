@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "佣金提现",
+  "usingComponents": {
+    "dsc-nav-bar": "/components/dsc-nav-bar/nav-bar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-collapse": "/components/uni-collapse/uni-collapse",
+    "uni-collapse-item": "/components/uni-collapse-item/uni-collapse-item",
+    "dsc-popup": "/components/uni-popup/uni-popup_1",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

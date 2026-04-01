@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的积分",
+  "usingComponents": {
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

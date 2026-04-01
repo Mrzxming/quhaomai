@@ -1,0 +1,36 @@
+
+.dsc_nav_bar.data-v-9b248a82 {
+	position: relative;
+	top: 0;
+	display: flex;
+	justify-content: space-between;
+	height: 80rpx;
+	padding-top: 10rpx;
+	box-sizing: border-box;
+}
+.nav_item.data-v-9b248a82 {
+	flex: 1;
+	text-align: center;
+	line-height: 100rpx;
+}
+.active.data-v-9b248a82{
+	font-weight: 700;
+	color: #FE0302;
+}
+.navigation_bars.data-v-9b248a82 {
+	position: absolute;
+	bottom: 0;
+	transition: all .3s;
+	-webkit-transform: translateX(-50%);
+	        transform: translateX(-50%);
+	width:34rpx;
+	height:8rpx;
+	background:rgba(249,41,41,1);
+	border-radius:4rpx;
+}
+.nav_item text.data-v-9b248a82 {
+	font-size: 30rpx;
+	font-weight: 700;
+	color: #000000;
+}
+

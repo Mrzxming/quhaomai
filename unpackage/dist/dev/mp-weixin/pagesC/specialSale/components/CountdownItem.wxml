@@ -1,0 +1,1 @@
+<block wx:if="{{displayTime}}"><view class="countdown data-v-6cbd820c">仅剩 <text class="time data-v-6cbd820c">{{displayTime}}</text></view></block>

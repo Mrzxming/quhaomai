@@ -1,0 +1,1 @@
+.camera-background.data-v-75f7dcde{width:100%;height:100%;background-color:rgba(0,0,0,.3)}.camera.data-v-75f7dcde{position:relative}.shutter-light.data-v-75f7dcde{position:absolute;top:0;left:0;z-index:9;width:100%;height:100%;background-color:#fff;opacity:0;transition:opacity .1s ease-out}.shutter-light-active.data-v-75f7dcde{opacity:1}

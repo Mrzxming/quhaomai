@@ -1,0 +1,8 @@
+
+.affiliate-cont-box{ background-color: #FFFFFF; padding-bottom: 30px;}
+.affiliate-cont-box .header{ width: 750rpx; height: 1177rpx; position: relative;}
+.affiliate-cont-box .header .share-ewm-box{ position: absolute; top: 80%; left: 31%; width: 48%;}
+.affiliate-cont-box .header .share-ewm-box text{ border:1px solid #ec5051; border-radius: 20rpx; color: #f92028; text-align: center; padding: 5rpx 20rpx; font-size: 25rpx;}
+.affiliate-warp{ padding: 20rpx;}
+.affiliate-warp .title{ padding: 10rpx 0; font-size: 30rpx;}
+

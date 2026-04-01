@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "储值卡",
+  "usingComponents": {
+    "dsc-value-cart": "/components/dsc-value-cart/dsc-value-cart",
+    "dsc-not-content": "/components/dsc-not-content"
+  }
+}

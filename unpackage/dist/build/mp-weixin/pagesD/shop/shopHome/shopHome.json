@@ -1,0 +1,27 @@
+{
+  "navigationBarTitleText": "店铺首页",
+  "usingComponents": {
+    "uni-load-more": "/components/uni-load-more/uni-load-more",
+    "uni-nav-bar": "/components/uni-nav-bar",
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-countdown": "/components/uni-countdown",
+    "uni-popup": "/components/uni-popup",
+    "dsc-slide": "/components/visualization/slide/Frontend",
+    "dsc-title": "/components/visualization/title/Frontend",
+    "dsc-announcement": "/components/visualization/announcement/Frontend",
+    "dsc-nav": "/components/visualization/nav/Frontend",
+    "dsc-line": "/components/visualization/line/Frontend",
+    "dsc-blank": "/components/visualization/blank/Frontend",
+    "dsc-jigsaw": "/components/visualization/jigsaw/Frontend",
+    "dsc-product": "/components/visualization/product/Frontend",
+    "dsc-coupon": "/components/visualization/coupon/Frontend",
+    "dsc-count-down": "/components/visualization/count-down/Frontend",
+    "dsc-button": "/components/visualization/button/Frontend",
+    "dsc-search": "/components/visualization/search/Frontend",
+    "dsc-store": "/components/visualization/store/Frontend",
+    "dsc-shop-signs": "/components/visualization/shop-signs/Frontend",
+    "dsc-shop-menu": "/components/visualization/shop-menu/Frontend",
+    "dsc-common-nav": "/components/dsc-common-nav",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

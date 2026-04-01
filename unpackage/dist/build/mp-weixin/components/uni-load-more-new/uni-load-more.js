@@ -1,0 +1,10 @@
+(global["webpackJsonp"]=global["webpackJsonp"]||[]).push([["components/uni-load-more-new/uni-load-more"],{"0615":function(t,n,e){"use strict";var o=e("9ca1"),u=e.n(o);u.a},2457:function(t,n,e){"use strict";e.r(n);var o=e("cc50"),u=e("8075");for(var c in u)["default"].indexOf(c)<0&&function(t){e.d(n,t,(function(){return u[t]}))}(c);e("0615");var i=e("828b"),a=Object(i["a"])(u["default"],o["b"],o["c"],!1,null,"63506fd2",null,!1,o["a"],void 0);n["default"]=a.exports},4504:function(t,n,e){"use strict";(function(t){Object.defineProperty(n,"__esModule",{value:!0}),n.default=void 0;var e=t.getSystemInfoSync().platform,o={name:"UniLoadMore",props:{status:{type:String,default:"more"},showIcon:{type:Boolean,default:!0},iconType:{type:String,default:"auto"},iconSize:{type:Number,default:24},color:{type:String,default:"#777777"},contentText:{type:Object,default:function(){return{contentdown:"上拉显示更多",contentrefresh:"正在加载...",contentnomore:"没有更多数据了"}}},type:{type:Boolean,default:!0}},data:function(){return{webviewHide:!1,platform:e}},computed:{iconSnowWidth:function(){return 2*(Math.floor(this.iconSize/24)||1)}},mounted:function(){},methods:{onClick:function(){this.$emit("clickLoadMore",{detail:{status:this.status}})}}};n.default=o}).call(this,e("df3c")["default"])},8075:function(t,n,e){"use strict";e.r(n);var o=e("4504"),u=e.n(o);for(var c in o)["default"].indexOf(c)<0&&function(t){e.d(n,t,(function(){return o[t]}))}(c);n["default"]=u.a},"9ca1":function(t,n,e){},cc50:function(t,n,e){"use strict";e.d(n,"b",(function(){return o})),e.d(n,"c",(function(){return u})),e.d(n,"a",(function(){}));var o=function(){var t=this.$createElement;this._self._c},u=[]}}]);
+;(global["webpackJsonp"] = global["webpackJsonp"] || []).push([
+    'components/uni-load-more-new/uni-load-more-create-component',
+    {
+        'components/uni-load-more-new/uni-load-more-create-component':(function(module, exports, __webpack_require__){
+            __webpack_require__('df3c')['createComponent'](__webpack_require__("2457"))
+        })
+    },
+    [['components/uni-load-more-new/uni-load-more-create-component']]
+]);

@@ -1,0 +1,157 @@
+@charset "UTF-8";
+.search_container.data-v-0515e7a6 {
+  /* 微信小程序：搜索框需要从系统导航栏下方开始 */
+  padding-top: 0;
+}
+.search_container .status_bar.data-v-0515e7a6 {
+  height: 40px;
+  background-color: #f9f9f9;
+  width: 100%;
+}
+.search_container .input_main.data-v-0515e7a6 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 0;
+}
+.search_container .input_view.data-v-0515e7a6 {
+  flex: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70rpx;
+  padding: 0 4rpx 0 30rpx;
+  border-radius: 14rpx;
+  color: #999;
+  border: 2rpx solid #FE0302;
+  background-color: #fff;
+}
+.search_container .input_view .placeholder_text.data-v-0515e7a6 {
+  font-size: 28rpx;
+  margin-left: 20rpx;
+  width: 420rpx;
+}
+.search_container .input_view .placeholder_texts.data-v-0515e7a6 {
+  font-size: 28rpx;
+  margin-left: 20rpx;
+  background-color: #FE0302;
+  color: #ffffff;
+  border-radius: 14rpx;
+  padding: 8rpx 24rpx;
+}
+.search_container .logo_wrap.data-v-0515e7a6 {
+  display: flex;
+  text-align: center;
+  margin: 0 auto;
+  height: 50rpx;
+  background-color: #ffffff;
+  align-items: center;
+  padding: 10rpx 24rpx 10rpx 14rpx;
+}
+/* 以下是原有样式 */
+.search-not-home.data-v-0515e7a6 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  /* 微信小程序导航栏高度通过内联样式动态设置 */
+  z-index: 99;
+  /* 开启硬件加速，防止移动 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+.search-not-home .mask.data-v-0515e7a6 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0, transparent);
+  z-index: -1;
+}
+.position-fixed.data-v-0515e7a6 {
+  position: fixed;
+  top: 0;
+  z-index: 998;
+  width: 100%;
+}
+.message.data-v-0515e7a6 {
+  position: relative;
+  margin-left: 20rpx;
+}
+.message .txt.data-v-0515e7a6 {
+  background: #fff;
+  height: 10rpx;
+  width: 10rpx;
+  position: absolute;
+  right: -8rpx;
+  top: 10rpx;
+  z-index: 99;
+  border-radius: 50%;
+}
+/*search*/
+.ms-search-wraper.data-v-0515e7a6 {
+  position: relative;
+  padding: 0 20rpx;
+}
+.hot-search.data-v-0515e7a6 {
+  padding-top: 0rpx;
+}
+.ms-search-tags .text.data-v-0515e7a6 {
+  color: #828282;
+  padding: 2rpx 20rpx;
+  display: inline-block;
+  background-color: #EDEDED;
+  border-radius: 50rpx;
+  font-size: 25rpx;
+  max-width: 200rpx;
+  margin: 0 15rpx 15rpx 0;
+}
+.graying.data-v-0515e7a6 {
+  color: #828282;
+  font-size: 14px;
+}
+.darking.data-v-0515e7a6 {
+  color: #000000;
+  font-size: 16px;
+}
+/* 微信小程序自定义导航栏 */
+.wx-custom-navbar.data-v-0515e7a6 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99998;
+  background-color: #FFFFFF;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+.wx-navbar-status-bar.data-v-0515e7a6 {
+  width: 100%;
+  background-color: #FFFFFF;
+}
+.wx-navbar-content.data-v-0515e7a6 {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  position: relative;
+  background-color: #FFFFFF;
+}
+.wx-navbar-back.data-v-0515e7a6 {
+  width: 44px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wx-navbar-title.data-v-0515e7a6 {
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: 500;
+  color: #000000;
+}
+.wx-navbar-right.data-v-0515e7a6 {
+  width: 44px;
+}

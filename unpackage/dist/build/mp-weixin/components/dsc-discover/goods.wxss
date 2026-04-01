@@ -1,0 +1,1 @@
+.product-info-warp{padding:20rpx;background:#fff;margin-bottom:15rpx}.product-info-warp .goods{display:flex;flex-direction:row;justify-content:flex-start;align-items:center}.product-info-warp .product-img{width:100rpx;height:100rpx;border:2rpx solid #f6f6f9}.product-info-warp .product-name{flex:1;margin:0 20rpx}

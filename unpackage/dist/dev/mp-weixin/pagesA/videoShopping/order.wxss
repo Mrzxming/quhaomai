@@ -1,0 +1,94 @@
+.video-goods-item.data-v-0593d53e {
+  margin: 20rpx;
+  background-color: #FFFFFF;
+  border-radius: 10rpx;
+}
+.video-goods-item .head.data-v-0593d53e {
+  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #F5F5F5;
+}
+.video-goods-item .head .shop-name.data-v-0593d53e {
+  font-size: 30rpx;
+}
+.video-goods-item .head .order-status.data-v-0593d53e {
+  color: #F0151B;
+  font-size: 30rpx;
+}
+.video-goods-item .item-bd.data-v-0593d53e {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #F5F5F5;
+}
+.video-goods-item .item-bd .subHead1.data-v-0593d53e {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 20rpx;
+}
+.video-goods-item .item-bd .subHead1 .item1.data-v-0593d53e {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.video-goods-item .item-bd .subHead1 .tit.data-v-0593d53e,
+.video-goods-item .item-bd .subHead1 .time.data-v-0593d53e {
+  color: #999999;
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+}
+.video-goods-item .item-bd .top.data-v-0593d53e {
+  display: flex;
+  padding: 20rpx 20rpx 0;
+}
+.video-goods-item .item-bd .top .left .image-box.data-v-0593d53e {
+  width: 80px;
+  height: 80px;
+}
+.video-goods-item .item-bd .top .right.data-v-0593d53e {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.video-goods-item .item-bd .top .right .right-box-left.data-v-0593d53e {
+  display: flex;
+  flex-direction: column;
+}
+.video-goods-item .item-bd .top .right .right-box-left .name.data-v-0593d53e {
+  font-size: 32rpx;
+}
+.video-goods-item .item-bd .top .right .right-box-left .attr.data-v-0593d53e {
+  color: #999999;
+}
+.video-goods-item .item-bd .top .right .right-box-right.data-v-0593d53e {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-align: right;
+}
+.video-goods-item .item-bd .top .right .right-box-right .price.data-v-0593d53e {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.video-goods-item .item-bd .top .right .right-box-right .num.data-v-0593d53e {
+  color: #999999;
+}
+.video-goods-item .item-bd .gong.data-v-0593d53e {
+  text-align: right;
+  padding: 20rpx;
+  font-size: 30rpx;
+}
+.video-goods-item .item-bd .gong text.data-v-0593d53e {
+  font-weight: 700;
+  font-size: 30rpx;
+  margin-left: 10rpx;
+}
+.video-goods-item .item-fd.data-v-0593d53e {
+  padding: 20rpx;
+  color: #999999;
+}

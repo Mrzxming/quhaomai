@@ -1,0 +1,9 @@
+{
+  "componentGenerics": {
+    "scoped-slots-default": true
+  },
+  "component": true,
+  "usingComponents": {
+    "goods-service-label": "/components/goods-service-label/goods-service-label"
+  }
+}

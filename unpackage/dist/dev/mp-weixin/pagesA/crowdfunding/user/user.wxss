@@ -1,0 +1,18 @@
+
+.drp-select .header.data-v-119db7a4{ background-size: 100% 100%; padding: 40rpx 20rpx; color: #FFFFFF; height: 230rpx; box-sizing: border-box;}
+.drp-select .header-warp.data-v-119db7a4{ display: flex; flex-direction: row; align-items: center; position: relative; z-index: 2;}
+.drp-select .header-warp .header-img.data-v-119db7a4{ width: 140rpx; height: 140rpx; overflow: hidden; border-radius: 100%; border:2px solid rgba(255,255,255,.6);
+}
+.drp-select .header-warp .header-img image.data-v-119db7a4{ width: 100%; height: 100%;}
+.drp-select .header-warp .header-flex.data-v-119db7a4{ flex: 1 1 0%; padding: 0 20rpx;}
+.drp-select .header-warp .header-flex .shop-name.data-v-119db7a4{ font-size: 32rpx;}
+.drp-select .header-warp .header-flex .shop-rank.data-v-119db7a4{ font-size: 26rpx; color: rgba(255,255,255,.9);}
+.drp-select .header .header-bg.data-v-119db7a4{ position: absolute; top: 0; left: 0; right: 0; width: 100%; height: 230rpx; z-index: 1;}
+/* 导航 */
+.my-nav-box.data-v-119db7a4 {margin-top:20rpx;border-radius:10rpx;background:#FFFFFF;}
+.my-nav-box .item.data-v-119db7a4 {display:flex;padding:20rpx;border-bottom:1px solid #f6f6f9;
+justify-content:space-between;align-items:center;}
+.my-nav-box .item .tit .iconfont.data-v-119db7a4 {margin-right:10rpx;font-size:14px;}
+.goods-list .goods-cont.data-v-119db7a4{ font-size: 25rpx; color: #999; line-height: 1.5;}
+.goods-list .goods-cont .uni-red.data-v-119db7a4{ margin: 0 5rpx;}
+

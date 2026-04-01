@@ -1,0 +1,14 @@
+{
+  "navigationBarTitleText": "客服中心",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "uni-icons": "/components/uni-icons/uni-icons",
+    "uni-notice-bar": "/components/uni-notice-bar/uni-notice-bar",
+    "uni-rate": "/components/uni-rate",
+    "jyf-parser": "/components/jyf-parser/jyf-parser_1",
+    "uni-popup": "/components/uni-popup/uni-popup_1",
+    "emotion": "/components/emotion/index",
+    "dsc-not-content": "/components/dsc-not-content",
+    "dsc-filter-top": "/components/dsc-filter-top"
+  }
+}

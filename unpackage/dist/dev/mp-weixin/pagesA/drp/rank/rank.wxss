@@ -1,0 +1,32 @@
+
+.drp-rank.data-v-12b27204{ min-height: 100vh; padding-bottom: 20rpx;
+}
+.drp-rank .header.data-v-12b27204{ position: relative;
+}
+.drp-rank .header .img.data-v-12b27204,
+.drp-rank .header .img image.data-v-12b27204{ width: 750rpx; height: 368rpx;}
+.drp-rank .header .tit.data-v-12b27204{ position: absolute; bottom: 25%; left: 40rpx; font-size: 30rpx; color: #FFFFFF;}
+.drp-rank .rank-box.data-v-12b27204{ position: relative; z-index: 2; margin: -80rpx 20rpx 0; background: #FFFFFF; border-radius: 20rpx; box-shadow: 0 10rpx 20rpx 0 rgba(32, 33, 36, 0.1); padding: 20rpx;}
+.drp-rank .rank-box .title.data-v-12b27204{ display: flex; flex-direction: row; justify-content: center; align-items: center; padding: 20rpx 0; color: #666666;}
+.drp-rank .rank-box .title .t1.data-v-12b27204{ width: 20%; text-align: center;}
+.drp-rank .rank-box .title .t2.data-v-12b27204{ width: 50%;
+}
+.drp-rank .rank-box .title .t3.data-v-12b27204{ flex: 1 1 0%; text-align: center;}
+.drp-rank .rank-box .list.data-v-12b27204{ display: flex; flex-direction: row; padding: 20rpx 0; border-bottom: 1px solid #f6f6f6;}
+.drp-rank .rank-box .list.data-v-12b27204:last-child{ border-bottom: 0;}
+.drp-rank .rank-box .list .left.data-v-12b27204{ width: 20%; display: flex; flex-direction: row; justify-content: center; align-items: center;}
+.drp-rank .rank-box .list .left .icon.data-v-12b27204,
+.drp-rank .rank-box .list .left .icon image.data-v-12b27204{ width: 42rpx; height: 42rpx;
+}
+.drp-rank .rank-box .list .left .text.data-v-12b27204{ text-align: center;
+}
+.drp-rank .rank-box .list .con.data-v-12b27204{ display: flex; flex-direction: row; justify-content: flex-start; align-items: center; width: 50%;
+}
+.drp-rank .rank-box .list .con .picture.data-v-12b27204{ width: 60rpx; height: 60rpx; margin-right: 20rpx; display: flex; flex-direction: row; align-items: center;
+}
+.drp-rank .rank-box .list .con .picture image.data-v-12b27204{ width: 100%; height: 100%; border-radius: 100%; overflow: hidden;}
+.drp-rank .rank-box .list .con .name.data-v-12b27204{ font-size: 30rpx; flex: 1;}
+.drp-rank .rank-box .list .right.data-v-12b27204{flex: 1 1 0%; display: flex; flex-direction: row; justify-content: center; align-items: center;
+}
+.drp-rank .rank-box .list .right .price.data-v-12b27204{ font-size: 30rpx; margin-right: 30rpx; height: 40rpx; line-height:35rpx;}
+
