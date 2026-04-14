@@ -7,6 +7,7 @@ export default {
     return {
       wv: null,
       lastTime: "",
+      _plusMessageHandler: null,
       defaultConfig: {
         clientVersion: "uniapp-v1.0",
         clientType: uni.getSystemInfoSync().platform,
@@ -42,39 +43,39 @@ export default {
     },
   },
   mounted() {},
+  beforeDestroy() {
+    this._destroyWebview();
+  },
   methods: {
     showCaptcha() {
       var that = this;
       // #ifdef APP-PLUS
+      this._destroyWebview();
 
-      // 合并参数
       _assign(this.defaultConfig, this.config, {
         challenge: this.getUuid(),
-      }); //每次更新challenge
+      });
 
-      // 创建webview
       this.wv = plus.webview.create(
         `hybrid/html/captcha4/index.html?data=${encodeURIComponent(
           JSON.stringify(this.defaultConfig)
         )}`,
-        "gt_webview",
+        "gt_webview_" + Date.now(),
         {
           background: "transparent",
-          width: "100%", //String类型,窗口的宽度.支持百分比、像素值，默认为100%.未设置width属性值时,可同时设置left和right属性值改变窗口的默认宽度.
+          width: "100%",
           height: "100%",
         }
       );
 
-      // 获取webview
-      var currentWebview = this.$root.$scope.$getAppWebview(); //此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效
+      var currentWebview = this.$root.$scope.$getAppWebview();
       currentWebview.append(this.wv);
 
-      plus.globalEvent.addEventListener("plusMessage", (msg) => {
-        //有重复推送问题
+      this._plusMessageHandler = (msg) => {
+        if (!msg || !msg.data || !msg.data.args || !msg.data.args.data) return;
         const result = msg.data.args.data;
         if (result.name == "postMessage") {
           if (result.arg.time === that.lastTime) {
-            // 处理uni连续推送bug
             return;
           }
           that.lastTime = result.arg.time;
@@ -98,29 +99,44 @@ export default {
               break;
           }
         }
-      });
+      };
+      plus.globalEvent.addEventListener("plusMessage", this._plusMessageHandler);
 
       this.wv.overrideUrlLoading(
-        {
-          mode: "reject",
-        },
+        { mode: "reject" },
         (e) => {
           plus.runtime.openURL(e.url);
         }
       );
       // #endif
     },
+    _destroyWebview() {
+      // #ifdef APP-PLUS
+      if (this._plusMessageHandler) {
+        plus.globalEvent.removeEventListener("plusMessage", this._plusMessageHandler);
+        this._plusMessageHandler = null;
+      }
+      if (this.wv) {
+        try {
+          this.wv.close("none");
+        } catch (e) {}
+        this.wv = null;
+      }
+      // #endif
+    },
     captchaReady() {
       this.$emit("captchaReady");
-      this.wv.evalJS("jsBridge.callback('showBox')");
+      if (this.wv) {
+        this.wv.evalJS("jsBridge.callback('showBox')");
+      }
     },
     captchaSuccess(data) {
       this.$emit("captchaSuccess", data);
-      this.wv.hide();
+      this._destroyWebview();
     },
     captchaClose() {
       this.$emit("captchaClose");
-      this.wv.hide();
+      this._destroyWebview();
     },
     captchaError: function (e) {
       uni.showToast({
@@ -129,7 +145,7 @@ export default {
         duration: 2000,
       });
       this.$emit("captchaError", e);
-      this.wv.hide();
+      this._destroyWebview();
     },
     captchaFail() {
       this.$emit("captchaFail");
