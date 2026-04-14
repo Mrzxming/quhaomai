@@ -1283,6 +1283,7 @@ const CART_SELECTION_STATE_KEY = '__cartSelectionState__';
 const CART_APP_SESSION_KEY = '__cartAppSessionId__';
 const CART_SELECTION_STORAGE_PREFIX = 'cart_selection_state_';
 const CART_ACTIVE_USER_ID_KEY = '__cartActiveUserId__';
+const CART_SELECTION_REC_IDS_KEY_PREFIX = 'cart_selected_rec_ids_';
 
 /** 赠品提示图标：与 news/app 中 ico.gift 同路径；iOS/App 内联 svg 部分端不渲染，改用 data URI + image */
 const CART_GIFT_TIP_ICON_SRC =
@@ -1381,9 +1382,41 @@ function clearSavedSelectionState() {
 	if (container && Object.prototype.hasOwnProperty.call(container, CART_SELECTION_STATE_KEY)) {
 		delete container[CART_SELECTION_STATE_KEY];
 	}
+	clearSavedSelectedRecIds();
 	try {
 		const storageKey = getSelectionStorageKey();
 		uni.removeStorageSync(storageKey);
+	} catch (error) {
+	}
+}
+
+function getSelectionRecIdsStorageKey() {
+	const userId = String(uni.getStorageSync('user_id') || '');
+	return `${CART_SELECTION_REC_IDS_KEY_PREFIX}${userId}`;
+}
+
+function readSavedSelectedRecIds() {
+	try {
+		const raw = uni.getStorageSync(getSelectionRecIdsStorageKey());
+		if (!raw) return [];
+		const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+		return Array.isArray(parsed) ? parsed : [];
+	} catch (error) {
+		return [];
+	}
+}
+
+function writeSavedSelectedRecIds(recIds) {
+	try {
+		const next = Array.isArray(recIds) ? Array.from(new Set(recIds.map(id => String(id)).filter(Boolean))) : [];
+		uni.setStorageSync(getSelectionRecIdsStorageKey(), JSON.stringify(next));
+	} catch (error) {
+	}
+}
+
+function clearSavedSelectedRecIds() {
+	try {
+		uni.removeStorageSync(getSelectionRecIdsStorageKey());
 	} catch (error) {
 	}
 }
@@ -2524,28 +2557,27 @@ function withTimeout(promise, ms) {
 				let selectedGoodsCount = 0;
 				let selectedGoodsTypes = 0;
 
+				// 以商品行上的 checked 作为真实来源，重建 checkedGoods/checkedShop，
+				// 避免 tab 切换后仅因数组被重置而把已选态清空。
 				this.goodsCartList.forEach((store, storeIndex) => {
-					if (!Array.isArray(this.checkedGoods[storeIndex])) {
-						this.$set(this.checkedGoods, storeIndex, []);
-					}
-					const selectedSet = new Set(this.checkedGoods[storeIndex].map(recId => String(recId)));
+					const nextCheckedGoods = [];
 					let selectableCount = 0;
 					let selectedCount = 0;
-
 					const actList = (store && Array.isArray(store.new_list)) ? store.new_list : [];
+
 					actList.forEach((act) => {
 						const goodsList = (act && Array.isArray(act.act_goods_list)) ? act.act_goods_list : [];
 						goodsList.forEach((item) => {
 							if (!item) return;
 							const selectable = item.is_invalid != 1 && Number(item.product_number || 0) > 0;
-							const recId = String(item.rec_id);
-							const isSelected = selectable && selectedSet.has(recId);
-							if (item.checked !== isSelected) {
-								item.checked = isSelected;
+							if (!selectable) {
+								if (item.checked) item.checked = false;
+								return;
 							}
-							if (!selectable) return;
+
 							selectableCount += 1;
-							if (isSelected) {
+							if (item.checked === true) {
+								nextCheckedGoods.push(item.rec_id);
 								selectedCount += 1;
 								selectedRecIds.push(item.rec_id);
 								selectedGoodsTypes += 1;
@@ -2554,6 +2586,7 @@ function withTimeout(promise, ms) {
 						});
 					});
 
+					this.$set(this.checkedGoods, storeIndex, nextCheckedGoods);
 					const isStoreChecked = selectableCount > 0 && selectedCount === selectableCount;
 					this.$set(this.checkedShop, storeIndex, isStoreChecked);
 				});
@@ -2569,6 +2602,24 @@ function withTimeout(promise, ms) {
 					this.totalPriceTiping = true;
 					this.totalPrice = '0.00';
 				}
+			},
+			getCheckedRecIdsFromCartFlags() {
+				const set = new Set();
+				if (!Array.isArray(this.goodsCartList)) return set;
+				this.goodsCartList.forEach((store) => {
+					const actList = (store && Array.isArray(store.new_list)) ? store.new_list : [];
+					actList.forEach((act) => {
+						const goodsList = (act && Array.isArray(act.act_goods_list)) ? act.act_goods_list : [];
+						goodsList.forEach((item) => {
+							if (!item) return;
+							const selectable = item.is_invalid != 1 && Number(item.product_number || 0) > 0;
+							if (selectable && item.checked === true) {
+								set.add(String(item.rec_id));
+							}
+						});
+					});
+				});
+				return set;
 			},
 			resetSelectionStateForLogout() {
 				this.clearCheckedFlagsFromCartList(this.goodsCartList);
@@ -2587,9 +2638,20 @@ function withTimeout(promise, ms) {
 			if (!snapshot.signature) {
 				this.resetSelectionArrays();
 				this.applySelectionSummaryFromCheckedState();
-				clearSavedSelectionState();
 				return;
 			}
+
+			// 优先信任当前购物车数据里已有的 checked（缓存回填场景），
+			// 避免 tab 切换后因为恢复器先 reset 导致已选态被抹掉。
+			const currentCheckedSet = this.getCheckedRecIdsFromCartFlags();
+			if (currentCheckedSet.size > 0) {
+				this.applySelectionSummaryFromCheckedState();
+				if (this.checkedGoodsId && this.checkedGoodsId.length > 0) {
+					this.saveSelectionState();
+				}
+				return;
+			}
+
 			const saved = readSavedSelectionState();
 			if (!saved) {
 				this.resetSelectionArrays();
@@ -2600,7 +2662,9 @@ function withTimeout(promise, ms) {
 			this.isRestoringSelection = true;
 			this.resetSelectionArrays();
 			const perStoreSelectedCounts = new Array(snapshot.storeSelectableCounts.length).fill(0);
-			const selectedList = Array.isArray(saved.selectedRecIds) ? saved.selectedRecIds : [];
+			const savedSelectedRecIds = Array.isArray(saved.selectedRecIds) ? saved.selectedRecIds : [];
+			const fallbackSelectedRecIds = readSavedSelectedRecIds();
+			const selectedList = savedSelectedRecIds.length > 0 ? savedSelectedRecIds : fallbackSelectedRecIds;
 			const selectedStoreIdSet = new Set((Array.isArray(saved.selectedStoreIds) ? saved.selectedStoreIds : []).map(id => String(id)));
 			let restoredCount = 0;
 
@@ -2673,6 +2737,9 @@ function withTimeout(promise, ms) {
 			}
 
 			this.applySelectionSummaryFromCheckedState();
+			if (this.checkedGoodsId && this.checkedGoodsId.length > 0) {
+				writeSavedSelectedRecIds(this.checkedGoodsId);
+			}
 			this.isRestoringSelection = false;
 		},
 			saveSelectionState() {
@@ -2714,6 +2781,7 @@ function withTimeout(promise, ms) {
 					checkedAll: this.checkedAll === true,
 					selectedStoreIds
 				});
+				writeSavedSelectedRecIds(uniqueRecIds);
 				this.cartSelectionSignature = snapshot.signature;
 			},
 			// 加载更多商品
@@ -8862,6 +8930,10 @@ function withTimeout(promise, ms) {
 	        // 【核心修复】有缓存时（包括空数组），立即恢复缓存数据，不显示骨架屏
 	        // 立即恢复缓存数据（同步执行）
 	        this.$store.commit('goodsCartList', { data: cache.goodsCartList || [] });
+	        const fallbackCheckedRecIds = readSavedSelectedRecIds();
+	        if (fallbackCheckedRecIds.length > 0) {
+	        	this.restoreCheckedFlagsFromRecIds(fallbackCheckedRecIds);
+	        }
 	        this.lastRecId = cache.lastRecId;
 	        this.isFirstLoad = false;
 	        if (!Number.isNaN(cache.count)) {
