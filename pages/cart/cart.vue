@@ -2506,6 +2506,69 @@ function withTimeout(promise, ms) {
 				this.checkedAll = false;
 				this._globalAllSelectedMode = false;
 			},
+			applySelectionSummaryFromCheckedState() {
+				if (!Array.isArray(this.goodsCartList) || this.goodsCartList.length === 0) {
+					this.checkedGoodsId = [];
+					this.checkedAll = false;
+					this._globalAllSelectedMode = false;
+					this.count = 0;
+					this.nums = 0;
+					this.disabled = true;
+					this.totalPriceTiping = true;
+					this.totalPrice = '0.00';
+					return;
+				}
+
+				const selectedRecIds = [];
+				let selectedGoodsCount = 0;
+				let selectedGoodsTypes = 0;
+
+				this.goodsCartList.forEach((store, storeIndex) => {
+					if (!Array.isArray(this.checkedGoods[storeIndex])) {
+						this.$set(this.checkedGoods, storeIndex, []);
+					}
+					const selectedSet = new Set(this.checkedGoods[storeIndex].map(recId => String(recId)));
+					let selectableCount = 0;
+					let selectedCount = 0;
+
+					const actList = (store && Array.isArray(store.new_list)) ? store.new_list : [];
+					actList.forEach((act) => {
+						const goodsList = (act && Array.isArray(act.act_goods_list)) ? act.act_goods_list : [];
+						goodsList.forEach((item) => {
+							if (!item) return;
+							const selectable = item.is_invalid != 1 && Number(item.product_number || 0) > 0;
+							const recId = String(item.rec_id);
+							const isSelected = selectable && selectedSet.has(recId);
+							if (item.checked !== isSelected) {
+								item.checked = isSelected;
+							}
+							if (!selectable) return;
+							selectableCount += 1;
+							if (isSelected) {
+								selectedCount += 1;
+								selectedRecIds.push(item.rec_id);
+								selectedGoodsTypes += 1;
+								selectedGoodsCount += Number(item.goods_number || 0);
+							}
+						});
+					});
+
+					const isStoreChecked = selectableCount > 0 && selectedCount === selectableCount;
+					this.$set(this.checkedShop, storeIndex, isStoreChecked);
+				});
+
+				this.checkedGoodsId = selectedRecIds;
+				this.count = selectedGoodsCount;
+				this.nums = selectedGoodsTypes;
+				this.checkAllOper();
+				this._globalAllSelectedMode = this.checkedAll === true;
+
+				if (selectedGoodsTypes === 0) {
+					this.disabled = true;
+					this.totalPriceTiping = true;
+					this.totalPrice = '0.00';
+				}
+			},
 		handleSelectionAfterFetch() {
 			const snapshot = this.buildCartSelectionSnapshot();
 			this.cartSelectionSignature = snapshot.signature;
