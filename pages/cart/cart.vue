@@ -6420,13 +6420,11 @@ function withTimeout(promise, ms) {
 					}
 				})
 			},
-			//修改购物车商品数量
 			goodsNumberhandle(e, id, act_id, store_id, listIndex, actIndex, index, goods_price) {
-				// 防止并发请求：如果已有请求正在进行，则忽略本次请求
 				if (this._isUpdatingNumber) {
 					return;
 				}
-				
+
 				this.stepDisabled.forEach((v, i) => {
 					v.forEach((s, d) => {
 						if (s.id == id) {
@@ -6438,83 +6436,29 @@ function withTimeout(promise, ms) {
 				const targetGoodsItem = this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index];
 				const previousGoodsNumber = this.normalizeNumericValue(targetGoodsItem.goods_number);
 				const wasGoodsSelected = targetGoodsItem.checked === true && targetGoodsItem.is_invalid != 1;
-				
-				// 注意：不要在这里立即更新 goods_number，等待接口返回后再更新
-				// 这样可以确保在库存不足时，数量不会先被设置为错误的值
-				// targetGoodsItem.goods_number = e
 
 				this.goodsnumber = e
 				this.pricenum = goods_price
 				this.allprice = this.goodsnumber * this.pricenum
 				uni.setStorageSync('allprice', this.allprice)
 				const version = incrementVersion();
-				
-				// 设置请求锁
-				this._isUpdatingNumber = true;	
-				
-				// 商品未选中时，只调用 setUpdateNumber，不计算价格，也不修改价格显示状态
-				if (!wasGoodsSelected) {
-					this.$store.dispatch('setUpdateNumber', {
-						rec_id: id,
-						num: e,
-						district_id: this.regionData.district.id,
-						app_version: version,
-					}).then(({
-						data: data
-					}) => {
-						this.stepDisabled.forEach((v, i) => {
-							v.forEach((s, d) => {
-								if (s.id == id) {
-									this.stepDisabled[i][d].type = false
-								}
-							})
-						});
-						if (data.error == 0) {
-							// 数量更新成功，更新本地数量
-							this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].goods_number = e;
-							// 同步到缓存，避免切页返回时显示旧数量
-							if (this.$isLogin && this.$isLogin()) {
-								this.saveCartCache(this.goodsCartList, this.lastRecId);
+
+				this._isUpdatingNumber = true;
+
+				const unlockStep = () => {
+					this.stepDisabled.forEach((v, i) => {
+						v.forEach((s, d) => {
+							if (s.id == id) {
+								this.stepDisabled[i][d].type = false
 							}
-						} else {
-							// 处理库存不足的情况：使用后端返回的实际可购买数量
-							if (data.number !== undefined && data.number !== null) {
-								// 优先使用后端返回的 number（实际可购买数量）
-								this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].goods_number = data.number
-							} else if (this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].xiangou_num > 0) {
-								// 如果没有返回 number，则使用限购数量
-								this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].goods_number =
-									this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].xiangou_num
-							}
-							// 同步到缓存（数量已被修正）
-							if (this.$isLogin && this.$isLogin()) {
-								this.saveCartCache(this.goodsCartList, this.lastRecId);
-							}
-							uni.showToast({
-								title: data.msg,
-								icon: 'none'
-							});
-						}
-						// 释放请求锁
-						this._isUpdatingNumber = false;
-						uni.hideKeyboard()
-					}).catch((err) => {
-						// 请求失败时也要释放锁
-						this._isUpdatingNumber = false;
-						this.stepDisabled.forEach((v, i) => {
-							v.forEach((s, d) => {
-								if (s.id == id) {
-									this.stepDisabled[i][d].type = false
-								}
-							})
-						});
-					})
-					return;
+						})
+					});
+				};
+
+				if (wasGoodsSelected) {
+					this.totalPriceTiping = false;
 				}
-				
-				// 商品已选中时，调用 setUpdateNumber，在现有总价基础上增减
-				// 只有商品已选中时才设置计算中状态
-				this.totalPriceTiping = false;
+
 				this.$store.dispatch('setUpdateNumber', {
 					rec_id: id,
 					num: e,
@@ -6523,108 +6467,35 @@ function withTimeout(promise, ms) {
 				}).then(({
 					data: data
 				}) => {
-					this.stepDisabled.forEach((v, i) => {
-						v.forEach((s, d) => {
-							if (s.id == id) {
-								this.stepDisabled[i][d].type = false
-							}
-						})
-					});
-				
+					unlockStep();
 					if (data.error == 0) {
-						// 数量更新成功，先更新本地数量，然后重新计算价格
-						targetGoodsItem.goods_number = e;
-						// 同步到缓存，避免切页返回时显示旧数量
-						if (this.$isLogin && this.$isLogin()) {
-							this.saveCartCache(this.goodsCartList, this.lastRecId);
-						}
-						// 释放请求锁
-						this._isUpdatingNumber = false;
-						uni.hideKeyboard();
-						// 使用 $nextTick 确保数量更新已经同步到视图
-						this.$nextTick(() => {
-							// 重新计算总价和总数量，确保与后端数据一致
-							this.changeGoods();
-						});
-						return;
-
+						this.$set(targetGoodsItem, 'goods_number', e);
 					} else {
-						// 处理库存不足的情况：使用后端返回的实际可购买数量
-						const actualNumber = (data.number !== undefined && data.number !== null) 
-							? data.number 
-							: (targetGoodsItem.xiangou_num > 0 ? targetGoodsItem.xiangou_num : targetGoodsItem.goods_number);
-						
-						// 更新商品数量为实际可购买数量（使用 $set 确保 Vue 响应式更新）
-						this.$set(targetGoodsItem, 'goods_number', actualNumber);
-
-						uni.showToast({
-							title: data.msg,
-							icon: 'none'
-						});
-						
-						// 如果商品已选中，需要重新计算价格（因为数量已被修正为实际可购买数量）
-						if (wasGoodsSelected) {
-							// 关键修复：库存不足时，后端购物车可能还是旧数据
-							// 需要先用实际可购买数量更新后端，确保后端数据正确，然后再计算价格
-							const updateVersion = incrementVersion();
-							this.$store.dispatch('setUpdateNumber', {
-								rec_id: id,
-								num: actualNumber, // 使用实际可购买数量更新后端
-								district_id: this.regionData.district.id,
-								app_version: updateVersion,
-							}).then(({ data: updateData }) => {
-								// 检查第二次更新是否成功
-								if (updateData.error == 0) {
-									// 后端已更新为实际数量，同步到缓存
-									if (this.$isLogin && this.$isLogin()) {
-										this.saveCartCache(this.goodsCartList, this.lastRecId);
-									}
-									// 释放请求锁
-									this._isUpdatingNumber = false;
-									uni.hideKeyboard();
-									// 使用 $nextTick 确保数量更新已经同步到视图
-									this.$nextTick(() => {
-										// 重新计算总价和总数量，此时后端数据已经是正确的数量了
-										this.changeGoods();
-									});
-								} else {
-									// 第二次更新也失败了，但本地数量已经更新，同步缓存后计算价格
-									if (this.$isLogin && this.$isLogin()) {
-										this.saveCartCache(this.goodsCartList, this.lastRecId);
-									}
-									this._isUpdatingNumber = false;
-									uni.hideKeyboard();
-									this.$nextTick(() => {
-										this.changeGoods();
-									});
-								}
-							}).catch((updateErr) => {
-								// 即使更新失败，也同步缓存并释放锁（使用本地已更新的数量）
-								if (this.$isLogin && this.$isLogin()) {
-									this.saveCartCache(this.goodsCartList, this.lastRecId);
-								}
-								this._isUpdatingNumber = false;
-								uni.hideKeyboard();
-								this.$nextTick(() => {
-									this.changeGoods();
-								});
-							});
-						} else {
-							// 释放请求锁
-							this._isUpdatingNumber = false;
-							uni.hideKeyboard();
+						const correctedNumber = (data.number !== undefined && data.number !== null)
+							? parseInt(data.number)
+							: previousGoodsNumber;
+						this.$set(targetGoodsItem, 'goods_number', correctedNumber);
+						if (data.msg) {
+							uni.showToast({ title: data.msg, icon: 'none', duration: 2000 });
 						}
 					}
-				}).catch((err) => {
-					// 请求失败时也要释放锁
+					if (this.$isLogin && this.$isLogin()) {
+						this.saveCartCache(this.goodsCartList, this.lastRecId);
+					}
 					this._isUpdatingNumber = false;
-					this.stepDisabled.forEach((v, i) => {
-						v.forEach((s, d) => {
-							if (s.id == id) {
-								this.stepDisabled[i][d].type = false
-							}
-						})
-					});
+					uni.hideKeyboard();
+					if (wasGoodsSelected) {
+						this.$nextTick(() => {
+							this.changeGoods();
+						});
+					}
+				}).catch((err) => {
+					this.$set(targetGoodsItem, 'goods_number', previousGoodsNumber);
+					unlockStep();
+					this._isUpdatingNumber = false;
+					if (wasGoodsSelected) {
+						this.totalPriceTiping = true;
+					}
 				})
 				//}, 1000)
 			},
