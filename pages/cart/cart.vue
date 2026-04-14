@@ -2557,9 +2557,10 @@ function withTimeout(promise, ms) {
 				let selectedGoodsCount = 0;
 				let selectedGoodsTypes = 0;
 
-				// 以商品行上的 checked 作为真实来源，重建 checkedGoods/checkedShop，
-				// 避免 tab 切换后仅因数组被重置而把已选态清空。
+				// 以 checkedGoods（用户交互唯一来源）作为真实来源，重建 item.checked/checkedShop，
+				// 避免恢复流程意外覆盖用户已选态。
 				this.goodsCartList.forEach((store, storeIndex) => {
+					const selectedSet = new Set((Array.isArray(this.checkedGoods[storeIndex]) ? this.checkedGoods[storeIndex] : []).map(recId => String(recId)));
 					const nextCheckedGoods = [];
 					let selectableCount = 0;
 					let selectedCount = 0;
@@ -2576,7 +2577,11 @@ function withTimeout(promise, ms) {
 							}
 
 							selectableCount += 1;
-							if (item.checked === true) {
+							const isSelected = selectedSet.has(String(item.rec_id));
+							if (item.checked !== isSelected) {
+								item.checked = isSelected;
+							}
+							if (isSelected) {
 								nextCheckedGoods.push(item.rec_id);
 								selectedCount += 1;
 								selectedRecIds.push(item.rec_id);
@@ -2602,6 +2607,19 @@ function withTimeout(promise, ms) {
 					this.totalPriceTiping = true;
 					this.totalPrice = '0.00';
 				}
+			},
+			getCheckedRecIdsFromCheckedGoods() {
+				const set = new Set();
+				if (!Array.isArray(this.checkedGoods)) return set;
+				this.checkedGoods.forEach((storeList) => {
+					if (!Array.isArray(storeList)) return;
+					storeList.forEach((recId) => {
+						if (recId !== undefined && recId !== null && recId !== '') {
+							set.add(String(recId));
+						}
+					});
+				});
+				return set;
 			},
 			getCheckedRecIdsFromCartFlags() {
 				const set = new Set();
@@ -2641,9 +2659,8 @@ function withTimeout(promise, ms) {
 				return;
 			}
 
-			// 优先信任当前购物车数据里已有的 checked（缓存回填场景），
-			// 避免 tab 切换后因为恢复器先 reset 导致已选态被抹掉。
-			const currentCheckedSet = this.getCheckedRecIdsFromCartFlags();
+			// 优先信任 checkedGoods（用户显式勾选），避免 tab 切换过程中被 item.checked 瞬时状态反向覆盖
+			const currentCheckedSet = this.getCheckedRecIdsFromCheckedGoods();
 			if (currentCheckedSet.size > 0) {
 				this.applySelectionSummaryFromCheckedState();
 				if (this.checkedGoodsId && this.checkedGoodsId.length > 0) {
@@ -2746,9 +2763,12 @@ function withTimeout(promise, ms) {
 				if (this.isRestoringSelection) {
 					return;
 				}
+				const checkedRecIdsFromFlags = Array.from(this.getCheckedRecIdsFromCartFlags());
 				const snapshot = this.buildCartSelectionSnapshot();
 				if (!snapshot.signature) {
-					clearSavedSelectionState();
+					if (checkedRecIdsFromFlags.length > 0) {
+						writeSavedSelectedRecIds(checkedRecIdsFromFlags);
+					}
 					this.cartSelectionSignature = '';
 					return;
 				}
@@ -2766,6 +2786,7 @@ function withTimeout(promise, ms) {
 					});
 				}
 				const uniqueRecIds = Array.from(new Set(recIds));
+				const finalRecIds = uniqueRecIds.length > 0 ? uniqueRecIds : checkedRecIdsFromFlags;
 				const selectedStoreIds = [];
 				if (Array.isArray(this.goodsCartList) && Array.isArray(this.checkedShop)) {
 					this.goodsCartList.forEach((store, idx) => {
@@ -2777,11 +2798,11 @@ function withTimeout(promise, ms) {
 				}
 				writeSavedSelectionState({
 					signature: snapshot.signature,
-					selectedRecIds: uniqueRecIds,
+					selectedRecIds: finalRecIds,
 					checkedAll: this.checkedAll === true,
 					selectedStoreIds
 				});
-				writeSavedSelectedRecIds(uniqueRecIds);
+				writeSavedSelectedRecIds(finalRecIds);
 				this.cartSelectionSignature = snapshot.signature;
 			},
 			// 加载更多商品
@@ -8930,10 +8951,6 @@ function withTimeout(promise, ms) {
 	        // 【核心修复】有缓存时（包括空数组），立即恢复缓存数据，不显示骨架屏
 	        // 立即恢复缓存数据（同步执行）
 	        this.$store.commit('goodsCartList', { data: cache.goodsCartList || [] });
-	        const fallbackCheckedRecIds = readSavedSelectedRecIds();
-	        if (fallbackCheckedRecIds.length > 0) {
-	        	this.restoreCheckedFlagsFromRecIds(fallbackCheckedRecIds);
-	        }
 	        this.lastRecId = cache.lastRecId;
 	        this.isFirstLoad = false;
 	        if (!Number.isNaN(cache.count)) {
