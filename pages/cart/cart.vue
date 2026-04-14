@@ -8750,15 +8750,12 @@ function withTimeout(promise, ms) {
 	    
 	    // 统一转换为字符串后比较，避免类型不一致导致误判
 	    if (currentUserId && cachedUserId && currentUserId !== cachedUserId) {
-	      // ??ID????????
+	      // 用户ID变化，清除旧缓存
 	      this.clearCartCache();
 	      this.clearAddressCache();
-	      clearSavedSelectionState();
-	    }
-	    if (isColdStartEnter) {
-	      clearSavedSelectionState();
 	    }
 	    
+	    // 先检查是否有缓存，决定是否显示 loading3 和 loading
 	    const token = uni.getStorageSync('token');
 	    const isLoggedIn = token && token !== '';
 	    const freshSyncTsRaw = uni.getStorageSync('__cart_sync_fresh_ts__');
@@ -8794,17 +8791,11 @@ function withTimeout(promise, ms) {
 	        this.$store.commit('goodsCartList', { data: cache.goodsCartList || [] });
 	        this.lastRecId = cache.lastRecId;
 	        this.isFirstLoad = false;
-	        if (isColdStartEnter) {
-	        	this.clearCheckedFlagsFromCartList(this.goodsCartList);
-	        	this.resetSelectionArrays();
-	        	this.applySelectionSummaryFromCheckedState();
-	        } else {
-	        	if (!Number.isNaN(cache.count)) {
-	        		this.count = cache.count;
-	        	}
-	        	if (!Number.isNaN(cache.nums)) {
-	        		this.nums = cache.nums;
-	        	}
+	        if (!Number.isNaN(cache.count)) {
+	        	this.count = cache.count;
+	        }
+	        if (!Number.isNaN(cache.nums)) {
+	        	this.nums = cache.nums;
 	        }
 
 	        // 标记为已初始化，避免 goodsList() 中重复处理
@@ -8819,11 +8810,7 @@ function withTimeout(promise, ms) {
 
 	        // 数据处理延迟执行，避免阻塞UI和tab切换
 	        setTimeout(() => {
-	          if (!isColdStartEnter) {
-	          	this.handleSelectionAfterFetch();
-	          } else {
-	          	this.applySelectionSummaryFromCheckedState();
-	          }
+	          this.handleSelectionAfterFetch();
 	          if (hasData) {
 	            // 有数据时，执行价格计算和订单验证
 	            // 【临时注释】异步验证订单状态
