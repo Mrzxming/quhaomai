@@ -17,14 +17,7 @@
 				</form>
 			</view>
 		</view>
-
-		<!-- #ifdef APP-PLUS -->
-		<captcha-slide ref="captchaSlide"
-		  @success="onCaptchaSuccess"
-		  @close="onCaptchaClose"
-		  @fail="onCaptchaFail"
-		  @ready="onCaptchaReady" />
-		<!-- #endif -->
+		<SlideCaptcha ref="slideCaptcha" @pass="onCaptchaPass" @close="onCaptchaClose" @fail="onCaptchaFail" />
 	</view>
 </template>
 
@@ -32,184 +25,115 @@
 	import { mapState } from 'vuex'
 	import uniIcons from '@/components/uni-icons/uni-icons.vue';
 	var graceChecker = require("@/common/graceChecker.js");
-	import CaptchaSlideComponent from "@/components/captcha-slide/index.vue";
-
-	// #ifdef H5
-	let CaptchaSlideLib = null;
-	// #endif
+	import SlideCaptcha from "@/components/SlideCaptcha/index.vue";
 
 	export default {
 		data() {
 			return {
-				captchaPassed: false,
-				mobile:'',
-				sms:'',
-				name:'',
+				captchaTicket: '',
+				mobile: '',
+				sms: '',
 				button_text: this.$t('lang.send_again_60'),
-				send_again:this.$t('lang.send_again'),
-				button_type:true,
-				disabled:true
+				send_again: this.$t('lang.send_again'),
+				button_type: true,
 			};
 		},
-		components:{
+		components: {
 			uniIcons,
-			'captcha-slide': CaptchaSlideComponent
+			SlideCaptcha
 		},
-		mounted() {
-			// #ifdef H5
-			this._loadH5CaptchaLib();
-			// #endif
-		},
-		computed:{
+		computed: {
 			...mapState({
 				client: state => state.common.imgVerify.client,
 			}),
-			token:{
-				get(){
-					return this.$store.state.user.token
-				},
-				set(val){
-					this.$store.state.user.token = val
-				}
+			token: {
+				get() { return this.$store.state.user.token },
+				set(val) { this.$store.state.user.token = val }
 			},
 		},
-		methods:{
-			// #ifdef H5
-			_loadH5CaptchaLib() {
-				if (CaptchaSlideLib) return;
-				const link = document.createElement('link');
-				link.rel = 'stylesheet';
-				link.href = '/static/captcha_slide.css';
-				document.head.appendChild(link);
-
-				const script = document.createElement('script');
-				script.src = '/static/captcha_slide.js';
-				script.onload = () => {
-					CaptchaSlideLib = window.CaptchaSlide;
-				};
-				document.body.appendChild(script);
-			},
-			// #endif
-
+		methods: {
 			handleSendSmsCode() {
-				if (!this.validateSmsInput()) return;
-
-				// #ifdef MP-WEIXIN
-				this.sendSmsAfterCaptcha();
-				return;
-				// #endif
-
-				// #ifdef H5
-				if (!CaptchaSlideLib) {
-					uni.showToast({ title: '验证码加载中，请稍候', icon: 'none' });
+				if (!this.mobile) {
+					uni.showToast({ title: '请输入手机号', icon: 'none' });
 					return;
 				}
-				CaptchaSlideLib.verify().then(() => {
-					this.captchaPassed = true;
-					this.sendSmsAfterCaptcha();
-				}).catch(() => {});
+				// #ifdef MP-WEIXIN
+				this.sendSms();
 				return;
 				// #endif
-
-				// #ifdef APP-PLUS
-				this.$refs.captchaSlide.showCaptcha();
-				// #endif
+				this.$refs.slideCaptcha.open();
 			},
-
-			onCaptchaSuccess(result) {
-				this.captchaPassed = true;
-				this.sendSmsAfterCaptcha();
+			onCaptchaPass(data) {
+				this.captchaTicket = data.ticket || '';
+				this.sendSms();
 			},
 			onCaptchaClose() {},
-			onCaptchaFail() {
-				uni.showToast({ title: '验证失败，请重试', icon: 'none' });
-			},
-			onCaptchaReady() {},
+			onCaptchaFail() {},
 
-			sendSmsAfterCaptcha() {
+			sendSms() {
 				const o = {
 					client: this.client,
 					mobile: this.mobile,
-				}
-
+					captcha_ticket: this.captchaTicket,
+				};
 				this.$store.dispatch('setMagicSendsms', o).then(res => {
 					if (res == 'success') {
-						this.button_type = false
-						let second = 60
+						this.button_type = false;
+						let second = 60;
 						const timer = setInterval(() => {
-							second--
+							second--;
 							if (second) {
-								this.button_text = this.send_again + '(' + second + 's)'
+								this.button_text = this.send_again + '(' + second + 's)';
 							} else {
-								this.button_type = true
+								this.button_type = true;
 								clearInterval(timer);
 							}
-						}, 1000)
+						}, 1000);
 					}
-				})
+				});
 			},
 
-			validateSmsInput() {
-				if (!this.mobile) {
-					uni.showToast({ title: '请输入手机号', icon: 'none' });
-					return false;
-				}
-				return true;
-			},
-
-			clickCaptcha(){
-				this.$store.dispatch('setImgVerify')
-			},
-
-			formSubmit(e){
+			formSubmit(e) {
 				var rule = [
-					{name:"mobile", checkType : "notnull", checkRule:"",  errorMsg: this.$t('lang.mobile_not_null')},
-					{name:"sms", checkType : "notnull", checkRule:"",  errorMsg:this.$t('lang.get_sms_code_notic')},
+					{ name: "mobile", checkType: "notnull", checkRule: "", errorMsg: this.$t('lang.mobile_not_null') },
+					{ name: "sms", checkType: "notnull", checkRule: "", errorMsg: this.$t('lang.get_sms_code_notic') },
 				];
-
 				var formData = e.detail.value;
 				var checkRes = graceChecker.check(formData, rule);
-				if(checkRes){
+				if (checkRes) {
 					uni.request({
 						url: this.websiteUrl + '/api/accountsafe/change_mobile',
 						method: 'POST',
 						data: {
-							mobile:this.mobile,
-							client:this.client,
-							code:this.sms
+							mobile: this.mobile,
+							client: this.client,
+							code: this.sms
 						},
 						header: {
 							'Content-Type': 'application/json',
 							'token': uni.getStorageSync('token'),
-							'X-Client-Hash':uni.getStorageSync('client_hash')
+							'X-Client-Hash': uni.getStorageSync('client_hash')
 						},
 						success: (res) => {
-							let data = res.data
-							if(data.status === 'success'){
-								uni.navigateTo({
-									url:'/pagesB/accountsafe/bindphone/bindphone?step=2'
-								})
-							}else{
-								if(data.errors){
-									uni.showToast({
-										title:data.errors.message,
-										icon:'none'
-									})
+							let data = res.data;
+							if (data.status === 'success') {
+								uni.navigateTo({ url: '/pagesB/accountsafe/bindphone/bindphone?step=2' });
+							} else {
+								if (data.errors) {
+									uni.showToast({ title: data.errors.message, icon: 'none' });
 								}
 							}
 						},
-						fail: (res) => {
-							console.log(JSON.stringify(res))
-						}
-					})
-				}else{
+						fail: (res) => { console.log(JSON.stringify(res)); }
+					});
+				} else {
 					uni.showToast({ title: graceChecker.error, icon: "none" });
 				}
 			}
 		},
-		onLoad(options){
-			this.mobile=options.id;
-			this.clickCaptcha();
+		onLoad(options) {
+			this.mobile = options.id;
+			this.$store.dispatch('setImgVerify');
 		}
 	}
 </script>
