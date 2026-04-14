@@ -1282,6 +1282,7 @@ import createPageTrackMixin from '@/common/mixins/pageTrackMixin.js';
 const CART_SELECTION_STATE_KEY = '__cartSelectionState__';
 const CART_APP_SESSION_KEY = '__cartAppSessionId__';
 const CART_SELECTION_STORAGE_PREFIX = 'cart_selection_state_';
+const CART_ACTIVE_USER_ID_KEY = '__cartActiveUserId__';
 
 /** 赠品提示图标：与 news/app 中 ico.gift 同路径；iOS/App 内联 svg 部分端不渲染，改用 data URI + image */
 const CART_GIFT_TIP_ICON_SRC =
@@ -2569,6 +2570,17 @@ function withTimeout(promise, ms) {
 					this.totalPrice = '0.00';
 				}
 			},
+			resetSelectionStateForLogout() {
+				this.clearCheckedFlagsFromCartList(this.goodsCartList);
+				this.resetSelectionArrays();
+				this.checkedGoodsId = [];
+				this.count = 0;
+				this.nums = 0;
+				this.totalPriceTiping = true;
+				this.totalPrice = '0.00';
+				this.disabled = true;
+				clearSavedSelectionState();
+			},
 		handleSelectionAfterFetch() {
 			const snapshot = this.buildCartSelectionSnapshot();
 			this.cartSelectionSignature = snapshot.signature;
@@ -2658,8 +2670,6 @@ function withTimeout(promise, ms) {
 
 			if (saved.signature !== snapshot.signature && restoredCount > 0) {
 				this.saveSelectionState();
-			} else if (saved.signature !== snapshot.signature && restoredCount === 0) {
-				clearSavedSelectionState();
 			}
 
 			this.applySelectionSummaryFromCheckedState();
@@ -8787,15 +8797,28 @@ function withTimeout(promise, ms) {
 	  this.startFlashSaleTimer();
 	  // 【关键修复】强制显示底部tab，不受页面逻辑影响
 	  this.forceShowTabBar();
-	  const launchState = getCartLaunchState();
-	  const isColdStartEnter = !!(launchState && launchState.isColdStart);
+	  getCartLaunchState();
 
 	  // 与「我的」等页一致：未登录不展示采购车，直接进登录
 	  const tokenGate = uni.getStorageSync('token');
-	  if (!tokenGate || tokenGate === '' || tokenGate === undefined) {
+	  const currentUserIdGate = String(uni.getStorageSync('user_id') || '');
+	  const lastActiveUserId = String(uni.getStorageSync(CART_ACTIVE_USER_ID_KEY) || '');
+	  if (!tokenGate || tokenGate === '' || tokenGate === undefined || !currentUserIdGate) {
+		  this.clearCartCache();
+		  this.clearAddressCache();
+		  clearSavedSelectionState();
+		  try {
+		  	uni.removeStorageSync(CART_ACTIVE_USER_ID_KEY);
+		  } catch (e) {}
 		  uni.navigateTo({ url: '/pagesB/login/login?delta=1' });
 		  return;
 	  }
+	  if (lastActiveUserId && lastActiveUserId !== currentUserIdGate) {
+	  	this.clearCartCache();
+	  	this.clearAddressCache();
+	  	clearSavedSelectionState();
+	  }
+	  uni.setStorageSync(CART_ACTIVE_USER_ID_KEY, currentUserIdGate);
 	  this.restoreAddressCache();
 
 	  // 【关键修复】onShow 中的所有操作都异步执行，不阻塞 tab 切换
@@ -8806,22 +8829,6 @@ function withTimeout(promise, ms) {
 	    // 注意：loading 状态稍后根据是否有缓存来决定是否设置
 	    
 	    // 继续执行后续逻辑
-	    // 检查用户ID是否变化（账号切换）
-	    const currentUserId = String(uni.getStorageSync('user_id') || '');
-	    const cacheKey = this.getCartCacheKey();
-	    const cachedUserId = cacheKey.replace('cart_cache_', '');
-	    
-	    // 统一转换为字符串后比较，避免类型不一致导致误判
-	    if (currentUserId && cachedUserId && currentUserId !== cachedUserId) {
-	      // ??ID????????
-	      this.clearCartCache();
-	      this.clearAddressCache();
-	      clearSavedSelectionState();
-	    }
-	    if (isColdStartEnter) {
-	      clearSavedSelectionState();
-	    }
-	    
 	    const token = uni.getStorageSync('token');
 	    const isLoggedIn = token && token !== '';
 	    const freshSyncTsRaw = uni.getStorageSync('__cart_sync_fresh_ts__');
@@ -8857,17 +8864,11 @@ function withTimeout(promise, ms) {
 	        this.$store.commit('goodsCartList', { data: cache.goodsCartList || [] });
 	        this.lastRecId = cache.lastRecId;
 	        this.isFirstLoad = false;
-	        if (isColdStartEnter) {
-	        	this.clearCheckedFlagsFromCartList(this.goodsCartList);
-	        	this.resetSelectionArrays();
-	        	this.applySelectionSummaryFromCheckedState();
-	        } else {
-	        	if (!Number.isNaN(cache.count)) {
-	        		this.count = cache.count;
-	        	}
-	        	if (!Number.isNaN(cache.nums)) {
-	        		this.nums = cache.nums;
-	        	}
+	        if (!Number.isNaN(cache.count)) {
+	        	this.count = cache.count;
+	        }
+	        if (!Number.isNaN(cache.nums)) {
+	        	this.nums = cache.nums;
 	        }
 
 	        // 标记为已初始化，避免 goodsList() 中重复处理
@@ -8882,11 +8883,7 @@ function withTimeout(promise, ms) {
 
 	        // 数据处理延迟执行，避免阻塞UI和tab切换
 	        setTimeout(() => {
-	          if (!isColdStartEnter) {
-	          	this.handleSelectionAfterFetch();
-	          } else {
-	          	this.applySelectionSummaryFromCheckedState();
-	          }
+	          this.handleSelectionAfterFetch();
 	          if (hasData) {
 	            // 有数据时，执行价格计算和订单验证
 	            // 【临时注释】异步验证订单状态
