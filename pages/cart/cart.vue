@@ -106,20 +106,20 @@
 							<view class="card-act-goods" v-for="(actItem,actIndex) in storeList.new_list"
 								:key="actIndex">
 								<!-- 满减/折扣活动行已移至店铺级 store-promotion，此处仅保留商品列表 -->
-								<block v-for="(item,index) in actItem.act_goods_list" :key="'item_' + listIndex + '_' + actIndex + '_' + (item.rec_id || index)">
+								<block v-for="(item,index) in actItem.act_goods_list" :key="index">
 									<block v-if="isStoreMainGoodsRowVisible(storeList, listIndex, actIndex, index)">
 								
 									<uni-swipe-action>
 										<uni-swipe-action-item :right-options="options"
 											@click="deleteCartGoods(item.rec_id)">
-											<view class="scroll-view-item scroll-view-item-left" :class="{'goods-item-invalid': item.is_invalid == 1}">
+											<view class="scroll-view-item scroll-view-item-left" :id="'cart-item-' + item.rec_id" :class="{'goods-item-invalid': item.is_invalid == 1 || item.product_number == 0}">
 												<view class="uni-flex">
 													<view class="checkbox"
-														:class="{'checked':checkedGoods[listIndex].includes(item.rec_id),'checkbox-disabled':item.is_invalid == 1 || item.product_number == 0 }"
-														@click="checkGoods(item.rec_id,listIndex,item.is_invalid,item.product_number,checkedGoods[listIndex].includes(item.rec_id),item.store_name,actIndex,index,item.act_id,item.goods_number,item.goods_price,item)">
+														:class="{'checked':(item.is_invalid != 1 && Number(item.product_number || 0) > 0 && checkedGoods[listIndex].includes(item.rec_id)),'checkbox-disabled':item.is_invalid == 1 || Number(item.product_number || 0) <= 0 }"
+														@click="checkGoods(item.rec_id,listIndex,item.is_invalid,item.product_number,(item.is_invalid != 1 && Number(item.product_number || 0) > 0 && checkedGoods[listIndex].includes(item.rec_id)),item.store_name,actIndex,index,item.act_id,item.goods_number,item.goods_price,item)">
 														<view class="checkbox-icon">
 															<uni-icons type="checkmarkempty" size="16" color="#ffffff"
-																v-if="item.is_invalid != 1"></uni-icons>
+																v-if="item.is_invalid != 1 && item.product_number > 0"></uni-icons>
 														</view>
 													</view>
 													<view class="checkbox-con cart-goods-row" style="flex: 1 1 0%;">
@@ -133,9 +133,9 @@
 																		v-if="item.goods_thumb" class="image"></image>
 																</navigator>
 																<block
-																	v-if="item.is_invalid == 0 && item.product_number == 0">
+																	v-if="item.is_invalid != 1 && Number(item.product_number || 0) <= 0">
 																	<view class="mask"></view>
-																	<view class="mash-text">{{$t('lang.no_goods')}}
+																	<view class="mash-text">暂无库存
 																	</view>
 																</block>
 																<block v-if="item.is_invalid == 1">
@@ -173,7 +173,7 @@
 															</navigator>
 															<view class="goods-attr twolist-hidden" v-if="item.goods_attr">{{ (item.goods_attr + '').indexOf('规格') === 0 ? item.goods_attr : '规格:' + item.goods_attr }}</view>
 															<!-- 标签行：横向滚动，字段 product_tags -->
-															<block v-for="(tags, tagWrapIndex) in [getProductTags(item, storeList)]" :key="'tags_' + (item.rec_id || item.goods_id || index) + '_' + tagWrapIndex">
+															<block v-for="(tags, tagWrapIndex) in [getProductTags(item)]" :key="'tags_' + (item.rec_id || item.goods_id || index) + '_' + tagWrapIndex">
 																<scroll-view scroll-x="true" class="activity-tags-scroll" :show-scrollbar="false" v-if="tags.length > 0">
 																	<view class="activity-tags-inner">
 																		<text class="product-tag tag-manjian" v-for="(t, ti) in tags" :key="ti"
@@ -188,10 +188,10 @@
 																			v-if="hasCouponAfterPrice(item)">券后</text>
 																		<text class="price">{{ hasCouponAfterPrice(item) ? getCouponAfterPriceFormat(item) : item.goods_price_format }}</text>
 																		<text class="order-original-price"
-																			v-if="hasCouponAfterPrice(item)">{{ item.goods_price_format }}</text>
+																			v-if="hasGoodsOriginalPrice(item)">{{ getGoodsOriginalPriceFormat(item) }}</text>
 																	</view>
 																	<text class="order-preferential-amount"
-																		v-if="hasCouponAfterPrice(item) && hasPreferentialAmount(item)">
+																		v-if="hasPreferentialAmount(item)">
 																		已优惠¥{{ getPreferentialAmountFormat(item) }}
 																	</text>
 																</view>
@@ -238,15 +238,23 @@
 										</uni-swipe-action-item>
 									</uni-swipe-action>
 									<!-- 商品级赠品提示：占据整行宽度 -->
-									<view class="goods-gift-tip-row" v-if="getItemGiftInfo(item, storeList)">
-										<view class="gift-tip-icon">🎁</view>
-										<view class="gift-tip-text">
-											购满{{ getItemGiftInfo(item, storeList).minAmount }}元可领赠品
+									<block v-for="giftInfo in [getItemGiftInfo(item, storeList)]" :key="'gift_tip_' + (item.rec_id || index)">
+										<view class="goods-gift-tip-row" v-if="giftInfo">
+											<view class="gift-tip-icon">
+												<image class="gift-tip-svg-img" :src="cartGiftTipIconSrc" mode="aspectFit" />
+											</view>
+											<view class="gift-tip-text">
+												购满{{ giftInfo.minAmount }}元可领赠品
+											</view>
+											<view v-if="giftInfo.total > 1" @click.stop="switchItemGiftAct(item, storeList)"
+												style="display:flex;align-items:center;">
+												<uni-icons type="arrowdown" size="14" color="#999999"></uni-icons>
+											</view>
+											<view class="gift-tip-btn" @click.stop="receiveGiftByItem(item, storeList)">
+												查看赠品
+											</view>
 										</view>
-										<view class="gift-tip-btn" @click.stop="receiveGiftByItem(item, storeList)">
-											查看赠品
-										</view>
-									</view>
+									</block>
 									<view class="cart-goods-item" v-for="(partsItem,partsIndex) in item.parts"
 										:key="partsIndex">
 										<scroll-view scroll-x scroll-y scroll-anchoring class="scroll-view-G"
@@ -266,9 +274,9 @@
 																<image :src="partsItem.goods_thumb"
 																	v-if="partsItem.goods_thumb" class="image"></image>
 																<block
-																	v-if="partsItem.is_invalid == 0 && partsItem.product_number == 0">
+																	v-if="partsItem.is_invalid != 1 && Number(partsItem.product_number || 0) <= 0">
 																	<view class="mask"></view>
-																	<view class="mash-text">{{$t('lang.no_goods')}}
+																	<view class="mash-text">暂无库存
 																	</view>
 																</block>
 																<block v-if="partsItem.is_invalid == 1">
@@ -357,12 +365,18 @@
 								</view>
 							</view>
 						</view>
-						<!-- 店铺维度：优惠合计 + 明细（需本店有选中商品）；主商品超 10 条可展开/收起 -->
-						<view class="store-cart-footer" v-if="storeHasCheckedGoods(storeList) && getStoreDiscountTotalTest(storeList) > 0">
+						<!-- 店铺维度：有明细时左右布局；无明细时展开/收起居中 -->
+						<view class="store-cart-footer" v-if="hasStoreDiscountDetail(storeList)">
 							<view class="store-cart-footer-left">
 								<view v-if="getStoreMainGoodsCount(storeList) > 10" class="expand-products-btn-cart" @click.stop="toggleStoreCartExpand(listIndex, storeList)">
-									<text>{{ isStoreCartExpanded(listIndex, storeList) ? '收起商品' : '展开全部' }}</text>
+									<text>{{ isStoreCartExpanded(listIndex, storeList) ? '收起商品' : '查看更多' }}</text>
 									<uni-icons :type="isStoreCartExpanded(listIndex, storeList) ? 'arrowup' : 'arrowdown'" size="14" color="#ff4d4f"></uni-icons>
+								</view>
+								<view v-else-if="storeList.ishas_more_goods === true" class="expand-products-btn-cart" @click="loadMoreGoods(listIndex, storeList, { autoExpand: true })" :class="{'loading': loadingMoreGoods[listIndex]}">
+									<text v-if="!loadingMoreGoods[listIndex]">查看更多</text>
+									<text v-else>加载中...</text>
+									<uni-icons v-if="!loadingMoreGoods[listIndex]" type="arrowdown" size="14" color="#ff4d4f"></uni-icons>
+									<uni-icons v-else type="spinner-cycle" size="14" color="#ff4d4f"></uni-icons>
 								</view>
 							</view>
 							<view class="store-cart-footer-right">
@@ -371,8 +385,14 @@
 								<text class="store-discount-detail-link" @click.stop="openStoreDiscountDetail(storeList, listIndex)">明细</text>
 							</view>
 						</view>
-						<view class="load-more-goods" v-if="storeList.ishas_more_goods === true">
-							<view class="load-more-btn" @click="loadMoreGoods(listIndex, storeList)" 
+						<view class="store-expand-center" v-else-if="getStoreMainGoodsCount(storeList) > 10">
+							<view class="expand-products-btn-cart" @click.stop="toggleStoreCartExpand(listIndex, storeList)">
+								<text>{{ isStoreCartExpanded(listIndex, storeList) ? '收起商品' : '查看更多' }}</text>
+								<uni-icons :type="isStoreCartExpanded(listIndex, storeList) ? 'arrowup' : 'arrowdown'" size="14" color="#ff4d4f"></uni-icons>
+							</view>
+						</view>
+						<view class="load-more-goods" v-if="storeList.ishas_more_goods === true && !hasStoreDiscountDetail(storeList) && getStoreMainGoodsCount(storeList) <= 10">
+							<view class="load-more-btn" @click="loadMoreGoods(listIndex, storeList, { autoExpand: true })" 
 								:class="{'loading': loadingMoreGoods[listIndex]}">
 								<text v-if="!loadingMoreGoods[listIndex]">查看更多</text>
 								<text v-else>加载中...</text>
@@ -407,25 +427,24 @@
 										<label style="min-width: 60rpx;">{{$t('lang.checkd_all')}}</label>
 									</view>
 								</view>
-								<view class="price-wrapper">
-									<text class="label-text">合计:</text>
-									<view class="submit-bar-price" v-if="totalPriceTiping">{{totalPriceTip}}</view>
-									<view class="submit-bar-price" v-else>计算中</view>
+								<view class="price-wrapper-new">
+									<text class="label-text-new">合计:</text>
+									<view class="submit-bar-price-new" v-if="totalPriceTiping">{{totalPriceTip}}</view>
+									<view class="submit-bar-price-new" v-else>计算中</view>
 								</view>
 							</view>
 
 							<!-- 第二排：数量 + 优惠 + 明细 -->
 							<view class="submit-bar-row-bottom">
-								<view class="bottom-left" style="padding-left: 20rpx;">
-									<text v-if="nums>0&&count>0" class="quantity-text" style="margin-right: 20rpx;">{{nums}}种{{count}}件</text>
-									<text v-if="nums>0&&count>0" class="discount-text">
+								<view class="bottom-left-new">
+									<text v-if="nums>0&&count>0" class="quantity-text-new">{{nums}}种{{count}}件</text>
+									<text v-if="nums>0&&count>0" class="discount-text-new">
 										<text v-if="totalPriceTiping">已优惠¥{{ formatAmount(totalDiscount) }}</text>
 										<text v-if="!totalPriceTiping">计算中</text>
 									</text>
 									<text v-else>{{$t('lang.already_save_one')}}</text>
 								</view>
-								<text class="detail-btn" @click="showPopup('priceDetail')" v-if="nums>0&&count>0" style="    color: #ff4d4f;
-    font-weight: 500;">{{$t('lang.detailed')}}</text>
+								<text class="detail-btn-new" @click="showPopup('priceDetail')" v-if="nums>0&&count>0">{{$t('lang.detailed')}}</text>
 							</view>
 						</view>
 
@@ -433,7 +452,13 @@
 						<view class="btn-bar">
 							<block v-if="!batchEdit">
 								<button class="btnSub" :class="[disabled ? 'btn-disabled' : 'btn-red']"
-									:disabled="disabled" @click="onSubmit">{{ submitBarText }}</button>
+									:disabled="disabled" @click="onSubmit">
+									<view class="checkout-btn-inner" v-if="showCheckoutBtnLoading">
+										<view class="checkout-btn-spinner"></view>
+										<text>加载中</text>
+									</view>
+									<text v-else>{{ submitBarText }}</text>
+								</button>
 							</block>
 							<button class="btn" :class="[length > 0 ? 'btn-red' : 'btn-disabled']"
 								:disabled="!length > 0" @click="onBatchDelete"
@@ -487,17 +512,17 @@
 				<view class="activity-popup">
 					<view class="title">
 						<view class="txt">
-							{{$t('lang.amount_max_available')}}{{ giftList && giftList.length ? giftList.length : act_type_ext }}{{$t('lang.goods_letter')}}
+							{{$t('lang.acquire')}}{{ giftList && giftList.length ? giftList.length : act_type_ext }}{{$t('lang.goods_letter')}}
 						</view>
-						<uni-icons type="closeempty" size="36" color="#999999" @click="handelClose('gift')"></uni-icons>
+						<uni-icons type="closeempty" size="24" color="#999999" @click="handelClose('gift')"></uni-icons>
 					</view>
 					<view class="content">
 						<scroll-view scroll-y style="height:250px;">
 							<view class="cart-goods-item" v-for="(item,index) in giftList" :key="item.id || index">
 								<view class="checkbox checked gift-checkbox-disabled">
-									<view class="checkbox-icon">
+									<!-- <view class="checkbox-icon">
 										<uni-icons type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
-									</view>
+									</view> -->
 								</view>
 								<view class="checkbox-con">
 									<view class="cart-goods-info">
@@ -605,7 +630,7 @@
 											<text>{{getCouponTimeText(item)}}</text>
 										</view>
 									</view>
-									<view class="coupons_right">
+									<view class="coupons_right" :class="{'coupons_right_unreceived': canCouponReceive(item) && !isCouponReceived(item)}">
 										<view class="get_coupon_time">
 											<button class="u-reset-button coupon_btn u-reset-disabled"
 												v-if="isCouponReceived(item)">
@@ -613,7 +638,7 @@
 											</button>
 											<button class="u-reset-button coupon_btn u-reset-disabled"
 												v-else-if="!canCouponReceive(item)">{{$t('lang.take_up')}}</button>
-											<button class="u-reset-button coupon_btn" v-else
+											<button class="u-reset-button coupon_btn" :class="{'coupon_btn_unreceived': canCouponReceive(item) && !isCouponReceived(item)}" v-else
 												@click="handelReceive(getCouponId(item), item.ru_id || couponPopupRuId)">
 												{{$t('lang.immediately')}}<br>{{$t('lang.receive')}}
 											</button>
@@ -652,7 +677,6 @@
 						</view>
 					</scroll-view>
 				</view>
-				<view style="height:100rpx;"></view>
 			</uni-popup>
 
 			<!-- 满减信息弹窗（对齐 checkout.js showPromotionDetailModal + styles.css） -->
@@ -820,7 +844,7 @@
 						<uni-icons type="closeempty" size="24" color="#999999" @click="handelClose('priceDetail')"></uni-icons>
 					</view>
 					<view class="content">
-						<scroll-view scroll-y>
+						<scroll-view scroll-y class="popup-scroll-main">
 							<view class="pop_content" :style="{height: `${popHeight.hd}px`}">
 								<!-- 商品金额部分 -->
 								<view class="price-detail-section">
@@ -829,13 +853,23 @@
 									<view class="price-detail-store-box" v-if="getPriceDetailStoreRows().length > 0">
 										<view class="price-detail-store-item" v-for="(store, idx) in getPriceDetailStoreRows()" :key="idx">
 											<view class="label">
-												<view class="label-left">{{ store.store_name }}</view>
+												<view class="label-left price-store-left">
+													<view class="price-store-name">{{ store.store_name }}</view>
+												</view>
 												<view class="label-right">¥{{ parseFloat(store.goods_subtotal).toFixed(2) }}</view>
+											</view>
+											<view class="label price-store-discount-row" v-if="hasStoreRowPromotionDiscount(store)">
+												<view class="price-store-discount-label">优惠</view>
+												<view class="price-store-discount-amount">-¥{{ getStoreRowPromotionDiscount(store) }}</view>
 											</view>
 										</view>
 									</view>
+									<view class="label price-detail-summary-sep" v-if="getPriceDetailAllStoresPromotionDiscount() > 0">
+										<view class="label-left red">优惠总额</view>
+										<view class="label-right red">-¥{{ getPriceDetailAllStoresPromotionDiscountFormat() }}</view>
+									</view>
 									<!-- 商品总计 -->
-									<view class="label" style="border-top: 2rpx solid #f0f0f0;    padding: 20rpx 0;">
+									<view class="label price-detail-goods-total-row">
 										<view class="label-left">商品总额</view>
 										<view class="label-right">¥{{ getPriceDetailGoodsSubtotal() }}</view>
 									</view>
@@ -843,18 +877,49 @@
 								
 								<!-- 优惠部分 -->
 								<view class="price-detail-section" v-if="getPriceDetailTotalDiscount() > 0">
-									<view class="price-detail-section-title">优惠</view>
-									<view class="label" v-if="getPriceDetailFullReduction() > 0">
-										<view class="label-left red">满减优惠</view>
-										<view class="label-right red">-¥{{ getPriceDetailFullReduction() }}</view>
+									<!-- 优惠明细主项（抽屉头部） -->
+									<view class="discount-activity-toggle-cart" @click="toggleCartDiscountActivity">
+										<text class="title">优惠明细</text>
+										<view class="discount-activity-toggle-right-cart">
+											<view class="value red">-¥{{ getPriceDetailTotalDiscount() }}</view>
+											<uni-icons
+												v-if="hasCartDiscountActivityChildren()"
+												:type="cartDiscountActivityExpanded ? 'arrowup' : 'arrowdown'"
+												size="16"
+												color="#999999"></uni-icons>
+										</view>
 									</view>
-									<view class="label" v-if="getPriceDetailDiscount() > 0">
-										<view class="label-left red">限时折扣</view>
-										<view class="label-right red">-¥{{ getPriceDetailDiscount() }}</view>
+									
+									<!-- 优惠明细子项（抽屉内容） -->
+									<view class="discount-activity-child-cart" v-if="cartDiscountActivityExpanded && getPriceDetailFullReduction() > 0">
+										<view class="label">
+											<view class="label-left red">满减优惠</view>
+											<view class="label-right red">-¥{{ getPriceDetailFullReduction() }}</view>
+										</view>
 									</view>
-									<view class="label" v-if="getPriceDetailCoupon() > 0">
-										<view class="label-left red">优惠券</view>
-										<view class="label-right red">-¥{{ getPriceDetailCoupon() }}</view>
+									<view class="discount-activity-child-cart" v-if="cartDiscountActivityExpanded && getPriceDetailDiscount() > 0">
+										<view class="label">
+											<view class="label-left red">限时折扣</view>
+											<view class="label-right red">-¥{{ getPriceDetailDiscount() }}</view>
+										</view>
+									</view>
+									<view class="discount-activity-child-cart" v-if="cartDiscountActivityExpanded && getPriceDetailPromotionDiscountAmount() > 0">
+										<view class="label">
+											<view class="label-left red">促销折扣</view>
+											<view class="label-right red">-¥{{ getPriceDetailPromotionDiscountAmount() }}</view>
+										</view>
+									</view>
+									<view class="discount-activity-child-cart" v-if="cartDiscountActivityExpanded && getPriceDetailBlackCardDiscountAmount() > 0">
+										<view class="label">
+											<view class="label-left red">黑卡优惠</view>
+											<view class="label-right red">-¥{{ getPriceDetailBlackCardDiscountAmount() }}</view>
+										</view>
+									</view>
+									<view class="discount-activity-child-cart" v-if="cartDiscountActivityExpanded && getPriceDetailCoupon() > 0">
+										<view class="label">
+											<view class="label-left red">优惠券</view>
+											<view class="label-right red">-¥{{ getPriceDetailCoupon() }}</view>
+										</view>
 									</view>
 								</view>
 								
@@ -1175,9 +1240,9 @@
 					</view>
 				</scroll-view>
 				<!-- #endif -->
-				<view style="height: 30rpx;"></view>
+				<!-- <view style="height: 30rpx;"></view> -->
 		
-				<view class="btn_wrap u-border-top" style="z-index: 99999999;">
+				<view class="btn_wrap u-border-top" :style="addressPopupBtnWrapStyle">
 					<button class="u-reset-button sub_btn address_btn red_btn" @click="togetlocation">添加新地址</button>
 		
 				</view>
@@ -1216,6 +1281,14 @@ import createPageTrackMixin from '@/common/mixins/pageTrackMixin.js';
 
 const CART_SELECTION_STATE_KEY = '__cartSelectionState__';
 const CART_APP_SESSION_KEY = '__cartAppSessionId__';
+const CART_SELECTION_STORAGE_PREFIX = 'cart_selection_state_';
+
+/** 赠品提示图标：与 news/app 中 ico.gift 同路径；iOS/App 内联 svg 部分端不渲染，改用 data URI + image */
+const CART_GIFT_TIP_ICON_SRC =
+	'data:image/svg+xml;charset=utf-8,' +
+	encodeURIComponent(
+		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>'
+	);
 
 function getCartLaunchState() {
 	if (typeof getApp !== 'function') {
@@ -1255,14 +1328,51 @@ function getSelectionContainer() {
 	return globalThis.__cartSelectionFallback;
 }
 
+function getSelectionStorageKey() {
+	const userId = String(uni.getStorageSync('user_id') || '');
+	return `${CART_SELECTION_STORAGE_PREFIX}${userId}`;
+}
+
 function readSavedSelectionState() {
 	const container = getSelectionContainer();
-	return container[CART_SELECTION_STATE_KEY] || null;
+	const storageKey = getSelectionStorageKey();
+	const memoryState = container[CART_SELECTION_STATE_KEY];
+	if (memoryState && typeof memoryState === 'object') {
+		if (Object.prototype.hasOwnProperty.call(memoryState, 'storageKey')) {
+			if (memoryState.storageKey === storageKey) {
+				return memoryState.value || null;
+			}
+		} else {
+			return memoryState || null;
+		}
+	}
+	try {
+		const raw = uni.getStorageSync(storageKey);
+		if (!raw) return null;
+		const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+		if (parsed && typeof parsed === 'object') {
+			container[CART_SELECTION_STATE_KEY] = {
+				storageKey,
+				value: parsed
+			};
+			return parsed;
+		}
+	} catch (error) {
+	}
+	return null;
 }
 
 function writeSavedSelectionState(state) {
 	const container = getSelectionContainer();
-	container[CART_SELECTION_STATE_KEY] = state;
+	const storageKey = getSelectionStorageKey();
+	container[CART_SELECTION_STATE_KEY] = {
+		storageKey,
+		value: state
+	};
+	try {
+		uni.setStorageSync(storageKey, JSON.stringify(state || null));
+	} catch (error) {
+	}
 }
 
 function clearSavedSelectionState() {
@@ -1270,9 +1380,15 @@ function clearSavedSelectionState() {
 	if (container && Object.prototype.hasOwnProperty.call(container, CART_SELECTION_STATE_KEY)) {
 		delete container[CART_SELECTION_STATE_KEY];
 	}
+	try {
+		const storageKey = getSelectionStorageKey();
+		uni.removeStorageSync(storageKey);
+	} catch (error) {
+	}
 }
 
-const REQUEST_TIMEOUT_MS = 8000;
+const REQUEST_TIMEOUT_MS = 60000;
+let CART_RECKON_REQ_SEQ = 0;
 
 function withTimeout(promise, ms) {
 	let timeoutId;
@@ -1299,6 +1415,7 @@ function withTimeout(promise, ms) {
 		},
 		data() {
 			return {
+				cartGiftTipIconSrc: CART_GIFT_TIP_ICON_SRC,
 				configs:{
 					padding: '30rpx',
 					gridRows: 6,
@@ -1331,6 +1448,12 @@ function withTimeout(promise, ms) {
 				isSilentUpdating: false, // 是否正在进行静默更新
 				isCalculating: false, // 添加计算状态锁
 				_isUpdatingNumber: false, // 添加数量更新锁，防止并发请求
+				_isReckoningPrice: false, // 价格计算请求锁，避免重复并发 reckon_cartgoods
+				_pendingReckon: false, // 价格计算中的重入标记
+				_pendingReckonSilent: true, // 重入请求是否可静默
+				_skipShowEveryGoodsListOnce: false, // onShow 已处理购物车时，跳过 showEvery 的重复 goodsList
+				_lastCartCacheWriteAt: 0,
+				_lastCartCacheWriteKey: '',
 				checkAllTimer: null,
 				recIdArr: [],
 				totalQuantity: 0,
@@ -1377,7 +1500,9 @@ function withTimeout(promise, ms) {
 				coudanLoadMoreDone: false,
 				// 店铺主商品折叠（>10 条）：key 为 storeExpandKey
 				storeCartExpanded: {},
-				// 店铺优惠明细弹窗（测试数据，待接接口）
+				// 购物车优惠明细展开状态
+				cartDiscountActivityExpanded: false,
+				// 店铺优惠明细弹窗
 				storeDiscountDetailShow: false,
 				storeDiscountDetailStore: null,
 				storeDiscountDetailList: [],
@@ -1476,6 +1601,7 @@ function withTimeout(promise, ms) {
 				_reckonAvailableFav: {}, // 结算接口返回的 available_favourable，按活动ID缓存
 				_reckonFavByStore: {}, // 结算接口返回的 available_favourable，按店铺缓存
 				_reckonStoreGiftActIds: {}, // 按店铺：{ store_id: [act_id1, act_id2] } 用于独立赠品行展示
+				itemGiftActIndexMap: {}, // 按商品记录当前展示的赠品活动索引：{ `${storeId}_${recId}`: index }
 				_settlementData: {}, // 结算接口返回的 settlement 数据，按 store_id 缓存
 				_settlementDataLoaded: false, // settlement 数据是否已加载完成
 				flashSaleNowTs: Math.floor(Date.now() / 1000), // 秒级当前时间戳（驱动限时抢倒计时刷新）
@@ -1535,6 +1661,12 @@ function withTimeout(promise, ms) {
 					`${a.province_name || ''}${a.district_name || ''}${a.street_name || ''}${a.address || ''}` :
 					`${a.province_name || ''}${a.city_name || ''}${a.district_name || ''}${a.street_name || ''}${a.address || ''}`;
 			},
+			addressPopupBtnWrapStyle() {
+				return {
+					zIndex: 99999999,
+					marginBottom: this.isIpx ? '30rpx' : '0'
+				}
+			},
 			ongoodsGuessList: {
 				get() {
 					return this.$store.state.shopping.ongoodsGuessList
@@ -1566,6 +1698,9 @@ function withTimeout(promise, ms) {
 			},
 			submitBarText() {
 				return this.$t('lang.go_checkout_1')
+			},
+			showCheckoutBtnLoading() {
+				return this.disabled === true && this._isReckoningPrice === true && this.nums > 0 && this.count > 0
 			},
 			totalPriceTip() {
 				return this.totalPrice
@@ -1681,22 +1816,14 @@ function withTimeout(promise, ms) {
 				return Math.min(660, Math.floor((sys.windowHeight || 667) * 0.95));
 			},
 			couponPopupPanelStyle() {
-				// iPhone 等设备上弹窗被“切断”的原因之一，是整体高度计算偏大。
-				// 这里直接按视窗高度 cap 做上限，不强制撑满，避免只有一条数据时内容被底部遮挡。
-				const cap = this.couponPopupCapPx;
-				const raw = Number(this.popHeight.couponPopupTotalPx) || 0;
-				let h = raw > 0 ? raw : (this.couponPopupScrollH > 0 ? (this.couponPopupScrollH + uni.upx2px(120)) : cap);
-				if (h > cap) h = cap;
 				return {
-					maxHeight: `${cap}px`,
-					height: `${h}px`
+					maxHeight: '76vh'
 				};
 			},
 			couponPopupScrollStyle() {
-				// 需求：内容区域“刚好铺满弹窗剩余空间”，不要再被数值高度切割。
-				// 这里直接让 scroll-view 高度占满父容器（coupon-popup-wrap）可用空间，
-				// 具体弹窗总高度由 uni-popup 自己控制。
-				return { height: '100%' };
+				return {
+					maxHeight: 'calc(76vh - 62px)'
+				};
 			},
 			// 去凑单弹窗数据
 			coudanPopupData() {
@@ -1813,8 +1940,6 @@ function withTimeout(promise, ms) {
 				this.platformStyle = 'bottom: 82rpx'; // H5环境使用特定值
 				// #endif
 			}, 0);
-		},
-		onLoad() {
 		},
 		onPageScroll(e) {
 			var that = this
@@ -2042,19 +2167,8 @@ function withTimeout(promise, ms) {
 				const couponItems = this.getPanelSectionItems(storeList, 'coupon');
 				if (!couponItems.length) return [];
 				const tags = couponItems.map((item) => {
-					// 轮播只用优惠券 sections.coupon.items 的信息
-					// 示例：满100000减2券、满10减3券
-					const man = item && (item.cou_man ?? item.threshold_amount ?? item.cou_threshold_amount ?? item.threshold ?? item.min_amount ?? 0);
-					const money = item && (item.cou_money ?? item.amount ?? item.coupon_money ?? item.discount_amount ?? item.coupon_value ?? 0);
-					const manNum = parseFloat(man);
-					const moneyNum = parseFloat(money);
-					let text = '';
-					if (!Number.isNaN(manNum) && manNum > 0 && !Number.isNaN(moneyNum) && moneyNum > 0) {
-						text = `满${item.cou_man || manNum}减${item.cou_money || moneyNum}券`;
-					} else {
-						// 兜底：用 cou_title / cou_name 生成（避免空白）
-						text = (item && (item.cou_title || item.cou_name || item.title || '')) || '';
-					}
+					// 按需求：仅使用 coupon.items[].cou_name 作为文案
+					const text = (item && item.cou_name ? String(item.cou_name).trim() : '');
 					return {
 						type: 'coupon',
 						text
@@ -2160,7 +2274,7 @@ function withTimeout(promise, ms) {
 				// 否则显示去凑单按钮
 				return true;
 			},
-			// 商品标签行数据：使用后端 goods_benefit_tags（商品行无字段时回查 store.goods）
+			// 商品标签行数据：仅使用当前行 item.goods_benefit_tags，不从同店其他行或 store.goods 兜底
 			startFlashSaleTimer() {
 				if (this.flashSaleTimer) return;
 				this.flashSaleNowTs = Math.floor(Date.now() / 1000);
@@ -2219,19 +2333,9 @@ function withTimeout(promise, ms) {
 				if (day > 0) return `${day}天 ${hh}:${mm}:${ss}`;
 				return `${hh}:${mm}:${ss}`;
 			},
-			getProductTags(item, storeList) {
+			getProductTags(item) {
 				if (!item) return [];
-				const storeGoods = (storeList && Array.isArray(storeList.goods)) ? storeList.goods : [];
-				const matchedInStoreGoods = storeGoods.find(g => {
-					const sameRec = String(g && g.rec_id) === String(item.rec_id);
-					const sameGoods = String(g && g.goods_id) === String(item.goods_id);
-					return sameRec || sameGoods;
-				}) || null;
-				const fallbackRaw = matchedInStoreGoods ? matchedInStoreGoods.goods_benefit_tags : undefined;
 				let rawTags = item.goods_benefit_tags;
-				if (rawTags === undefined || rawTags === null || rawTags === '') {
-					rawTags = fallbackRaw;
-				}
 				if (typeof rawTags === 'string') {
 					try {
 						rawTags = JSON.parse(rawTags);
@@ -2377,6 +2481,7 @@ function withTimeout(promise, ms) {
 						this.checkedShop.splice(0, this.checkedShop.length);
 					}
 					this.checkedAll = false;
+					this._globalAllSelectedMode = false;
 					return;
 				}
 				if (Array.isArray(this.checkedGoods) && this.checkedGoods.length > this.goodsCartList.length) {
@@ -2399,33 +2504,59 @@ function withTimeout(promise, ms) {
 					});
 				});
 				this.checkedAll = false;
+				this._globalAllSelectedMode = false;
 			},
 		handleSelectionAfterFetch() {
 			const snapshot = this.buildCartSelectionSnapshot();
 			this.cartSelectionSignature = snapshot.signature;
 			if (!snapshot.signature) {
 				this.resetSelectionArrays();
+				this.applySelectionSummaryFromCheckedState();
 				clearSavedSelectionState();
 				return;
 			}
 			const saved = readSavedSelectionState();
 			if (!saved) {
-				// 没有保存的选中状态，直接返回
 				this.resetSelectionArrays();
+				this.applySelectionSummaryFromCheckedState();
 				return;
 			}
-			
-			// 【增强】即使签名不完全匹配，也尝试恢复能匹配的商品选中状态
-			// 这样可以支持下拉刷新时保持选中状态，即使商品数据有变化（价格、库存等）
+
 			this.isRestoringSelection = true;
 			this.resetSelectionArrays();
 			const perStoreSelectedCounts = new Array(snapshot.storeSelectableCounts.length).fill(0);
 			const selectedList = Array.isArray(saved.selectedRecIds) ? saved.selectedRecIds : [];
-			let restoredCount = 0; // 成功恢复的商品数量
-			
+			const selectedStoreIdSet = new Set((Array.isArray(saved.selectedStoreIds) ? saved.selectedStoreIds : []).map(id => String(id)));
+			let restoredCount = 0;
+
+			if (selectedStoreIdSet.size > 0 && Array.isArray(this.goodsCartList)) {
+				this.goodsCartList.forEach((store, storeIndex) => {
+					if (!store) return;
+					const storeId = store.store_id != null ? String(store.store_id) : '';
+					if (!storeId || !selectedStoreIdSet.has(storeId)) return;
+					if (!Array.isArray(this.checkedGoods[storeIndex])) {
+						this.$set(this.checkedGoods, storeIndex, []);
+					}
+					const actList = Array.isArray(store.new_list) ? store.new_list : [];
+					actList.forEach((act) => {
+						const goodsList = act && Array.isArray(act.act_goods_list) ? act.act_goods_list : [];
+						goodsList.forEach((goodsItem) => {
+							if (!goodsItem) return;
+							if (goodsItem.is_invalid == 1 || Number(goodsItem.product_number || 0) <= 0) return;
+							const recId = goodsItem.rec_id;
+							if (!this.checkedGoods[storeIndex].includes(recId)) {
+								this.checkedGoods[storeIndex].push(recId);
+								restoredCount++;
+								perStoreSelectedCounts[storeIndex] += 1;
+							}
+							goodsItem.checked = true;
+						});
+					});
+				});
+			}
+
 			selectedList.forEach((recId) => {
 				const meta = snapshot.recMap[recId];
-				// 如果商品不存在或已失效，自动过滤掉（不恢复）
 				if (!meta || meta.isInvalid) {
 					return;
 				}
@@ -2433,48 +2564,42 @@ function withTimeout(promise, ms) {
 				if (!Array.isArray(this.checkedGoods[storeIndex])) {
 					this.$set(this.checkedGoods, storeIndex, []);
 				}
-				if (!this.checkedGoods[storeIndex].includes(recId)) {
-					this.checkedGoods[storeIndex].push(recId);
-				}
 				const goodsItem = this.goodsCartList[storeIndex]?.new_list?.[actIndex]?.act_goods_list?.[itemIndex];
 				if (goodsItem) {
+					const normalizedRecId = goodsItem.rec_id;
+					if (!this.checkedGoods[storeIndex].includes(normalizedRecId)) {
+						this.checkedGoods[storeIndex].push(normalizedRecId);
+						restoredCount++;
+						perStoreSelectedCounts[storeIndex] += 1;
+					}
 					goodsItem.checked = true;
-					restoredCount++;
 				}
-				perStoreSelectedCounts[storeIndex] += 1;
 			});
-			
-			// 更新店铺选中状态
+
 			snapshot.storeSelectableCounts.forEach((count, idx) => {
 				const selected = perStoreSelectedCounts[idx] || 0;
 				const shopChecked = count > 0 && selected === count;
-				// 【修复问题1】如果店铺有失效商品，强制取消店铺选中
-				// 即使所有有效商品都被选中，有失效商品的店铺也不应该显示为选中状态
 				if (shopChecked && Array.isArray(this.shopInvalidArr) && this.shopInvalidArr[idx] === true) {
 					this.$set(this.checkedShop, idx, false);
 				} else {
 					this.$set(this.checkedShop, idx, shopChecked);
 				}
 			});
-			
-			// 更新全选状态
+
 			const allFullySelected = snapshot.storeSelectableCounts.every((count, idx) => {
 				if (!count) return true;
 				return (perStoreSelectedCounts[idx] || 0) === count;
 			});
-			// 如果之前是全选状态，且所有店铺都全选，则保持全选
-			// 否则根据实际选中情况决定
 			this.checkedAll = saved.checkedAll === true && allFullySelected;
-			
-			// 如果签名不匹配，但有成功恢复的商品，更新签名（表示部分恢复成功）
+			this._globalAllSelectedMode = this.checkedAll === true;
+
 			if (saved.signature !== snapshot.signature && restoredCount > 0) {
-				// 部分恢复成功，更新选中状态缓存
 				this.saveSelectionState();
 			} else if (saved.signature !== snapshot.signature && restoredCount === 0) {
-				// 签名不匹配且没有成功恢复的商品，清除选中状态缓存
 				clearSavedSelectionState();
 			}
-			
+
+			this.applySelectionSummaryFromCheckedState();
 			this.isRestoringSelection = false;
 		},
 			saveSelectionState() {
@@ -2501,16 +2626,27 @@ function withTimeout(promise, ms) {
 					});
 				}
 				const uniqueRecIds = Array.from(new Set(recIds));
+				const selectedStoreIds = [];
+				if (Array.isArray(this.goodsCartList) && Array.isArray(this.checkedShop)) {
+					this.goodsCartList.forEach((store, idx) => {
+						if (!store || store.store_id == null) return;
+						if (this.checkedShop[idx] === true) {
+							selectedStoreIds.push(store.store_id);
+						}
+					});
+				}
 				writeSavedSelectionState({
 					signature: snapshot.signature,
 					selectedRecIds: uniqueRecIds,
-					checkedAll: this.checkedAll === true
+					checkedAll: this.checkedAll === true,
+					selectedStoreIds
 				});
 				this.cartSelectionSignature = snapshot.signature;
 			},
 			// 加载更多商品
-			loadMoreGoods(storeIndex, storeList) {
+			loadMoreGoods(storeIndex, storeList, options = {}) {
 				var that = this;
+				const shouldAutoExpand = !!(options && options.autoExpand);
 				
 				// 防止重复点击
 				if (that.loadingMoreGoods[storeIndex]) {
@@ -2554,6 +2690,7 @@ function withTimeout(promise, ms) {
 				
 				// 返回 Promise，方便在需要时等待加载完成
 				return that.$store.dispatch('setCartMoreGoods', requestParams).then(res => {
+					let appendedCount = 0;
 					if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
 						// 找到当前店铺的数据（应该只有一条）
 						const storeData = res.data.find(item => item.store_id === storeList.store_id || 
@@ -2584,6 +2721,7 @@ function withTimeout(promise, ms) {
 													}
 												}
 												storeList.new_list[existingActIndex].act_goods_list.push(newGoods);
+												appendedCount += 1;
 											}
 										});
 									}
@@ -2604,8 +2742,18 @@ function withTimeout(promise, ms) {
 										});
 									}
 									storeList.new_list.push(newActItem);
+									if (newActItem.act_goods_list && Array.isArray(newActItem.act_goods_list)) {
+										appendedCount += newActItem.act_goods_list.length;
+									}
 								}
 							});
+
+							// 仅在用户显式点击“查看更多”时自动展开
+							// 程序内部的补全加载（如取消勾选触发）不应改变展开态
+							if (shouldAutoExpand && appendedCount > 0) {
+								const expandKey = that.getStoreExpandKey(storeList, storeIndex);
+								that.$set(that.storeCartExpanded, expandKey, true);
+							}
 							
 							// 更新 ishas_more_goods 状态
 							that.$set(storeList, 'ishas_more_goods', storeData.ishas_more_goods || false);
@@ -2985,12 +3133,7 @@ function withTimeout(promise, ms) {
 				}
 				var that = this
 				var newAttr = []
-				var appVersion
-				// #ifndef H5
-				let wginfoStr = uni.getStorageSync('wgtinfo') != "" ? uni.getStorageSync('wgtinfo') : {};
-				let wgtinfo = JSON.parse(uni.getStorageSync('wgtinfo'));
-				appVersion = Number(wgtinfo.version.replace(/\./g, ''));
-				// #endif
+				const cartAddAppVersion = incrementVersion()
 				that.addCartClass = false;
 			
 
@@ -3056,7 +3199,7 @@ function withTimeout(promise, ms) {
 					area_id: '0',
 					parent_id: '0',
 					rec_type: type,
-					app_version: appVersion,
+					app_version: cartAddAppVersion,
 					// cou_id: that.goodsDetail.best_price.cou_id > 0 ? that.goodsDetail.best_price.cou_id : 0
 					cou_id: ''
 				}).then(res => {
@@ -3428,7 +3571,8 @@ function withTimeout(promise, ms) {
 			  // 这里只需要执行数据加载，loading3的状态由onShow统一管理
 			  const token = uni.getStorageSync('token');
 			  const isLoggedIn = token && token !== '';
-			  const cache = isLoggedIn ? this.loadCartCache() : null;
+				  const cache = isLoggedIn ? this.loadCartCache() : null;
+				  const hasCache = !!cache;
 			  // 注意：这里只用于判断是否有数据，不用于判断是否有缓存
 			  // 因为onShow已经区分了"有缓存"和"有数据"
 			  const hasDataInCache = cache && cache.goodsCartList && cache.goodsCartList.length > 0;
@@ -3436,14 +3580,17 @@ function withTimeout(promise, ms) {
 			  // loading3 的状态已在 onShow 中正确设置，这里不需要修改
 			  // onShow中：有缓存（包括空数组）时已设置为false，无缓存时已设置为true
 			  
+			  const shouldSkipGoodsList = this._skipShowEveryGoodsListOnce === true;
+			  if (shouldSkipGoodsList) {
+			    this._skipShowEveryGoodsListOnce = false;
+			  }
+			  const tasks = [this.goodsGuessHandle(1)];
+			  if (!shouldSkipGoodsList) {
+			    tasks.unshift(this.goodsList(false, hasCache));
+			  }
+
 			  // 并行执行独立请求
-			  Promise.all([
-			    this.goodsList(),
-				 this.goodsGuessHandle(1)
-			 
-			  ]).then(() => {
-			    // 【赠品初始化】页面加载时获取赠品数据，无需用户选中商品
-			    this.initGiftData();
+				  Promise.all(tasks).then(() => {
 			  }).finally(() => {
 			    // 【方案1修复】检查数据状态，确保loading3正确关闭
 			    // 注意：onShow已经根据缓存状态设置了loading3，这里只需要确保最终状态正确
@@ -3746,18 +3893,6 @@ function withTimeout(promise, ms) {
 			});
 		},
 			//购物车列表
-			// 在data中添加
-			data() {
-			  return {
-			    _totalPriceCache: null, // 缓存计算结果
-			    _dataProcessingTimer: null,
-			    _initialized: false, // 标记是否完成初始化
-			    _lastFullSelectionCount: undefined,
-			    _lastFullSelectionTypes: undefined,
-			    // ... 其他数据
-			  }
-			},
-			
 			// ========== 购物车缓存相关方法 ==========
 			/**
 			 * 生成缓存 key（基于用户ID）
@@ -3901,6 +4036,8 @@ function withTimeout(promise, ms) {
 							return {
 								goodsCartList: parsed.goodsCartList,
 								lastRecId: parsed.lastRecId || null,
+								count: this.normalizeNumericValue(parsed.count),
+								nums: this.normalizeNumericValue(parsed.nums),
 								isExpired: isExpired
 							};
 						}
@@ -3917,13 +4054,32 @@ function withTimeout(promise, ms) {
 			 */
 			saveCartCache(goodsCartList, lastRecId) {
 				try {
+					const normalizedCount = this.normalizeNumericValue(this.count);
+					const normalizedNums = this.normalizeNumericValue(this.nums);
+					const countForCache = Number.isNaN(normalizedCount) ? null : normalizedCount;
+					const numsForCache = Number.isNaN(normalizedNums) ? null : normalizedNums;
+					const writeKey = [
+						lastRecId || '',
+						countForCache === null ? '' : countForCache,
+						numsForCache === null ? '' : numsForCache
+					].join('|');
+					const now = Date.now();
+					// 保护：短时间内相同关键数据不重复写缓存，减少高频写入
+					if (this._lastCartCacheWriteKey === writeKey && (now - (this._lastCartCacheWriteAt || 0) < 800)) {
+						return;
+					}
+
 					const cacheKey = this.getCartCacheKey();
 					const cacheData = {
 						goodsCartList: goodsCartList || [],
 						lastRecId: lastRecId || null,
-						timestamp: Date.now()
+						count: countForCache,
+						nums: numsForCache,
+						timestamp: now
 					};
 					uni.setStorageSync(cacheKey, JSON.stringify(cacheData));
+					this._lastCartCacheWriteAt = now;
+					this._lastCartCacheWriteKey = writeKey;
 				} catch (error) {
 				}
 			},
@@ -3974,6 +4130,19 @@ function withTimeout(promise, ms) {
 				});
 				
 				return maxRecId;
+			},
+			clearCheckedFlagsFromCartList(goodsCartList) {
+				if (!Array.isArray(goodsCartList)) return;
+				goodsCartList.forEach((store) => {
+					const actList = Array.isArray(store && store.new_list) ? store.new_list : [];
+					actList.forEach((act) => {
+						const goodsList = Array.isArray(act && act.act_goods_list) ? act.act_goods_list : [];
+						goodsList.forEach((item) => {
+							if (!item) return;
+							item.checked = false;
+						});
+					});
+				});
 			},
 			
 			/**
@@ -4147,6 +4316,9 @@ function withTimeout(promise, ms) {
 				if (newLastRecId && (!this.lastRecId || newLastRecId > this.lastRecId)) {
 					this.lastRecId = newLastRecId;
 				}
+
+				// 新增商品同步初始化价格基线字段，保证取消选中后可回退到 goodslist 值
+				this.ensureBasePriceFieldsForAllGoods();
 				
 				// 强制更新视图
 				this.$forceUpdate();
@@ -4221,14 +4393,14 @@ function withTimeout(promise, ms) {
 
 					// 4. 分批应用变更
 					this.applyChangesBatch(shopChanges, itemChanges);
+					// 变更后刷新价格基线，避免取消选中后残留 reckon 值
+					this.ensureBasePriceFieldsForAllGoods();
 
 					// 5. 触发价格重计算
-					setTimeout(() => {
-						this.changeGoods(true); // silent=true
-					}, 50);
 				} catch (error) {
 					// 降级到全量更新
 					this.$store.commit('goodsCartList', { data: newServerData });
+					this.ensureBasePriceFieldsForAllGoods();
 				}
 			},
 
@@ -4276,31 +4448,57 @@ function withTimeout(promise, ms) {
 					return changes;
 				}
 
+				const newShopMap = new Map();
+				newShops.forEach((shop) => {
+					if (shop && shop.store_id != null) {
+						newShopMap.set(String(shop.store_id), shop);
+					}
+				});
+				const queuedKeys = new Set();
+				const pushUpdate = (payload, key) => {
+					if (!queuedKeys.has(key)) {
+						queuedKeys.add(key);
+						changes.updated.push(payload);
+					}
+				};
+
 				// 只对比现有店铺的显示商品
 				oldShops.forEach((oldShop, shopIndex) => {
-					const newShop = newShops.find(shop => shop.store_id === oldShop.store_id);
+					const newShop = newShopMap.get(String(oldShop && oldShop.store_id));
 					if (!newShop || !newShop.store_id) return;
 
-					// 获取显示商品（前10个）
-					const oldVisibleItems = this.getVisibleItems(oldShop);
-					const newVisibleItems = this.getVisibleItems(newShop);
+					// 使用和模板一致的“主商品可见规则”（前10条 + 展开态）
+					const oldVisibleRefs = this.getRenderedVisibleItemRefs(oldShop, shopIndex);
+					const newVisibleRefs = this.getRenderedVisibleItemRefs(newShop, shopIndex);
+					const oldVisibleRecSeq = oldVisibleRefs.map(ref => ref.recId || '').join(',');
+					const newVisibleRecSeq = newVisibleRefs.map(ref => ref.recId || '').join(',');
 
-					// 对比每个显示商品
-					const maxCompare = Math.min(oldVisibleItems.length, newVisibleItems.length, 10);
+					// 可见区的“成员或顺序”变化，直接替换该店铺，避免索引错位导致加减按钮错乱
+					if (oldVisibleRecSeq !== newVisibleRecSeq || oldVisibleRefs.length !== newVisibleRefs.length) {
+						pushUpdate({
+							shopIndex,
+							updateType: 'replaceShop',
+							newShopData: newShop
+						}, `shop:${shopIndex}:replace`);
+						return;
+					}
 
-					for (let i = 0; i < maxCompare; i++) {
-						const oldItem = oldVisibleItems[i];
-						const newItem = newVisibleItems[i];
-
+					// 可见区结构一致时，仅按 rec_id 精准更新变化商品
+					oldVisibleRefs.forEach((oldRef, i) => {
+						const oldItem = oldRef.item;
+						const newRef = newVisibleRefs[i];
+						const newItem = newRef && newRef.item ? newRef.item : null;
+						if (!oldItem || !newItem) return;
 						if (this.itemHasChanged(oldItem, newItem)) {
-							changes.updated.push({
+							pushUpdate({
 								shopIndex,
-								itemIndex: i,
+								recId: oldRef.recId,
+								updateType: 'byRecId',
 								oldData: oldItem,
 								newData: newItem
-							});
+							}, `rec:${shopIndex}:${oldRef.recId}`);
 						}
-					}
+					});
 				});
 
 				changes.hasChanges = changes.updated.length > 0;
@@ -4309,22 +4507,41 @@ function withTimeout(promise, ms) {
 			},
 
 			/**
-			 * 获取店铺的显示商品（前10个）
+			 * 获取和模板渲染一致的主商品可见引用（前10条 + 展开态）
 			 */
-			getVisibleItems(shop) {
+			getRenderedVisibleItemRefs(shop, listIndex) {
 				if (!shop || !shop.new_list || !Array.isArray(shop.new_list)) {
 					return [];
 				}
 
-				const visibleItems = [];
-				for (const act of shop.new_list) {
-					if (act.act_goods_list && Array.isArray(act.act_goods_list)) {
-						visibleItems.push(...act.act_goods_list.slice(0, 10));
-						if (visibleItems.length >= 10) break;
+				const refs = [];
+				const key = this.getStoreExpandKey(shop, listIndex);
+				const expanded = !!this.storeCartExpanded[key];
+				const total = this.getStoreMainGoodsCount(shop);
+				const limit = (total > 10 && !expanded) ? 10 : Number.MAX_SAFE_INTEGER;
+				let flatIndex = 0;
+
+				for (let actIndex = 0; actIndex < shop.new_list.length; actIndex++) {
+					const act = shop.new_list[actIndex];
+					if (!act || !Array.isArray(act.act_goods_list)) continue;
+					for (let itemIndex = 0; itemIndex < act.act_goods_list.length; itemIndex++) {
+						const item = act.act_goods_list[itemIndex];
+						if (flatIndex < limit) {
+							refs.push({
+								recId: this.getItemRecId(item),
+								actIndex,
+								itemIndex,
+								item
+							});
+						}
+						flatIndex += 1;
+						if (flatIndex >= limit && limit !== Number.MAX_SAFE_INTEGER) {
+							return refs;
+						}
 					}
 				}
 
-				return visibleItems.slice(0, 10);
+				return refs;
 			},
 
 			/**
@@ -4340,8 +4557,70 @@ function withTimeout(promise, ms) {
 					oldItem.shop_price !== newItem.shop_price ||
 					oldItem.is_invalid !== newItem.is_invalid ||
 					oldItem.product_number !== newItem.product_number ||
-					oldItem.goods_name !== newItem.goods_name
+					oldItem.goods_name !== newItem.goods_name ||
+					(oldItem.preferential_amount ?? '') !== (newItem.preferential_amount ?? '') ||
+					(oldItem.goods_original_price ?? '') !== (newItem.goods_original_price ?? '') ||
+					(oldItem.coupon_after_price ?? '') !== (newItem.coupon_after_price ?? '') ||
+					(oldItem.coupon_after_price_format ?? oldItem.coupon_after_price_formated ?? oldItem.coupon_after_price_formatted ?? '') !==
+						(newItem.coupon_after_price_format ?? newItem.coupon_after_price_formated ?? newItem.coupon_after_price_formatted ?? '') ||
+					this.getGoodsBenefitTagsSignature(oldItem) !== this.getGoodsBenefitTagsSignature(newItem) ||
+					this.getSimpleDataSignature(oldItem.goods_label) !== this.getSimpleDataSignature(newItem.goods_label) ||
+					this.getSimpleDataSignature(oldItem.goods_label_suspension) !== this.getSimpleDataSignature(newItem.goods_label_suspension) ||
+					this.getSimpleDataSignature(oldItem.act_info) !== this.getSimpleDataSignature(newItem.act_info)
 				);
+			},
+			getItemRecId(item) {
+				if (!item) return '';
+				const recId = item.rec_id ?? item.recid ?? item.recId ?? '';
+				return recId === '' || recId === null || recId === undefined ? '' : String(recId);
+			},
+			getSimpleDataSignature(value) {
+				if (value === undefined || value === null || value === '') return '';
+				let normalized = value;
+				if (typeof normalized === 'string') {
+					const text = normalized.trim();
+					if (!text) return '';
+					if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('[') && text.endsWith(']'))) {
+						try {
+							normalized = JSON.parse(text);
+						} catch (e) {
+							normalized = text;
+						}
+					} else {
+						normalized = text;
+					}
+				}
+				try {
+					return JSON.stringify(normalized);
+				} catch (e) {
+					return String(normalized);
+				}
+			},
+			getGoodsBenefitTagsSignature(item) {
+				if (!item) return '';
+				let tags = item.goods_benefit_tags;
+				if (typeof tags === 'string') {
+					try {
+						tags = JSON.parse(tags);
+					} catch (e) {
+						tags = [];
+					}
+				}
+				if (!Array.isArray(tags) || tags.length === 0) return '';
+				const normalized = tags.map((tag) => {
+					if (!tag || typeof tag !== 'object') return {};
+					const childTexts = Array.isArray(tag.items)
+						? tag.items.map(child => (child && child.text != null ? String(child.text) : '')).join('|')
+						: '';
+					return {
+						type: tag.type || '',
+						text: tag.text || '',
+						show: tag.show === false ? 0 : 1,
+						sort_order: tag.sort_order || 0,
+						items: childTexts
+					};
+				});
+				return this.getSimpleDataSignature(normalized);
 			},
 
 			/**
@@ -4419,8 +4698,14 @@ function withTimeout(promise, ms) {
 
 					// 错开执行时间，避免阻塞UI
 					setTimeout(() => {
-						batch.forEach(({shopIndex, itemIndex, newData}) => {
-							this.updateSingleItem(shopIndex, itemIndex, newData);
+						batch.forEach(({shopIndex, itemIndex, recId, updateType, newData, newShopData}) => {
+							if (updateType === 'replaceShop' && newShopData) {
+								this.replaceSingleShop(shopIndex, newShopData);
+							} else if (updateType === 'byRecId' && recId) {
+								this.updateSingleItemByRecId(shopIndex, recId, newData, itemIndex);
+							} else {
+								this.updateSingleItem(shopIndex, itemIndex, newData);
+							}
 						});
 					}, i * 10);
 				}
@@ -4581,10 +4866,53 @@ function withTimeout(promise, ms) {
 			/**
 			 * 更新单个商品
 			 */
+			updateSingleItemByRecId(shopIndex, recId, newData, fallbackItemIndex = -1) {
+				try {
+					const shop = this.goodsCartList[shopIndex];
+					if (!shop || !Array.isArray(shop.new_list)) return;
+					this.syncGoodsBasePriceFields(newData);
+
+					let found = false;
+					for (const act of shop.new_list) {
+						if (!act || !Array.isArray(act.act_goods_list)) continue;
+						const targetIndex = act.act_goods_list.findIndex((item) => this.getItemRecId(item) === String(recId));
+						if (targetIndex >= 0) {
+							this.$set(act.act_goods_list, targetIndex, newData);
+							found = true;
+							break;
+						}
+					}
+
+					if (!found && typeof fallbackItemIndex === 'number' && fallbackItemIndex >= 0) {
+						this.updateSingleItem(shopIndex, fallbackItemIndex, newData);
+					}
+				} catch (error) {
+				}
+			},
+			replaceSingleShop(shopIndex, newShopData) {
+				try {
+					if (!Array.isArray(this.goodsCartList)) return;
+					if (shopIndex < 0 || shopIndex >= this.goodsCartList.length) return;
+					if (newShopData && Array.isArray(newShopData.new_list)) {
+						newShopData.new_list.forEach((act) => {
+							if (!act || !Array.isArray(act.act_goods_list)) return;
+							act.act_goods_list.forEach((goods) => {
+								this.syncGoodsBasePriceFields(goods);
+							});
+						});
+					}
+					this.$set(this.goodsCartList, shopIndex, newShopData);
+				} catch (error) {
+				}
+			},
+			/**
+			 * 更新单个商品
+			 */
 			updateSingleItem(shopIndex, itemIndex, newData) {
 				try {
 					const shop = this.goodsCartList[shopIndex];
 					if (!shop || !shop.new_list) return;
+					this.syncGoodsBasePriceFields(newData);
 
 					// 找到对应的活动和商品位置
 					let currentIndex = 0;
@@ -4640,6 +4968,7 @@ function withTimeout(promise, ms) {
 			      // 如果数据还没有恢复，或者数据不一致，才恢复数据
 			      if (currentListLength !== cacheListLength) {
 			        that.$store.commit('goodsCartList', { data: cache.goodsCartList });
+			        that.ensureBasePriceFieldsForAllGoods();
 			        that.lastRecId = cache.lastRecId;
 			        that.isFirstLoad = false;
 			        
@@ -4648,10 +4977,10 @@ function withTimeout(promise, ms) {
 			          that.handleSelectionAfterFetch();
 			          that._initialized = true;
 			          // 延迟执行 changeGoods
-			          if (that.goodsCartList && that.goodsCartList.length > 0) {
-			            setTimeout(() => {
-			              that.changeGoods();
-			            }, 50);
+				          if (that.goodsCartList && that.goodsCartList.length > 0) {
+				            setTimeout(() => {
+				              that.changeGoods(silent);
+				            }, 50);
 			          } else {
 			            that.loading = false;
 			          }
@@ -4659,13 +4988,14 @@ function withTimeout(promise, ms) {
 			      } else {
 			        // 数据已经恢复，只需要确保状态正确
 			        if (!that._initialized) {
+			          that.ensureBasePriceFieldsForAllGoods();
 			          that.$nextTick(() => {
 			            that.handleSelectionAfterFetch();
 			            that._initialized = true;
-			            if (that.goodsCartList && that.goodsCartList.length > 0) {
-			              setTimeout(() => {
-			                that.changeGoods();
-			              }, 50);
+				            if (that.goodsCartList && that.goodsCartList.length > 0) {
+				              setTimeout(() => {
+				                that.changeGoods(silent);
+				              }, 50);
 			            } else {
 			              that.loading = false;
 			            }
@@ -4718,6 +5048,7 @@ function withTimeout(promise, ms) {
 			    if (isLoggedInForSave) {
 			      that.saveCartCache(that.goodsCartList, lastRecId);
 			    }
+			    that.ensureBasePriceFieldsForAllGoods();
 
 
 			    // 【优化问题2】延迟执行复杂的数据处理，避免阻塞渲染
@@ -4755,10 +5086,12 @@ function withTimeout(promise, ms) {
 			      }
 			      finishLoading();
 			    }).catch((err) => {
-			      that.$store.commit('goodsCartList', { data: [] });
+			      const hasCurrentData = Array.isArray(that.goodsCartList) && that.goodsCartList.length > 0;
+			      if (!silent && !hasCurrentData) {
+			        that.$store.commit('goodsCartList', { data: [] });
+			      }
 			      that.dataLoading = false;
 			      that.loading = false;
-			      that.clearCartCache();
 			      if (err && err.message === '请求超时') {
 			        uni.showToast({ title: '请求超时，请重试', icon: 'none' });
 			      }
@@ -4876,7 +5209,7 @@ function withTimeout(promise, ms) {
 		// this.disabled =true
 		let clength = []
 		//是否有失效商品
-		if (is_invalid == 1 || product_number == 0) return;
+		if (is_invalid == 1 || Number(product_number || 0) <= 0) return;
 
 	// 根据传入的 is_checked 参数来决定新的选中状态（取反）
 	const newCheckedState = !is_checked;
@@ -5164,6 +5497,30 @@ function withTimeout(promise, ms) {
 			//商品勾选变化更新购物车列表
 			changeGoods(silent = false) {
 				var that = this;
+				const reckonReqId = ++CART_RECKON_REQ_SEQ;
+				const reckonStartAt = Date.now();
+				if (that._isReckoningPrice) {
+					that._pendingReckon = true;
+					that._pendingReckonSilent = that._pendingReckonSilent && silent;
+					console.warn('[cart][reckon] 请求排队中，跳过本次立即执行', {
+						reqId: reckonReqId,
+						silent,
+						pendingSilent: that._pendingReckonSilent
+					});
+					return;
+				}
+				that._isReckoningPrice = true;
+				const finishReckon = () => {
+					that._isReckoningPrice = false;
+					if (that._pendingReckon) {
+						const nextSilent = that._pendingReckonSilent;
+						that._pendingReckon = false;
+						that._pendingReckonSilent = true;
+						that.$nextTick(() => {
+							that.changeGoods(nextSilent);
+						});
+					}
+				};
 				
 				// 立即检查是否有选中商品 - 这是关键修复
 				const hasSelected = that.immediatelyCheckSelectedGoods();
@@ -5185,6 +5542,7 @@ function withTimeout(promise, ms) {
 					that.clearCouponAfterPriceForAllGoods();
 				that.checkAllOper();
 				that.saveSelectionState();
+					finishReckon();
 					return;
 				}
 				
@@ -5198,21 +5556,44 @@ function withTimeout(promise, ms) {
 			that.checkedGoodsId = [];
 
 			// 收集选中的商品ID，并过滤掉失效商品
-			const invalidRecIds = []; // 收集失效商品的rec_id
+			const invalidRecIds = new Set(); // 收集失效商品的rec_id
 			that.goodsCartList.forEach(store => {
 				store.new_list.forEach(act => {
 					act.act_goods_list.forEach(goods => {
-						if (goods.is_invalid == 1) {
-							invalidRecIds.push(goods.rec_id);
+						if (goods.is_invalid == 1 || Number(goods.product_number || 0) <= 0) {
+							invalidRecIds.add(String(goods.rec_id));
 						}
 					});
 				});
 			});
+
+			// 清理选中数组：库存为0或失效商品与已删除商品不允许保留选中态
+			if (Array.isArray(that.checkedGoods)) {
+				that.checkedGoods.forEach((list, storeIndex) => {
+					if (!Array.isArray(list)) return;
+					const filtered = list.filter((recId) => !invalidRecIds.has(String(recId)) && !that.delList.includes(recId));
+					if (filtered.length !== list.length) {
+						that.$set(that.checkedGoods, storeIndex, filtered);
+					}
+				});
+			}
+
+			const selectedRecIdSet = new Set();
+			if (Array.isArray(that.checkedGoods)) {
+				that.checkedGoods.forEach((list) => {
+					if (!Array.isArray(list)) return;
+					list.forEach((recId) => {
+						if (recId !== undefined && recId !== null && recId !== '') {
+							selectedRecIdSet.add(String(recId));
+						}
+					});
+				});
+			}
 			
 			that.checkedGoods.forEach((v, i) => {
 				v.forEach(item => {
 					// 确保不添加失效商品的rec_id
-					if (!invalidRecIds.includes(item)) {
+					if (!invalidRecIds.has(String(item))) {
 						that.checkedGoodsId.push(item);
 					}
 				});
@@ -5225,7 +5606,11 @@ function withTimeout(promise, ms) {
 				
 			// 判断是否全选（这里的 checkedAll 结合 checkedShop/checkedGoods 才是真正的业务含义）
 			const isAllChecked = that.checkedAll;
-			const inGlobalAllMode = that._globalAllSelectedMode === true;
+			// 全局全选模式必须以“当前仍是全选”作为前提，避免返回页面时误传整店 ru_id
+			const inGlobalAllMode = that._globalAllSelectedMode === true && isAllChecked === true;
+			if (!isAllChecked && that._globalAllSelectedMode === true) {
+				that._globalAllSelectedMode = false;
+			}
 			
 			// 统计数量和种类
 			var indexOne = 0;        // 有选中商品的店铺数量
@@ -5253,9 +5638,18 @@ function withTimeout(promise, ms) {
 
 						// 只考虑"可选"的商品：非失效 且 有库存
 						const selectable = item.product_number > 0 && item.is_invalid != 1;
-						if (!selectable) continue;
+						if (!selectable) {
+							if (item.checked) {
+								item.checked = false;
+							}
+							continue;
+						}
 
-						if (item.checked === true) {
+						const isSelected = selectedRecIdSet.has(String(item.rec_id));
+						if (item.checked !== isSelected) {
+							item.checked = isSelected;
+						}
+						if (isSelected) {
 							storeHasChecked = true;
 							storeCheckedRecIds.push(item.rec_id);
 
@@ -5291,7 +5685,7 @@ function withTimeout(promise, ms) {
 								if (!g2) continue;
 								const selectable2 = g2.product_number > 0 && g2.is_invalid != 1;
 								// 在全选模式下：该商品可选但当前未勾选 → 需要排除
-								if (selectable2 && g2.checked !== true) {
+								if (selectable2 && !selectedRecIdSet.has(String(g2.rec_id))) {
 									excludeRecIdList.push(g2.rec_id);
 								}
 							}
@@ -5357,9 +5751,30 @@ function withTimeout(promise, ms) {
 
 			// 保存indexOne的值，用于价格计算完成后的回调
 			const hasSelectedGoods = indexOne > 0;
+			console.log('[cart][reckon] 请求开始', {
+				reqId: reckonReqId,
+				silent,
+				isAllChecked,
+				inGlobalAllMode,
+				selectedStoreCount: indexOne,
+				selectedGoodsTypes: localGoodsTypes,
+				selectedGoodsCount: localGoodsCount,
+				ruIdCount: ruIdList.length,
+				recIdCount: recIdList.length,
+				excludeRecIdCount: excludeRecIdList.length,
+				params: requestParams
+			});
 				
 			const pricePromise = that.$store.dispatch('setCartPrice', requestParams);
 			withTimeout(pricePromise, REQUEST_TIMEOUT_MS).then(res => {
+				console.log('[cart][reckon] 请求成功', {
+					reqId: reckonReqId,
+					elapsedMs: Date.now() - reckonStartAt,
+					status: res && res.status,
+					hasData: !!(res && res.data),
+					settlementLoaded: !!(res && res.data && res.data.settlement),
+					returnRecId: res && res.data ? res.data.rec_id : undefined
+				});
 				// 静默更新模式下，不修改 loading 状态
 				if (!silent) {
 				that.loading = false;
@@ -5373,6 +5788,7 @@ function withTimeout(promise, ms) {
 					that.totalPrice = parseFloat(priceData.total_price || 0).toFixed(2);
 					that.shipping_fee = parseFloat(priceData.shipping_fee || 0).toFixed(2);
 					that.priceDtailnum = parseFloat(priceData.goods_price || 0).toFixed(2);
+					// 默认兜底：使用旧字段，若 settlement 可用会在下方覆盖为“优惠总额”
 					that.totalDiscount = parseFloat(priceData.store_cou_price || 0);
 					
 					// 赠品相关：从结算接口中缓存数据（不直接弹窗，仍由用户点击“领取赠品”触发）
@@ -5439,6 +5855,8 @@ function withTimeout(promise, ms) {
 						settlementByStore.grand = priceData.settlement.grand || {};
 						that._settlementData = settlementByStore;
 						that._settlementDataLoaded = true; // 标记 settlement 数据已加载完成
+						// 外层“已优惠”与金额明细弹窗“优惠总额”保持一致
+						that.totalDiscount = parseFloat(that.getPriceDetailAllStoresPromotionDiscount() || 0);
 						console.log('[cart] reckon_cartgoods settlement 数据已缓存 =>', settlementByStore);
 					}
 					
@@ -5447,6 +5865,10 @@ function withTimeout(promise, ms) {
 					that.applyCouponAfterPriceToCartGoods(priceData);
 					
 					that.applyCartTotalsFromResponse(priceData, localGoodsCount, localGoodsTypes);
+					const tokenForCache = uni.getStorageSync('token');
+					if (tokenForCache && tokenForCache !== '') {
+						that.saveCartCache(that.goodsCartList, that.lastRecId);
+					}
 					
 					// 保存最新的服务端统计，供后续增减数量时使用
 					const goodsNumTotalFromServer = that.normalizeNumericValue(priceData.goods_num_total);
@@ -5477,7 +5899,16 @@ function withTimeout(promise, ms) {
 					// 价格计算失败，保持禁用状态
 					that.disabled = true;
 				}
+				finishReckon();
 			}).catch(err => {
+				console.error('[cart][reckon] 请求失败', {
+					reqId: reckonReqId,
+					elapsedMs: Date.now() - reckonStartAt,
+					timeoutMs: REQUEST_TIMEOUT_MS,
+					message: err && err.message ? err.message : err,
+					silent,
+					params: requestParams
+				});
 				that.loading = false;
 				that.totalPriceTiping = true;
 				that.totalPrice = '0.00';
@@ -5485,6 +5916,7 @@ function withTimeout(promise, ms) {
 				if (err && err.message === '请求超时') {
 					uni.showToast({ title: '请求超时，请重试', icon: 'none' });
 				}
+				finishReckon();
 			});
 				// if (nums >= 200) {
 				// 	uni.showToast({
@@ -5552,6 +5984,42 @@ function withTimeout(promise, ms) {
 		const parsed = Number(cleaned);
 		return Number.isNaN(parsed) ? NaN : parsed;
 	},
+	syncGoodsBasePriceFields(item) {
+		if (!item || typeof item !== 'object') return;
+		const baseCouponAfterPrice = item.coupon_after_price ?? '';
+		const baseCouponAfterPriceFormat = item.coupon_after_price_format ?? item.coupon_after_price_formated ?? item.coupon_after_price_formatted ?? '';
+		const basePreferentialAmount = item.preferential_amount ?? item.preferentialAmount ?? '';
+		const baseGoodsOriginalPrice = item.goods_original_price ?? '';
+		this.$set(item, '_base_coupon_after_price', baseCouponAfterPrice);
+		this.$set(item, '_base_coupon_after_price_format', baseCouponAfterPriceFormat);
+		this.$set(item, '_base_preferential_amount', basePreferentialAmount);
+		this.$set(item, '_base_goods_original_price', baseGoodsOriginalPrice);
+	},
+	restoreGoodsPriceFromBase(item) {
+		if (!item || typeof item !== 'object') return;
+		const couponAfterPrice = item._base_coupon_after_price !== undefined ? item._base_coupon_after_price : (item.coupon_after_price ?? '');
+		const couponAfterPriceFormat = item._base_coupon_after_price_format !== undefined ? item._base_coupon_after_price_format : (item.coupon_after_price_format ?? item.coupon_after_price_formated ?? item.coupon_after_price_formatted ?? '');
+		const preferentialAmount = item._base_preferential_amount !== undefined ? item._base_preferential_amount : (item.preferential_amount ?? item.preferentialAmount ?? '');
+		const goodsOriginalPrice = item._base_goods_original_price !== undefined ? item._base_goods_original_price : (item.goods_original_price ?? '');
+		this.$set(item, 'coupon_after_price', couponAfterPrice);
+		this.$set(item, 'coupon_after_price_format', couponAfterPriceFormat);
+		this.$set(item, 'preferential_amount', preferentialAmount);
+		this.$set(item, 'goods_original_price', goodsOriginalPrice);
+	},
+	ensureBasePriceFieldsForAllGoods() {
+		try {
+			if (!Array.isArray(this.goodsCartList)) return;
+			this.goodsCartList.forEach((store) => {
+				if (!store || !Array.isArray(store.new_list)) return;
+				store.new_list.forEach((act) => {
+					if (!act || !Array.isArray(act.act_goods_list)) return;
+					act.act_goods_list.forEach((goods) => {
+						this.syncGoodsBasePriceFields(goods);
+					});
+				});
+			});
+		} catch (e) {}
+	},
 
 	// 券后价：由 reckon_cartgoods 返回的 coupon_after_price 字段决定
 	hasCouponAfterPrice(item) {
@@ -5571,6 +6039,22 @@ function withTimeout(promise, ms) {
 		if (Number.isNaN(num)) return '';
 		return '¥' + num.toFixed(2);
 	},
+	hasGoodsOriginalPrice(item) {
+		if (!item) return false;
+		const v = item.goods_original_price ?? '';
+		if (v === null || v === undefined) return false;
+		const str = String(v).trim();
+		if (str === '') return false;
+		const num = this.normalizeNumericValue(v);
+		return !Number.isNaN(num) && num > 0;
+	},
+	getGoodsOriginalPriceFormat(item) {
+		if (!item) return '';
+		const raw = item.goods_original_price ?? '';
+		const num = this.normalizeNumericValue(raw);
+		if (Number.isNaN(num)) return '';
+		return '¥' + num.toFixed(2);
+	},
 	hasPreferentialAmount(item) {
 		if (!item) return false;
 		const v = item.preferential_amount ?? item.preferentialAmount ?? '';
@@ -5578,7 +6062,7 @@ function withTimeout(promise, ms) {
 		const str = String(v).trim();
 		if (str === '') return false;
 		const num = this.normalizeNumericValue(str);
-		return !Number.isNaN(num);
+		return !Number.isNaN(num) && Math.abs(num) > 0;
 	},
 	getPreferentialAmountFormat(item) {
 		if (!item) return '0.00';
@@ -5597,10 +6081,8 @@ function withTimeout(promise, ms) {
 					if (!act || !Array.isArray(act.act_goods_list)) return;
 					act.act_goods_list.forEach(goods => {
 						if (!goods) return;
-						// 用 $set 确保响应式
-						this.$set(goods, 'coupon_after_price', '');
-						this.$set(goods, 'coupon_after_price_format', '');
-						this.$set(goods, 'preferential_amount', '');
+						// 取消选中时，回退到 goodslist 基线值，而不是直接清空
+						this.restoreGoodsPriceFromBase(goods);
 					});
 				});
 			});
@@ -6190,50 +6672,162 @@ function withTimeout(promise, ms) {
 					}
 				})
 			},
-			// 获取商品的赠品信息
-		getItemGiftInfo(item, storeList) {
-			if (!item || !storeList) return null;
-			
-			// 获取该店铺的赠品活动ID
-			const actIds = this.getReckonGiftActIds(storeList);
-			if (!actIds.length) return null;
-			
-			// 获取第一个赠品活动的信息
-			const firstActId = actIds[0];
-			const minAmount = this.getReckonMinAmount(firstActId);
-			
-			return {
-				actId: firstActId,
-				minAmount: minAmount,
-				saveAmount: this._reckonAvailableFav?.[firstActId]?.act_type_ext || 0
-			};
-		},
-
-		// 商品级赠品查看
-		receiveGiftByItem(item, storeList) {
-			if (!item || !storeList) return;
-			const giftInfo = this.getItemGiftInfo(item, storeList);
-			if (!giftInfo) return;
-			
-			// 复用现有的 receiveGiftByStore 方法
-			this.receiveGiftByStore(storeList);
-		},
-
-		// 是否有结算接口返回的赠品活动（按店铺）
+			normalizeGiftActId(value) {
+				const n = Number(value);
+				return Number.isNaN(n) ? null : n;
+			},
+			getGiftCursorKey(item, storeList) {
+				const storeId = storeList && (storeList.store_id || storeList.ru_id || storeList.cart_ru_id || 0);
+				const recId = item && item.rec_id;
+				if (!storeId || recId === undefined || recId === null) return '';
+				return `${storeId}_${recId}`;
+			},
+			getStoreGiftGoodsList(storeList) {
+				if (!storeList) return [];
+				if (Array.isArray(storeList.gift_goods_list) && storeList.gift_goods_list.length > 0) {
+					return storeList.gift_goods_list;
+				}
+				// 兜底：部分接口把 gift_goods_list 挂在商品下
+				const merged = [];
+				const dedup = new Set();
+				const actList = Array.isArray(storeList.new_list) ? storeList.new_list : [];
+				actList.forEach(act => {
+					const goodsList = Array.isArray(act && act.act_goods_list) ? act.act_goods_list : [];
+					goodsList.forEach(g => {
+						const gifts = Array.isArray(g && g.gift_goods_list) ? g.gift_goods_list : [];
+						gifts.forEach(giftItem => {
+							const key = `${giftItem.is_gift || ''}_${giftItem.goods_id || giftItem.id || ''}`;
+							if (dedup.has(key)) return;
+							dedup.add(key);
+							merged.push(giftItem);
+						});
+					});
+				});
+				return merged;
+			},
+			parseGiftSerialized(giftRaw, actId) {
+				if (!giftRaw) return [];
+				const text = String(giftRaw).replace(/\\"/g, '"');
+				const itemReg = /s:2:"id";s:\d+:"([^"]*)";s:4:"name";s:\d+:"([^"]*)";s:5:"price";(?:i|d):([^;]+);s:3:"num";i:(\d+);/g;
+				const list = [];
+				let m;
+				while ((m = itemReg.exec(text)) !== null) {
+					const goodsId = m[1];
+					const goodsName = m[2];
+					const goodsPrice = Number(m[3]);
+					const goodsNum = Number(m[4]);
+					list.push({
+						goods_id: goodsId,
+						id: goodsId,
+						goods_name: goodsName,
+						name: goodsName,
+						goods_price: Number.isNaN(goodsPrice) ? 0 : goodsPrice,
+						goods_price_format: Number.isNaN(goodsPrice) ? '¥0.00' : `¥${goodsPrice.toFixed(2)}`,
+						goods_number: Number.isNaN(goodsNum) ? 1 : goodsNum,
+						num: Number.isNaN(goodsNum) ? 1 : goodsNum,
+						is_gift: actId
+					});
+				}
+				return list;
+			},
+			getStoreGiftActivities(storeList) {
+				if (!storeList) return [];
+				const favMap = (storeList && typeof storeList.available_favourable === 'object' && storeList.available_favourable) ? storeList.available_favourable : {};
+				const giftGoodsList = this.getStoreGiftGoodsList(storeList);
+				const byActId = {};
+				giftGoodsList.forEach(g => {
+					const actId = this.normalizeGiftActId(g && (g.is_gift ?? g.act_id));
+					if (actId === null) return;
+					if (!byActId[actId]) byActId[actId] = [];
+					byActId[actId].push(g);
+				});
+				const list = [];
+				Object.keys(favMap).forEach((k) => {
+					const fav = favMap[k];
+					if (!fav || Number(fav.act_type) !== 0) return; // 只取满赠活动
+					const actId = this.normalizeGiftActId(fav.act_id ?? k);
+					if (actId === null) return;
+					let gifts = Array.isArray(byActId[actId]) ? byActId[actId] : [];
+					if (gifts.length === 0) {
+						gifts = this.parseGiftSerialized(fav.gift, actId);
+					}
+					list.push({
+						actId,
+						actName: fav.act_name || '',
+						minAmount: Number(fav.min_amount || 0),
+						actTypeExt: Number(fav.act_type_ext || 0),
+						canyuGoodsList: fav.canyu_goods_list || {},
+						gifts
+					});
+				});
+				return list.sort((a, b) => (a.minAmount || 0) - (b.minAmount || 0));
+			},
+			getItemGiftActivities(item, storeList) {
+				if (!item || !storeList) return [];
+				const storeActs = this.getStoreGiftActivities(storeList);
+				if (!storeActs.length) return [];
+				const itemActIds = Array.isArray(item.act_id) ? item.act_id.map(v => this.normalizeGiftActId(v)).filter(v => v !== null) : [];
+				const itemActSet = new Set(itemActIds);
+				const recId = item.rec_id;
+				const matched = storeActs.filter(act => {
+					if (itemActSet.has(act.actId)) return true;
+					const canyuMap = act.canyuGoodsList && typeof act.canyuGoodsList === 'object' ? act.canyuGoodsList : {};
+					return recId !== undefined && recId !== null && Object.prototype.hasOwnProperty.call(canyuMap, String(recId));
+				});
+				return matched.filter(act => Array.isArray(act.gifts) && act.gifts.length > 0);
+			},
+			getItemGiftActCount(item, storeList) {
+				return this.getItemGiftActivities(item, storeList).length;
+			},
+			getItemGiftInfo(item, storeList) {
+				const acts = this.getItemGiftActivities(item, storeList);
+				if (!acts.length) return null;
+				const key = this.getGiftCursorKey(item, storeList);
+				let idx = key && this.itemGiftActIndexMap[key] != null ? Number(this.itemGiftActIndexMap[key]) : 0;
+				if (Number.isNaN(idx) || idx < 0) idx = 0;
+				idx = idx % acts.length;
+				const act = acts[idx];
+				return {
+					actId: act.actId,
+					actName: act.actName,
+					minAmount: act.minAmount,
+					saveAmount: act.actTypeExt,
+					gifts: act.gifts,
+					index: idx,
+					total: acts.length
+				};
+			},
+			switchItemGiftAct(item, storeList) {
+				const acts = this.getItemGiftActivities(item, storeList);
+				if (acts.length <= 1) return;
+				const key = this.getGiftCursorKey(item, storeList);
+				if (!key) return;
+				const current = this.itemGiftActIndexMap[key] != null ? Number(this.itemGiftActIndexMap[key]) : 0;
+				const next = (Number.isNaN(current) ? 0 : current + 1) % acts.length;
+				this.$set(this.itemGiftActIndexMap, key, next);
+			},
+			// 商品级赠品查看：按当前商品当前活动打开弹层
+			receiveGiftByItem(item, storeList) {
+				if (!item || !storeList) return;
+				const giftInfo = this.getItemGiftInfo(item, storeList);
+				if (!giftInfo) return;
+				this.receiveGiftByStore(storeList, giftInfo.actId);
+			},
+			// 是否有满赠活动（按店铺）
 			hasStoreReckonGifts(storeList) {
-				if (!storeList || !this._reckonStoreGiftActIds) return false;
-				const ids = this._reckonStoreGiftActIds[storeList.store_id];
-				return Array.isArray(ids) && ids.length > 0;
+				return this.getStoreGiftActivities(storeList).length > 0;
 			},
-			// 获取该店铺的赠品活动ID列表
+			// 获取该店铺满赠活动ID列表
 			getReckonGiftActIds(storeList) {
-				if (!storeList || !this._reckonStoreGiftActIds) return [];
-				return this._reckonStoreGiftActIds[storeList.store_id] || [];
+				return this.getStoreGiftActivities(storeList).map(v => v.actId);
 			},
-			// 获取活动满额（来自结算接口）
-			getReckonMinAmount(actId) {
-				const fav = this._reckonAvailableFav && this._reckonAvailableFav[actId];
-				return (fav && fav.min_amount != null) ? fav.min_amount : 0;
+			// 获取活动满额
+			getReckonMinAmount(actId, storeList) {
+				const id = this.normalizeGiftActId(actId);
+				if (id === null) return 0;
+				const acts = this.getStoreGiftActivities(storeList);
+				const hit = acts.find(v => v.actId === id);
+				return hit ? hit.minAmount : 0;
 			},
 			// 该店已选商品金额是否达到任一赠品活动门槛（用于控制赠品文案是否展示）；未选任何商品时一律不展示
 			storeSelectedAmountReachesGift(storeList) {
@@ -6248,7 +6842,7 @@ function withTimeout(promise, ms) {
 				});
 				if (total <= 0) return false;
 				const actIds = this.getReckonGiftActIds(storeList);
-				return actIds.some(actId => total >= this.getReckonMinAmount(actId));
+				return actIds.some(actId => total >= this.getReckonMinAmount(actId, storeList));
 			},
 			// 判断该店是否至少有一个商品被勾选，用于控制赠品文案在完全未选中时直接不展示
 			storeHasCheckedGoods(storeList) {
@@ -6302,50 +6896,50 @@ function withTimeout(promise, ms) {
 				const key = this.getStoreExpandKey(storeList, listIndex);
 				return !!this.storeCartExpanded[key];
 			},
+			getStoreCollapseAnchorSelector(storeList) {
+				try {
+					const acts = (storeList && Array.isArray(storeList.new_list)) ? storeList.new_list : [];
+					let flatIndex = 0;
+					for (let a = 0; a < acts.length; a++) {
+						const goodsList = Array.isArray(acts[a].act_goods_list) ? acts[a].act_goods_list : [];
+						for (let g = 0; g < goodsList.length; g++) {
+							if (flatIndex === 9) {
+								const recId = this.getItemRecId(goodsList[g]);
+								return recId ? ('#cart-item-' + recId) : '';
+							}
+							flatIndex += 1;
+						}
+					}
+				} catch (e) {}
+				return '';
+			},
 			toggleStoreCartExpand(listIndex, storeList) {
 				const key = this.getStoreExpandKey(storeList, listIndex);
-				this.$set(this.storeCartExpanded, key, !this.storeCartExpanded[key]);
+				const nextExpanded = !this.storeCartExpanded[key];
+				const collapseAnchorSelector = nextExpanded ? '' : this.getStoreCollapseAnchorSelector(storeList);
+				this.$set(this.storeCartExpanded, key, nextExpanded);
+				if (!nextExpanded && collapseAnchorSelector) {
+					this.$nextTick(() => {
+						setTimeout(() => {
+							uni.pageScrollTo({
+								selector: collapseAnchorSelector,
+								duration: 250
+							});
+						}, 30);
+					});
+				}
 			},
-			// 店铺优惠合计测试数据（对齐 checkout.js showStoreDiscountDetail，接接口后替换）
-			getStoreDiscountMockPayload(storeList) {
-				const name = (storeList && storeList.store_name) ? String(storeList.store_name) : '';
-				if (name.indexOf('诺真') >= 0 || name.indexOf('四叶草') >= 0) {
-					return {
-						items: [
-							{ type: 'manjian', label: '满减优惠', amount: '-¥30.00' },
-							{ type: 'coupon', label: '优惠券（满99减10）', amount: '-¥10.00' },
-							{ type: 'time', label: '限时折扣', amount: '-¥5.50' }
-						],
-						total: '45.50'
-					};
-				}
-				if (name.indexOf('杜蕾斯') >= 0) {
-					return {
-						items: [
-							{ type: 'manjian', label: '满减优惠（满199减20）', amount: '-¥20.00' },
-							{ type: 'coupon', label: '优惠券', amount: '-¥10.00' },
-							{ type: 'time', label: '限时抢折扣', amount: '-¥5.00' }
-						],
-						total: '35.00'
-					};
-				}
-				if (name.indexOf('冈本') >= 0) {
-					return {
-						items: [
-							{ type: 'manjian', label: '满减优惠（满99减10）', amount: '-¥10.00' },
-							{ type: 'coupon', label: '新人专享券', amount: '-¥5.00' },
-							{ type: 'coupon', label: '优惠券', amount: '-¥5.00' }
-						],
-						total: '20.00'
-					};
-				}
-				return {
-					items: [
-						{ type: 'manjian', label: '满减优惠', amount: '-¥18.00' },
-						{ type: 'coupon', label: '店铺优惠券', amount: '-¥8.50' }
-					],
-					total: '26.50'
-				};
+			// —— 购物车优惠明细展开/收起 ——
+			hasCartDiscountActivityChildren() {
+				return (this.getPriceDetailFullReduction() > 0) ||
+					   (this.getPriceDetailDiscount() > 0) ||
+					   (this.getPriceDetailPromotionDiscountAmount() > 0) ||
+					   (this.getPriceDetailBlackCardDiscountAmount() > 0) ||
+					   (this.getPriceDetailCoupon() > 0);
+			},
+			toggleCartDiscountActivity() {
+				if (!this.hasCartDiscountActivityChildren()) return;
+				this.cartDiscountActivityExpanded = !this.cartDiscountActivityExpanded;
 			},
 			getStoreDiscountTotalTest(storeList) {
 				if (!storeList) return '0.00';
@@ -6354,15 +6948,16 @@ function withTimeout(promise, ms) {
 				if (settlement && settlement.store_promotion_discount_total != null) {
 					return parseFloat(settlement.store_promotion_discount_total).toFixed(2);
 				}
-				// 降级到 mock 数据
-				return this.getStoreDiscountMockPayload(storeList).total;
+				return '0.00';
+			},
+			hasStoreDiscountDetail(storeList) {
+				return this.storeHasCheckedGoods(storeList) && this.getStoreDiscountTotalTest(storeList) > 0;
 			},
 			openStoreDiscountDetail(storeList) {
 				if (!storeList) return;
 				const storeId = storeList.store_id || storeList.ru_id;
 				const settlement = this._settlementData && this._settlementData[storeId];
 				
-				// 使用真实数据或降级到 mock 数据
 				let detailItems = [];
 				let totalAmount = '0.00';
 				
@@ -6375,10 +6970,7 @@ function withTimeout(promise, ms) {
 					}));
 					totalAmount = parseFloat(settlement.store_promotion_discount_total || 0).toFixed(2);
 				} else {
-					// 降级到 mock 数据
-					const mock = this.getStoreDiscountMockPayload(storeList);
-					detailItems = mock.items;
-					totalAmount = mock.total;
+					return;
 				}
 				
 				this.storeDiscountDetailStore = storeList;
@@ -6426,6 +7018,32 @@ function withTimeout(promise, ms) {
 				}
 				return [];
 			},
+			getStoreRowPromotionDiscount(store) {
+				if (!store || typeof store !== 'object') return '0.00';
+				const raw = store.store_promotion_discount_total;
+				const num = parseFloat(raw || 0);
+				return Number.isNaN(num) ? '0.00' : num.toFixed(2);
+			},
+			hasStoreRowPromotionDiscount(store) {
+				return parseFloat(this.getStoreRowPromotionDiscount(store)) > 0;
+			},
+			getPriceDetailAllStoresPromotionDiscount() {
+				const grand = this._settlementData && this._settlementData.grand ? this._settlementData.grand : null;
+				if (grand && grand.all_stores_promotion_discount_total != null) {
+					const v = parseFloat(grand.all_stores_promotion_discount_total || 0);
+					if (!Number.isNaN(v)) return v;
+				}
+				// 兼容后端暂未回传新字段时，前端按店铺行合计兜底
+				const rows = this.getPriceDetailStoreRows();
+				if (!rows.length) return 0;
+				return rows.reduce((sum, row) => {
+					const n = parseFloat(row && row.store_promotion_discount_total || 0);
+					return sum + (Number.isNaN(n) ? 0 : n);
+				}, 0);
+			},
+			getPriceDetailAllStoresPromotionDiscountFormat() {
+				return this.getPriceDetailAllStoresPromotionDiscount().toFixed(2);
+			},
 			
 			// 价格明细弹窗：获取满减优惠
 			getPriceDetailFullReduction() {
@@ -6442,6 +7060,22 @@ function withTimeout(promise, ms) {
 				}
 				return '0.00';
 			},
+
+			// 价格明细弹窗：获取促销折扣
+			getPriceDetailPromotionDiscountAmount() {
+				if (this._settlementData && this._settlementData.grand) {
+					return parseFloat(this._settlementData.grand.promotion_discount_amount || 0).toFixed(2);
+				}
+				return '0.00';
+			},
+
+			// 价格明细弹窗：获取黑卡优惠
+			getPriceDetailBlackCardDiscountAmount() {
+				if (this._settlementData && this._settlementData.grand) {
+					return parseFloat(this._settlementData.grand.black_card_discount_amount || 0).toFixed(2);
+				}
+				return '0.00';
+			},
 			
 			// 价格明细弹窗：获取优惠券
 			getPriceDetailCoupon() {
@@ -6453,10 +7087,9 @@ function withTimeout(promise, ms) {
 			
 			// 价格明细弹窗：获取总优惠
 			getPriceDetailTotalDiscount() {
-				if (this._settlementData && this._settlementData.grand) {
-					return parseFloat(this._settlementData.grand.total_promotion_discount || 0);
-				}
-				return 0;
+				// 统一使用“优惠总额”（all_stores_promotion_discount_total）口径
+				// 保证抽屉头部金额与上方“优惠总额”完全一致
+				return this.getPriceDetailAllStoresPromotionDiscount();
 			},
 			
 			// 价格明细弹窗：获取运费
@@ -6477,62 +7110,41 @@ function withTimeout(promise, ms) {
 			// 取该店第一个赠品活动的满额（用于文案只显示一行）
 			getReckonFirstMinAmount(storeList) {
 				const actIds = this.getReckonGiftActIds(storeList);
-				return actIds.length ? this.getReckonMinAmount(actIds[0]) : 0;
+				return actIds.length ? this.getReckonMinAmount(actIds[0], storeList) : 0;
 			},
-			// 按店铺打开赠品弹层：合并该店所有赠品活动的赠品，只显示一个「查看赠品」入口，弹层内展示全部赠品
-			receiveGiftByStore(storeList) {
+			// 按店铺打开赠品弹层：支持按活动打开；未指定时默认打开该店第一个活动
+			receiveGiftByStore(storeList, targetActId = null) {
 				if (!storeList) return
-				const actIds = this.getReckonGiftActIds(storeList)
-				if (!actIds.length) return
-				// 合并该店所有活动下的赠品（接口可能返回多条，如 is_gift 1302、1303 各一条）
-				const rawGifts = []
-				actIds.forEach(actId => {
-					const list = this._reckonGiftByAct && this._reckonGiftByAct[actId] ? this._reckonGiftByAct[actId] : []
-					rawGifts.push(...list)
-				})
+				const acts = this.getStoreGiftActivities(storeList)
+				if (!acts.length) return
+				const normalizedTargetActId = this.normalizeGiftActId(targetActId)
+				const targetAct = normalizedTargetActId === null ? acts[0] : (acts.find(v => v.actId === normalizedTargetActId) || acts[0])
+				const rawGifts = Array.isArray(targetAct.gifts) ? targetAct.gifts : []
 				// 统一字段：接口为 goods_thumb/goods_name/goods_price_format 等，模板用 thumb/name/price_formated
 				let idx = 0
 				this.giftList = rawGifts.map(g => ({
 					...g,
 					// 使用 goods_id + is_gift + 序号 组合，避免重复 key 提示
-					id: g.id || (`gift-${g.goods_id || 'g'}-${g.is_gift || 'a'}-${idx++}`),
+					id: g.id || (`gift-${g.goods_id || 'g'}-${g.is_gift || targetAct.actId || 'a'}-${idx++}`),
 					thumb: g.goods_thumb || g.thumb,
 					name: g.goods_name || g.name,
 					price_formated: g.goods_price_format != null ? g.goods_price_format : (g.shop_price_formated || g.price_formated),
 					is_checked: true
 				}))
-
-				const firstActId = actIds[0]
-				const fav = this._reckonAvailableFav && this._reckonAvailableFav[firstActId] ? this._reckonAvailableFav[firstActId] : null
-				this.act_type_ext = fav && fav.act_type_ext ? parseFloat(fav.act_type_ext) : this.getReckonMinAmount(firstActId)
-				this.minamount = fav && fav.min_amount != null ? Number(fav.min_amount) : this.getReckonMinAmount(firstActId)
+				this.act_type_ext = Number(targetAct.actTypeExt || 0)
+				this.minamount = Number(targetAct.minAmount || 0)
 				this.checkGiftArr = this.giftList.map(v => v.id)
 				this.checkGiftStr = this.giftList[0] ? this.giftList[0].id : ''
 				this.giftShow = true
 			},
 			// 兼容旧调用（按 act_id 打开，仅展示该活动赠品）
 			receiveGift(act_id, type, min_amount, actItem) {
-				const storeList = (this.goodsCartList || []).find(s => (this.getReckonGiftActIds(s) || []).includes(act_id))
+				const normalizedActId = this.normalizeGiftActId(act_id)
+				const storeList = (this.goodsCartList || []).find(s => (this.getReckonGiftActIds(s) || []).includes(normalizedActId))
 				if (storeList) {
-					this.receiveGiftByStore(storeList)
+					this.receiveGiftByStore(storeList, normalizedActId)
 					return
 				}
-				this.giftShow = true
-				const rawGifts = this._reckonGiftByAct && this._reckonGiftAct[act_id] ? this._reckonGiftByAct[act_id] : []
-				let idx = 0
-				this.giftList = rawGifts.map(g => ({
-					...g,
-					id: g.id || (`gift-${g.goods_id || 'g'}-${g.is_gift || act_id}-${idx++}`),
-					thumb: g.goods_thumb || g.thumb,
-					name: g.goods_name || g.name,
-					price_formated: g.goods_price_format != null ? g.goods_price_format : (g.shop_price_formated || g.price_formated),
-					is_checked: true
-				}))
-				const fav = this._reckonAvailableFav && this._reckonAvailableFav[act_id] ? this._reckonAvailableFav[act_id] : null
-				this.act_type_ext = fav && fav.act_type_ext ? parseFloat(fav.act_type_ext) : parseFloat(min_amount || 0)
-				this.minamount = fav && fav.min_amount != null ? Number(fav.min_amount) : Number(min_amount || 0)
-				this.checkGiftArr = this.giftList.map(v => v.id)
-				this.checkGiftStr = this.giftList[0] ? this.giftList[0].id : ''
 			},
 			//选择赠品
 			checkGift(id, index) {
@@ -6611,29 +7223,41 @@ function withTimeout(promise, ms) {
 			
 			},
 			//优惠券列表
-			updateCouponPopupHeight() {
-				this.$nextTick(() => {
-					const cap = this.couponPopupCapPx;
-					// 少数据时的最小内容 / 面板高度（原来太小，导致第二行文案被切半）
-					const minBody = uni.upx2px(260);
-					const minPanel = uni.upx2px(320);
-					const q = uni.createSelectorQuery().in(this);
-					q.select('.coupon-popup-title').boundingClientRect();
-					q.select('.coupon-popup-measure').boundingClientRect();
-					q.exec((res) => {
-						const headRect = res && res[0];
-						const bodyRect = res && res[1];
-						const headPx = headRect && Number(headRect.height) > 0 ? Math.ceil(headRect.height) : uni.upx2px(120);
-						let bodyH = bodyRect && Number(bodyRect.height) > 0 ? Math.ceil(bodyRect.height) : minBody;
-						// 给内容区预留一点额外空间，避免只有一块卡片时底部一行被“压线切半”
-						bodyH += uni.upx2px(40);
-						if (bodyH < minBody) bodyH = minBody;
-						let total = headPx + bodyH;
-						total = Math.min(Math.max(total, minPanel), cap);
-						const scrollH = Math.max(total - headPx, uni.upx2px(120));
-						this.$set(this.popHeight, 'couponPopupTotalPx', total);
-						this.$set(this.popHeight, 'couponPopupScrollPx', scrollH);
-					});
+			updateCouponPopupHeight() {},
+			getCommonPopupScrollH(options = {}) {
+				const sys = uni.getSystemInfoSync();
+				const wh = sys.windowHeight || 667;
+				const rows = Number(options.rows || 0);
+				const rowHeightPx = uni.upx2px(Number(options.rowUpx || 120));
+				const paddingPx = uni.upx2px(Number(options.extraUpx || 120));
+				const minPx = uni.upx2px(Number(options.minUpx || 180));
+				const capPx = Math.min(Math.floor(wh * Number(options.capRate || 0.72)), uni.upx2px(Number(options.capUpx || 900)));
+				const contentPx = rows * rowHeightPx + paddingPx;
+				return Math.min(capPx, Math.max(minPx, contentPx));
+			},
+			recalcManjianPopupScrollH() {
+				const data = this.manjianPopupData || {};
+				const rulesCount = Array.isArray(data.rules) ? data.rules.length : 0;
+				const couponsCount = Array.isArray(data.coupons) ? data.coupons.length : 0;
+				const rows = 2 + rulesCount + couponsCount;
+				this.couponPopupScrollH = this.getCommonPopupScrollH({
+					rows,
+					rowUpx: 120,
+					extraUpx: 140,
+					minUpx: 180,
+					capRate: 0.68,
+					capUpx: 860
+				});
+			},
+			recalcCoudanPopupScrollH(listLength = 0) {
+				const rows = Math.max(Number(listLength || 0), 2);
+				this.couponPopupScrollH = this.getCommonPopupScrollH({
+					rows,
+					rowUpx: 182,
+					extraUpx: 120,
+					minUpx: 260,
+					capRate: 0.72,
+					capUpx: 900
 				});
 			},
 			handleCoupon(ru_id) {
@@ -6644,9 +7268,6 @@ function withTimeout(promise, ms) {
 			    this.couponShow = true
 			    if (store) this.coupuns_num = store.coupuns_num || 0
 			    this.$store.dispatch('setCoupons', { ru_id: ru_id })
-			    this.updateCouponPopupHeight()
-			    setTimeout(() => this.updateCouponPopupHeight(), 100)
-			    setTimeout(() => this.updateCouponPopupHeight(), 280)
 			},
 
 
@@ -6656,6 +7277,9 @@ function withTimeout(promise, ms) {
 				this.manjianPopupStore = storeList || null
 				this.manjianPopupListIndex = listIndex != null ? listIndex : 0
 				this.manjianPopupShow = true
+				this.$nextTick(() => {
+					this.recalcManjianPopupScrollH()
+				})
 			},
 			closeManjianPopup() {
 				this.manjianPopupShow = false
@@ -6681,6 +7305,7 @@ function withTimeout(promise, ms) {
 				// 每次打开凑单弹窗时，清空本地临时增量，由后端 cart_goods_number 作为最新基准
 				this.coudanTempDeltaMap = {}
 				this.coudanPopupShow = true
+				this.recalcCoudanPopupScrollH(0)
 				const tier = storeList ? this.getNextManjianTier(storeList, this.coudanPopupListIndex) : null
 				const actId = tier ? tier.actId : 0
 				this.loadCoudanGoods(actId, 1)
@@ -6715,6 +7340,9 @@ function withTimeout(promise, ms) {
 						list = data.data
 					}
 					if (list.length < size) this.coudanLoadMoreDone = true
+					if (page === 1) {
+						this.recalcCoudanPopupScrollH(list.length)
+					}
 				}).catch(() => {
 					this.coudanLoading = false
 				})
@@ -7021,6 +7649,8 @@ function withTimeout(promise, ms) {
 				}).then(({
 					data: data
 				}) => {
+					// 先本地把当前券标记为已领取，保证弹窗按钮即时更新（无感）
+					this.markCouponReceivedLocal(val)
 					// 领取成功后，弹出自定义成功弹窗（与示例 success-toast 一致）
 					// 不再用 uni.showToast，避免与自定义弹窗重复
 					this.showCouponReceiveSuccessToast()
@@ -7028,6 +7658,37 @@ function withTimeout(promise, ms) {
 					this.$store.dispatch('setCoupons', {
 						ru_id: ru_id
 					})
+				})
+			},
+			markCouponReceivedLocal(couponId) {
+				const idStr = String(couponId || '')
+				if (!idStr) return
+				const markOne = (item) => {
+					if (!item || typeof item !== 'object') return
+					const currentId = item.cou_id || item.coupon_id || item.id
+					if (String(currentId || '') !== idStr) return
+					this.$set(item, 'is_received', 1)
+					this.$set(item, 'cou_is_receive', 1)
+					this.$set(item, 'receive_status', 1)
+					this.$set(item, 'can_receive', 0)
+					this.$set(item, 'button_status', 'disabled')
+					this.$set(item, 'button_text', '已领取')
+				}
+				const store = this.couponPopupStore
+				if (!store || !store.shop_preferential_panel) return
+				const panel = store.shop_preferential_panel
+				const modules = panel.preferential_modules || {}
+				const couponModule = modules.coupon || {}
+				if (Array.isArray(couponModule.items)) {
+					couponModule.items.forEach(markOne)
+				}
+				if (Array.isArray(couponModule.coupon_cards)) {
+					couponModule.coupon_cards.forEach(markOne)
+				}
+				const sections = Array.isArray(panel.sections) ? panel.sections : []
+				sections.forEach((section) => {
+					if (!section || section.section_key !== 'coupon' || !Array.isArray(section.items)) return
+					section.items.forEach(markOne)
 				})
 			},
 
@@ -7626,8 +8287,6 @@ function withTimeout(promise, ms) {
 			        // 首次点击后立即禁用
 			        this.loading = true;
 			        this.disabled = true;
-	    const launchState = getCartLaunchState();
-	    const isColdStartLaunch = !!(launchState && launchState.isColdStart);
 			        
 			        var indexOne = 0
 			        for (var i = 0; i < this.checkedGoods.length; i++) {
@@ -8065,6 +8724,8 @@ function withTimeout(promise, ms) {
 	  this.startFlashSaleTimer();
 	  // 【关键修复】强制显示底部tab，不受页面逻辑影响
 	  this.forceShowTabBar();
+	  const launchState = getCartLaunchState();
+	  const isColdStartEnter = !!(launchState && launchState.isColdStart);
 
 	  // 与「我的」等页一致：未登录不展示采购车，直接进登录
 	  const tokenGate = uni.getStorageSync('token');
@@ -8089,12 +8750,15 @@ function withTimeout(promise, ms) {
 	    
 	    // 统一转换为字符串后比较，避免类型不一致导致误判
 	    if (currentUserId && cachedUserId && currentUserId !== cachedUserId) {
-	      // 用户ID变化，清除旧缓存
+	      // ??ID????????
 	      this.clearCartCache();
 	      this.clearAddressCache();
+	      clearSavedSelectionState();
+	    }
+	    if (isColdStartEnter) {
+	      clearSavedSelectionState();
 	    }
 	    
-	    // 先检查是否有缓存，决定是否显示 loading3 和 loading
 	    const token = uni.getStorageSync('token');
 	    const isLoggedIn = token && token !== '';
 	    const freshSyncTsRaw = uni.getStorageSync('__cart_sync_fresh_ts__');
@@ -8124,11 +8788,24 @@ function withTimeout(promise, ms) {
 	      }
 
 	      if (hasCache && !shouldSkipCacheRestore) {
+	        this._skipShowEveryGoodsListOnce = true;
 	        // 【核心修复】有缓存时（包括空数组），立即恢复缓存数据，不显示骨架屏
 	        // 立即恢复缓存数据（同步执行）
 	        this.$store.commit('goodsCartList', { data: cache.goodsCartList || [] });
 	        this.lastRecId = cache.lastRecId;
 	        this.isFirstLoad = false;
+	        if (isColdStartEnter) {
+	        	this.clearCheckedFlagsFromCartList(this.goodsCartList);
+	        	this.resetSelectionArrays();
+	        	this.applySelectionSummaryFromCheckedState();
+	        } else {
+	        	if (!Number.isNaN(cache.count)) {
+	        		this.count = cache.count;
+	        	}
+	        	if (!Number.isNaN(cache.nums)) {
+	        		this.nums = cache.nums;
+	        	}
+	        }
 
 	        // 标记为已初始化，避免 goodsList() 中重复处理
 	        this._initialized = true;
@@ -8142,14 +8819,13 @@ function withTimeout(promise, ms) {
 
 	        // 数据处理延迟执行，避免阻塞UI和tab切换
 	        setTimeout(() => {
-	          this.handleSelectionAfterFetch();
+	          if (!isColdStartEnter) {
+	          	this.handleSelectionAfterFetch();
+	          } else {
+	          	this.applySelectionSummaryFromCheckedState();
+	          }
 	          if (hasData) {
 	            // 有数据时，执行价格计算和订单验证
-	            setTimeout(() => {
-	              // 有缓存时，使用静默更新模式，不显示 loading 遮罩
-	              this.changeGoods(true); // silent = true
-	            }, 100);
-
 	            // 【临时注释】异步验证订单状态
 	            setTimeout(() => {
 	              console.log('[onShow] 缓存有效，开始异步验证订单状态');
@@ -8169,18 +8845,15 @@ function withTimeout(promise, ms) {
 	            this.loading = false;
 	          }
 
-	          // 【修改】如果缓存已过期，并行执行全量更新和订单验证
-	          if (cache.isExpired || isColdStartLaunch) {
-	            this.isSilentUpdating = true;
-
-	            // 【临时恢复】只执行全量更新
-	            this.goodsList(true, true).finally(() => {
-	              this.isSilentUpdating = false;
-	            });
-	          }
+	          // 有缓存也始终做一次静默全量更新，保证“缓存无字段但接口有字段”能够更新显示
+	          this.isSilentUpdating = true;
+	          this.goodsList(true, true).finally(() => {
+	            this.isSilentUpdating = false;
+	          });
 	        }, 50);
 	      } else {
 	        if (hasCache && shouldSkipCacheRestore) {
+	          this._skipShowEveryGoodsListOnce = true;
 	          // 刚完成 add_v1 同步：跳过旧缓存恢复 + 立即静默拉取最新购物车
 	          this.loading3 = false;
 	          this.loading = false;
@@ -8191,11 +8864,9 @@ function withTimeout(promise, ms) {
 	            try { uni.removeStorageSync('__cart_sync_fresh_ts__') } catch (e) {}
 	            // 同步后需要恢复选中状态，避免 UI 依赖选中数组导致显示错乱
 	            this.handleSelectionAfterFetch();
-	            this.$nextTick(() => {
-	              this.changeGoods(true);
-	            });
 	          });
 	        } else {
+	        this._skipShowEveryGoodsListOnce = false;
 	        // 【核心修复】只在真正无缓存时才显示骨架屏和loading
 	        this.loading3 = true;
 	        this.loading = true; // 无缓存时，需要显示 loading 遮罩
@@ -8203,6 +8874,7 @@ function withTimeout(promise, ms) {
 	        }
 	      }
 	    } else {
+	      this._skipShowEveryGoodsListOnce = false;
 	      // 【未登录优化】未登录时购物车肯定是空的，不需要显示 loading/骨架屏
 	      this.loading3 = false; // 不显示骨架屏
 	      this.dataLoading = false; // 不显示数据加载中
@@ -8274,29 +8946,10 @@ function withTimeout(promise, ms) {
 				immediate: true
 			},
 			couponShow(val) {
-				if (val) {
-					this.updateCouponPopupHeight();
-					setTimeout(() => this.updateCouponPopupHeight(), 100);
-					setTimeout(() => this.updateCouponPopupHeight(), 280);
-				} else {
+				if (!val) {
 					this.$set(this.popHeight, 'couponPopupTotalPx', 0);
 					this.$set(this.popHeight, 'couponPopupScrollPx', 0);
 				}
-			},
-			couponPopupList() {
-				if (this.couponShow) this.updateCouponPopupHeight();
-			},
-			couponPopupActivitySections: {
-				handler() {
-					if (this.couponShow) this.updateCouponPopupHeight();
-				},
-				deep: true
-			},
-			couponPopupBlackCardSection: {
-				handler() {
-					if (this.couponShow) this.updateCouponPopupHeight();
-				},
-				deep: true
 			},
 			goodsCartList: {
 				handler(newVal, oldVal) {
@@ -8429,8 +9082,9 @@ function withTimeout(promise, ms) {
 
 	/* 导航 start */
 	.nav_bar {
+		background-color: #fff;
 		.status_bar {
-			background-color: #f9f9f9;
+			background-color: #fff;
 			height: var(--status-bar-height);
 			width: 100%;
 		}
@@ -8459,16 +9113,17 @@ function withTimeout(promise, ms) {
 		// justify-content: space-between;
 		background-color: #fff;
 		margin-bottom: 16rpx;
+		box-sizing: border-box;
 
 		/* #ifdef APP-PLUS */
-		width: 95%;
+		width: 100%;
 		/* #endif */
 		/* #ifdef MP-WEIXIN */
-		width: 95%;
-		margin-left: 20rpx;
-		margin-top: -10rpx;
+		width: 100%;
+		margin-left: 0;
+		margin-top: 0;
 		/* #endif */
-		padding: 20upx;
+		padding: 20upx 20rpx;
 
 		.header-address-box {
 			display: flex;
@@ -8512,7 +9167,7 @@ function withTimeout(promise, ms) {
 	.address-section {
 		background: #fff;
 		/* 对齐示例的 checkout-content 左右 padding（15px -> 约 30rpx） */
-		margin: 0 30rpx 20rpx;
+		margin: 0 10rpx 20rpx;
 		position: relative;
 		cursor: pointer;
 		border-radius: 16rpx;
@@ -8595,7 +9250,7 @@ function withTimeout(promise, ms) {
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0 0 20upx;
+		// padding: 0 0 20upx;
 		flex-wrap: nowrap;
 
 		.head-left {
@@ -9121,6 +9776,7 @@ function withTimeout(promise, ms) {
 		align-items: center;
 		gap: 12rpx;
 		padding: 16rpx 12rpx 16rpx;
+		padding-top:0;
 		// background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
 		// border-left: 4rpx solid #ff9800;
 		border-radius: 8rpx;
@@ -9133,9 +9789,20 @@ function withTimeout(promise, ms) {
 	}
 
 	.goods-gift-tip-row .gift-tip-icon {
-		font-size: 28rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 		line-height: 1;
+		color: #ff9800;
+		    margin-bottom: 8rpx;
+	}
+
+	.goods-gift-tip-row .gift-tip-icon .gift-tip-svg-img {
+		width: 28rpx;
+		height: 28rpx;
+		display: block;
+		flex-shrink: 0;
 	}
 
 	.goods-gift-tip-row .gift-tip-text {
@@ -9185,9 +9852,19 @@ function withTimeout(promise, ms) {
 	}
 
 	.goods-gift-tip .gift-tip-icon {
-		font-size: 28rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 		line-height: 1;
+		color: #ff9800;
+	}
+
+	.goods-gift-tip .gift-tip-icon .gift-tip-svg-img {
+		width: 28rpx;
+		height: 28rpx;
+		display: block;
+		flex-shrink: 0;
 	}
 
 	.goods-gift-tip .gift-tip-text {
@@ -9493,7 +10170,7 @@ function withTimeout(promise, ms) {
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
-		margin-bottom: 12rpx;
+		// margin-bottom: 12rpx;
 		
 		.checkall {
 			flex: 0 0 auto;
@@ -9610,8 +10287,38 @@ function withTimeout(promise, ms) {
 	}
 
 	.activity-popup {
+		background: #fff;
+		border-radius: 28rpx 28rpx 0 0;
+		display: flex;
+		flex-direction: column;
+		max-height: 85vh;
+		overflow: hidden;
+
 		.red {
 			color: #FE2F02;
+		}
+
+		.title {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10rpx 20rpx;
+			border-bottom: 2rpx solid #f0f0f0;
+			background: #fff;
+			position: sticky;
+			top: 0;
+			z-index: 2;
+		}
+
+		.content {
+			flex: 1;
+			min-height: 0;
+			overflow: hidden;
+		}
+
+		.content scroll-view {
+			height: 100%;
 		}
 
 		.price-detail-title {
@@ -9699,6 +10406,85 @@ function withTimeout(promise, ms) {
 			color: #272727;
 		}
 		
+		// 购物车优惠明细抽屉样式
+		.discount-activity-toggle-cart {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			
+			border-radius: 12rpx;
+			padding: 14rpx 8rpx;
+			// margin: 8rpx 22rpx;
+			box-shadow: 0rpx 2rpx 8rpx 0rpx rgba(254, 47, 2, 0.06);
+			position: relative;
+			
+			&::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 6rpx;
+				border-radius: 12rpx 0 0 12rpx;
+			}
+			
+			.title {
+				font-weight: 600;
+				color: #333333;
+				font-size: 28rpx;
+				border:none;
+			}
+		}
+
+		.discount-activity-toggle-right-cart {
+			display: inline-flex;
+			align-items: center;
+			gap: 8rpx;
+			
+			.value {
+				font-weight: 600;
+				font-size: 28rpx;
+			}
+		}
+
+		.discount-activity-child-cart {
+			background: #FAFBFC;
+			border-left: 6rpx solid #E8F4FD;
+			margin: 0 42rpx 8rpx 42rpx;
+			border-radius: 0 8rpx 8rpx 0;
+			
+			&:last-child {
+				margin-bottom: 0;
+			}
+			
+			.label {
+				padding: 16rpx 20rpx 16rpx 24rpx;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				
+				.label-left {
+					color: #666666;
+					font-size: 26rpx;
+					font-weight: 400;
+					position: relative;
+					
+					&::before {
+						content: '•';
+						color: #999999;
+						margin-right: 12rpx;
+						font-size: 20rpx;
+					}
+				}
+				
+				.label-right {
+					color: #666666;
+					font-size: 26rpx;
+					font-weight: 500;
+				}
+			}
+		}
+		
 		.price-detail-store-box {
 			// margin: 0 22rpx 16rpx 22rpx;
 			// padding: 16rpx;
@@ -9713,6 +10499,47 @@ function withTimeout(promise, ms) {
 		
 		.price-detail-store-item:not(:last-child) {
 			// border-bottom: 1rpx solid #f0f0f0;
+		}
+
+		.price-store-left {
+			display: flex;
+			flex-direction: column;
+			gap: 4rpx;
+		}
+
+		.price-store-name {
+			font-size: 28rpx;
+			color: #272727;
+			line-height: 1.3;
+		}
+
+		.price-store-discount-row {
+			margin-top: -16rpx;
+			margin-bottom: 8rpx;
+		}
+
+		.price-store-discount-label {
+			font-size: 22rpx;
+			color: #999999;
+			line-height: 1.2;
+		}
+
+		.price-store-discount-amount {
+			font-size: 22rpx;
+			color: #999999;
+			line-height: 1.2;
+		}
+
+		.price-detail-summary-sep {
+			border-top: 2rpx solid #f0f0f0;
+			padding-top: 16rpx;
+			margin-top: 8rpx;
+			margin-bottom: 8rpx;
+		}
+
+		.price-detail-goods-total-row {
+			padding: 12rpx 0;
+			margin-top: 0;
 		}
 		
 		.price-detail-note {
@@ -9733,8 +10560,10 @@ function withTimeout(promise, ms) {
 		border-radius: 16rpx 16rpx 0 0;
 		width: 100%;
 		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		max-height: 85vh;
 		overflow-x: hidden;
-		padding-bottom: env(safe-area-inset-bottom);
 	}
 	.coupon-popup-title {
 		display: flex;
@@ -9746,6 +10575,10 @@ function withTimeout(promise, ms) {
 		border-radius: 16rpx 16rpx 0 0;
 		width: 100%;
 		box-sizing: border-box;
+		flex-shrink: 0;
+		position: sticky;
+		top: 0;
+		z-index: 2;
 	}
 	.coupon-popup-txt {
 		font-size: 34rpx;
@@ -9755,6 +10588,8 @@ function withTimeout(promise, ms) {
 	}
 	.coupon-popup-scroll {
 		width: 100%;
+		flex: 1;
+		min-height: 0;
 		box-sizing: border-box;
 		overflow-x: hidden;
 		/* 对齐示例：modal-content-scroll padding: 20px */
@@ -10189,6 +11024,9 @@ function withTimeout(promise, ms) {
 		border-left-width: 0;
 		background-color: #fbf2f2;
 	}
+	.coupon-popup-wrap .coupons_right.coupons_right_unreceived {
+		background-color: #FE2F02;
+	}
 	.coupon-popup-wrap .get_coupon_time {
 		display: flex;
 		justify-content: space-between;
@@ -10210,6 +11048,10 @@ function withTimeout(promise, ms) {
 		font-size: 28rpx;
 		color: #FE2F02;
 	}
+	.coupon-popup-wrap .get_coupon_time .coupon_btn.coupon_btn_unreceived {
+		background: #FE2F02;
+		color: #FFFFFF;
+	}
 	.coupon-popup-wrap .coupons_right:after {
 		content: '';
 		position: absolute;
@@ -10220,6 +11062,9 @@ function withTimeout(promise, ms) {
 		border-radius: 50%;
 		background-color: #f2d2d2;
 	}
+	.coupon-popup-wrap .coupons_right.coupons_right_unreceived:after {
+		background-color: #FE2F02;
+	}
 	.coupon-popup-wrap .coupons_right:before {
 		content: '';
 		position: absolute;
@@ -10229,6 +11074,9 @@ function withTimeout(promise, ms) {
 		height: 42rpx;
 		border-radius: 50%;
 		background-color: #f2d2d2;
+	}
+	.coupon-popup-wrap .coupons_right.coupons_right_unreceived:before {
+		background-color: #FE2F02;
 	}
 	.coupon-popup-wrap .coupons_item.g-gay .coupons_left {
 		// background: #f5f5f5;
@@ -10287,8 +11135,10 @@ cursor: default;
 		border-radius: 32rpx 32rpx 0 0;
 		width: 100%;
 		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		max-height: 85vh;
 		overflow-x: hidden;
-		padding-bottom: env(safe-area-inset-bottom);
 		text-align: left;
 	}
 	.manjian-modal-header {
@@ -10313,6 +11163,8 @@ cursor: default;
 	}
 	.manjian-modal-scroll {
 		width: 100%;
+		flex: 1;
+		min-height: 0;
 		box-sizing: border-box;
 	}
 	.manjian-modal-content.modal-content-scroll {
@@ -10462,8 +11314,10 @@ cursor: default;
 		border-radius: 24rpx 24rpx 0 0;
 		width: 100%;
 		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		max-height: 85vh;
 		overflow-x: hidden;
-		padding-bottom: env(safe-area-inset-bottom);
 	}
 	.gather-modal-header {
 		display: flex;
@@ -10488,6 +11342,8 @@ cursor: default;
 	}
 	.gather-modal-body {
 		width: 100%;
+		flex: 1;
+		min-height: 0;
 		box-sizing: border-box;
 	}
 	.gather-modal-scroll-inner {
@@ -10734,6 +11590,12 @@ cursor: default;
 		flex: 1;
 		min-width: 0;
 	}
+	.store-expand-center {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 20rpx 0;
+	}
 	.expand-products-btn-cart {
 		display: inline-flex;
 		flex-direction: row;
@@ -10778,8 +11640,10 @@ cursor: default;
 		border-radius: 32rpx 32rpx 0 0;
 		width: 100%;
 		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		max-height: 85vh;
 		overflow-x: hidden;
-		padding-bottom: env(safe-area-inset-bottom);
 		text-align: left;
 	}
 	.store-discount-popup-header {
@@ -10803,7 +11667,13 @@ cursor: default;
 	}
 	.store-discount-popup-body {
 		width: 100%;
+		flex: 1;
+		min-height: 0;
 		box-sizing: border-box;
+	}
+
+	.popup-scroll-main {
+		height: 100%;
 	}
 	.discount-detail-section-inner {
 		padding: 0 40rpx 24rpx;
@@ -10905,7 +11775,7 @@ cursor: default;
 			// border: 2rpx solid #f92028;
 			border-radius: 8rpx;
 			color: #f92028;
-			font-size: 28rpx;
+			font-size: 24rpx;
 			background-color: #fff;
 			transition: all 0.3s;
 			
@@ -11241,7 +12111,6 @@ cursor: default;
 
 	/* 优惠弹框 start */
 	.pop_content {
-		padding-bottom: env(safe-area-inset-bottom);
 		border-top-left-radius: 30rpx;
 		border-top-right-radius: 30rpx;
 		background-color: #fff;
@@ -11279,7 +12148,7 @@ cursor: default;
 		}
 
 		.pop_scroll_view {
-			padding: 0 30rpx 30rpx;
+			padding: 20rpx 30rpx 30rpx;
 
 			.label_text {
 				// margin-bottom: 0.2rem;
@@ -11685,10 +12554,83 @@ cursor: default;
 	.btnSub {
 		width: 220rpx;
 		height: 76rpx;
-		background: #F72028;
+		background: #FF4500;
 		border-radius: 38rpx;
 		margin: 6rpx 16rpx 6rpx 0;
 		// margin-right: 16rpx;
+	}
+
+	.checkout-btn-inner {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8rpx;
+	}
+
+	.checkout-btn-spinner {
+		width: 20rpx;
+		height: 20rpx;
+		border-radius: 50%;
+		border: 2rpx solid rgba(255, 255, 255, 0.45);
+		border-top-color: #ffffff;
+		animation: checkout-spin 0.9s linear infinite;
+	}
+
+	@keyframes checkout-spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+	
+	// 新的合计区域样式
+	.price-wrapper-new {
+		
+		
+		border-radius: 8rpx;
+		display: flex;
+		align-items: center;
+		gap: 8rpx;
+	}
+	
+	.label-text-new {
+		font-size: 24rpx;
+		color: #333333;
+	}
+	
+	.submit-bar-price-new {
+		font-size: 32rpx;
+		font-weight: 600;
+		color: #FF4500;
+	}
+	
+	// 新的底部左侧区域样式
+	.bottom-left-new {
+		
+		
+		border-radius: 8rpx;
+		display: flex;
+		align-items: center;
+		gap: 16rpx;
+	}
+	
+	.quantity-text-new {
+		font-size: 24rpx;
+		color: #999999;
+	}
+	
+	.discount-text-new {
+		font-size: 24rpx;
+		color: #333333;
+	}
+	
+	.detail-btn-new {
+		color: #ff4d4f;
+		font-weight: 500;
+		font-size: 24rpx;
+		margin-left: 16rpx;
 	}
 
 	// onemore
@@ -12139,4 +13081,3 @@ cursor: default;
 
 	// 2
 </style>
-
