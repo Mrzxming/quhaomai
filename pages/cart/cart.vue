@@ -5013,39 +5013,36 @@ function withTimeout(promise, ms) {
 			  
 			  // 使用 nextTick 确保数据更新后立即渲染，复杂计算延迟执行
 			const finishLoading = () => {
-			    // 【修改】静默模式下不关闭 dataLoading，由调用方控制
 			    if (!silent) {
-			      // 立即关闭 loading，让 UI 先渲染
-			      // 注意：不在 goodsList 中关闭 loading3，由 showEvery 的 Promise.all 统一管理
-			      // 接口已经返回，无论数据是否为空，都应该立即关闭数据加载状态
-			      // 因为 finishLoading 是在接口的 .then() 回调中调用的，说明数据已经更新完成
 			      that.dataLoading = false;
 			    }
 
-			    // 计算并保存 lastRecId
 			    const lastRecId = that.calculateLastRecId(that.goodsCartList);
 			    that.lastRecId = lastRecId;
 
-			    // 只有用户已登录时才保存缓存
 			    if (isLoggedInForSave) {
 			      that.saveCartCache(that.goodsCartList, lastRecId);
 			    }
 			    that.ensureBasePriceFieldsForAllGoods();
 
-
-			    // 【优化问题2】延迟执行复杂的数据处理，避免阻塞渲染
-			    // 【修复问题3】确保 processCartData() 在数据加载完成后被调用，更新 shopInvalidArr
 			    if (that.processCartData && that.goodsCartList && that.goodsCartList.length > 0) {
 			      that.processCartData(that.goodsCartList);
 			    }
-			    
-			    // 【修复】购物车数据加载完成后立即关闭全屏 loading，价格计算用静默模式（底部显示"计算中"）
+
+			    if (silent) {
+			      that._initialized = true;
+			      that.applySelectionSummaryFromCheckedState();
+			      if (that.immediatelyCheckSelectedGoods()) {
+			        that.saveSelectionState();
+			      }
+			      return;
+			    }
+
 			    that.loading = false;
 			    that.$nextTick(() => {
 			      that.handleSelectionAfterFetch();
 			      that._initialized = true;
 			      if (that.goodsCartList && that.goodsCartList.length > 0) {
-			        // 静默模式：不显示全屏 loading，底部价格区域显示"计算中"
 			        that.changeGoods(true);
 			      } else {
 			        that.loading = false;
@@ -6162,6 +6159,7 @@ function withTimeout(promise, ms) {
 				const checkedList = Array.isArray(this.checkedGoods[storeIndex]) ? this.checkedGoods[storeIndex] : [];
 				let selectableCount = 0;
 				let selectedCount = 0;
+				const validRecIds = [];
 				const actList = Array.isArray(store.new_list) ? store.new_list : [];
 				actList.forEach((act) => {
 					const goodsList = Array.isArray(act.act_goods_list) ? act.act_goods_list : [];
@@ -6169,20 +6167,25 @@ function withTimeout(promise, ms) {
 						if (!item) return;
 						const isSelectable = item.is_invalid != 1 && Number(item.product_number || 0) > 0;
 						const isSelected = checkedList.includes(item.rec_id);
-						item.checked = isSelected;
-						if (isSelectable) {
+						if (isSelectable && isSelected) {
+							item.checked = true;
 							selectableCount++;
-							if (isSelected) {
-								selectedCount++;
-								totalTypes++;
-								totalCount += parseInt(item.goods_number) || 0;
-								checkedGoodsId.push(item.rec_id);
-							}
+							selectedCount++;
+							totalTypes++;
+							totalCount += parseInt(item.goods_number) || 0;
+							checkedGoodsId.push(item.rec_id);
+							validRecIds.push(item.rec_id);
+						} else if (isSelectable) {
+							item.checked = false;
+							selectableCount++;
 						} else {
 							item.checked = false;
 						}
 					});
 				});
+				if (validRecIds.length !== checkedList.length) {
+					this.$set(this.checkedGoods, storeIndex, validRecIds);
+				}
 				this.$set(this.checkedShop, storeIndex, selectableCount > 0 && selectedCount === selectableCount);
 			});
 
