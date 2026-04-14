@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+    <title>安全验证</title>
+    <link rel="stylesheet" href="./captcha_slide.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; background: transparent; }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,.5);
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 12px 48px rgba(0,0,0,.2);
+            overflow: hidden;
+            max-width: 95vw;
+        }
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px 12px;
+            border-bottom: 1px solid #f0f2f7;
+        }
+        .card-title { font-size: 15px; font-weight: 700; color: #222; }
+        .card-close {
+            background: none; border: none;
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #bbb; font-size: 18px;
+        }
+        .card-body { padding: 20px 24px 22px; display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-head">
+            <span class="card-title">请完成安全验证</span>
+            <button class="card-close" id="closeBtn">&#215;</button>
+        </div>
+        <div class="card-body">
+            <div id="captcha-container"></div>
+        </div>
+    </div>
+
+    <script src="./captcha_slide.js"></script>
+    <script src="../captcha4/uni.webview.1.5.1.js"></script>
+    <script>
+    (function() {
+        var plusReady = function(cb) {
+            if (window.plus) { cb(); } else { document.addEventListener('plusready', cb); }
+        };
+
+        function callNative(type, data) {
+            plusReady(function() {
+                uni.postMessage({
+                    data: { time: Date.now(), type: type, data: data || {} }
+                });
+            });
+        }
+
+        document.getElementById('closeBtn').addEventListener('click', function() {
+            callNative('close');
+        });
+        document.body.addEventListener('click', function(e) {
+            if (e.target === document.body) callNative('close');
+        });
+
+        var cap = new CaptchaSlide({
+            container: '#captcha-container',
+            width: 300,
+            height: 150,
+            onPass: function() {
+                setTimeout(function() {
+                    callNative('result', { passed: true, timestamp: Date.now() });
+                }, 400);
+            },
+            onFail: function() {
+                callNative('fail');
+            }
+        });
+        cap.init();
+        callNative('ready');
+    })();
+    </script>
+</body>
+</html>

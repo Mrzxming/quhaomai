@@ -1,0 +1,281 @@
+/* ============================================================
+   滑动拼图验证码 — 样式
+   无外部依赖，可独立嵌入任何页面
+   ============================================================ */
+
+.cs-wrap {
+    display: inline-block;
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+    font-size: 13px;
+    color: #333;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 画布容器 */
+.cs-canvas-wrap {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.12);
+    background: #e8edf5;
+}
+
+.cs-canvas-wrap canvas {
+    display: block;
+}
+
+/* 拼图块画布（绝对定位，跟随滑块移动） */
+.cs-piece-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    filter: drop-shadow(2px 4px 8px rgba(0,0,0,.45));
+    transition: filter .15s;
+}
+
+/* 验证结果提示浮层 */
+.cs-tip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .2s;
+}
+.cs-tip.cs-tip-visible { opacity: 1; }
+.cs-tip-success {
+    background: rgba(46, 204, 113, .90);
+    color: #fff;
+}
+.cs-tip-error {
+    background: rgba(231, 76, 60, .90);
+    color: #fff;
+}
+
+/* 滑块区 */
+.cs-slider-wrap {
+    position: relative;
+    margin-top: 10px;
+    height: 44px;
+}
+
+.cs-slider-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 44px;
+    background: #eef0f5;
+    border-radius: 22px;
+    border: 1px solid #d8dce8;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: background .25s, border-color .25s;
+}
+.cs-slider-bar.cs-dragging {
+    background: #deeaff;
+    border-color: #4f8ffd;
+}
+.cs-slider-bar.cs-bar-success {
+    background: #d0f5e0;
+    border-color: #2ecc71;
+}
+.cs-slider-bar.cs-bar-error {
+    background: #fde8e8;
+    border-color: #e74c3c;
+}
+
+/* 进度条填充 */
+.cs-slider-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #a8d4ff 0%, #4f8ffd 100%);
+    border-radius: 22px;
+    transition: width .05s linear;
+}
+.cs-bar-success .cs-slider-fill {
+    background: linear-gradient(90deg, #a8f5c8 0%, #2ecc71 100%);
+}
+.cs-bar-error .cs-slider-fill {
+    background: linear-gradient(90deg, #f5b8b8 0%, #e74c3c 100%);
+}
+
+.cs-slider-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 42px;
+    font-size: 13px;
+    color: #888;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 拖拽按钮 */
+.cs-slider-btn {
+    position: absolute;
+    top: 0; left: 0;
+    width: 52px; height: 44px;
+    background: #fff;
+    border-radius: 22px;
+    border: 1px solid #d8dce8;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(79,143,253,.25);
+    box-sizing: border-box;
+    z-index: 2;
+    transition: background .2s, border-color .2s, box-shadow .2s;
+}
+.cs-slider-btn:active { cursor: grabbing; }
+.cs-slider-btn:hover  { box-shadow: 0 4px 14px rgba(79,143,253,.4); }
+.cs-slider-btn.cs-pass {
+    background: #2ecc71;
+    border-color: #27ae60;
+    cursor: default;
+    box-shadow: 0 2px 8px rgba(46,204,113,.4);
+}
+.cs-slider-btn.cs-fail {
+    background: #e74c3c;
+    border-color: #c0392b;
+    cursor: default;
+}
+
+/* 按钮图标 */
+.cs-btn-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+}
+.cs-btn-icon span {
+    display: block;
+    width: 16px; height: 2px;
+    background: #4f8ffd;
+    border-radius: 1px;
+    transition: background .2s;
+}
+.cs-slider-btn:hover .cs-btn-icon span { background: #2b7bf0; }
+.cs-slider-btn.cs-pass .cs-btn-icon span,
+.cs-slider-btn.cs-fail .cs-btn-icon span {
+    display: none;
+}
+
+/* 按钮内成功/失败图标 */
+.cs-btn-checkmark {
+    display: none;
+    font-size: 20px;
+    color: #fff;
+    line-height: 1;
+}
+.cs-slider-btn.cs-pass .cs-btn-checkmark,
+.cs-slider-btn.cs-fail .cs-btn-checkmark {
+    display: block;
+}
+
+/* 底部工具栏 */
+.cs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 6px;
+    gap: 8px;
+}
+.cs-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #aaa;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color .2s, background .2s;
+}
+.cs-refresh-btn:hover {
+    color: #4f8ffd;
+    background: #f0f5ff;
+}
+.cs-refresh-btn svg {
+    transition: transform .35s;
+}
+.cs-refresh-btn:hover svg {
+    transform: rotate(180deg);
+}
+
+/* ============================================================
+   弹窗模式
+   ============================================================ */
+.cs-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .5);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .22s ease;
+}
+.cs-modal-overlay.cs-modal-active { opacity: 1; }
+
+.cs-modal-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, .2);
+    overflow: hidden;
+    min-width: 360px;
+    max-width: 95vw;
+    transform: translateY(20px) scale(.96);
+    transition: transform .22s ease;
+}
+.cs-modal-overlay.cs-modal-active .cs-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.cs-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid #f0f2f7;
+}
+.cs-modal-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: .3px;
+}
+.cs-modal-close {
+    background: none;
+    border: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #bbb;
+    font-size: 18px;
+    line-height: 1;
+    transition: background .15s, color .15s;
+}
+.cs-modal-close:hover {
+    background: #f0f2f7;
+    color: #555;
+}
+
+.cs-modal-body {
+    padding: 20px 24px 22px;
+    display: flex;
+    justify-content: center;
+}
