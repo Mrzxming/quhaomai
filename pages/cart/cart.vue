@@ -2579,11 +2579,7 @@ function withTimeout(promise, ms) {
 			snapshot.storeSelectableCounts.forEach((count, idx) => {
 				const selected = perStoreSelectedCounts[idx] || 0;
 				const shopChecked = count > 0 && selected === count;
-				if (shopChecked && Array.isArray(this.shopInvalidArr) && this.shopInvalidArr[idx] === true) {
-					this.$set(this.checkedShop, idx, false);
-				} else {
-					this.$set(this.checkedShop, idx, shopChecked);
-				}
+				this.$set(this.checkedShop, idx, shopChecked);
 			});
 
 			const allFullySelected = snapshot.storeSelectableCounts.every((count, idx) => {
@@ -2944,8 +2940,7 @@ function withTimeout(promise, ms) {
 							return hasGoods;
 						});
 
-						// 更新 Vuex store
-						that.$store.commit('goodsCartList', { data: filteredList });
+						that.$store.commit('goodsCartList', { data: filteredList, preserveSelection: true });
 
 						// 使用 $nextTick 确保 Vue 响应式系统已更新视图
 						that.$nextTick(() => {
@@ -4300,9 +4295,8 @@ function withTimeout(promise, ms) {
 						}
 					} else {
 						// 店铺不存在，插入新店铺到购物车列表的第一个位置
-						// 使用 Vuex mutation 来更新，确保响应式
 						const newList = [newStore, ...this.goodsCartList];
-						this.$store.commit('goodsCartList', { data: newList });
+						this.$store.commit('goodsCartList', { data: newList, preserveSelection: true });
 					}
 				});
 				
@@ -4398,8 +4392,7 @@ function withTimeout(promise, ms) {
 
 					// 5. 触发价格重计算
 				} catch (error) {
-					// 降级到全量更新
-					this.$store.commit('goodsCartList', { data: newServerData });
+					this.$store.commit('goodsCartList', { data: newServerData, preserveSelection: true });
 					this.ensureBasePriceFieldsForAllGoods();
 				}
 			},
@@ -4646,44 +4639,36 @@ function withTimeout(promise, ms) {
 			 * 移除店铺
 			 */
 			removeShops(shopIds) {
+				const removedIndices = [];
+				this.goodsCartList.forEach((shop, index) => {
+					if (shopIds.includes(shop.store_id)) {
+						removedIndices.push(index);
+					}
+				});
+
+				removedIndices.sort((a, b) => b - a).forEach(index => {
+					this.checkedShop.splice(index, 1);
+					this.checkedGoods.splice(index, 1);
+					this.allGoodsListId.splice(index, 1);
+				});
+
 				const filteredList = this.goodsCartList.filter(shop =>
 					!shopIds.includes(shop.store_id)
 				);
-
-				this.$store.commit('goodsCartList', { data: filteredList });
-
-				// 同步更新选中状态数组
-				if (shopIds.length > 0) {
-					const removedIndices = [];
-					this.goodsCartList.forEach((shop, index) => {
-						if (shopIds.includes(shop.store_id)) {
-							removedIndices.push(index);
-						}
-					});
-
-					// 从后往前删除，避免索引错乱
-					removedIndices.sort((a, b) => b - a).forEach(index => {
-						this.checkedShop.splice(index, 1);
-						this.checkedGoods.splice(index, 1);
-						this.allGoodsListId.splice(index, 1);
-					});
-				}
+				this.$store.commit('goodsCartList', { data: filteredList, preserveSelection: true });
 			},
 
 			/**
 			 * 添加新店铺
 			 */
 			addShops(newShops) {
-				// 添加到列表末尾
 				const updatedList = [...this.goodsCartList, ...newShops];
-				this.$store.commit('goodsCartList', { data: updatedList });
-
-				// 初始化选中状态数组
 				newShops.forEach(() => {
 					this.checkedShop.push(false);
 					this.checkedGoods.push([]);
 					this.allGoodsListId.push([]);
 				});
+				this.$store.commit('goodsCartList', { data: updatedList, preserveSelection: true });
 			},
 
 			/**
@@ -4812,10 +4797,7 @@ function withTimeout(promise, ms) {
 					return cleanedShop;
 				}).filter(shop => shop.new_list && shop.new_list.length > 0);
 
-				// 更新Vuex store
-				this.$store.commit('goodsCartList', { data: cleanedList });
-
-				// 【关键修复】同步更新选中状态数组
+				this.$store.commit('goodsCartList', { data: cleanedList, preserveSelection: true });
 				this.syncSelectionArraysAfterRemoval(cleanedList, orderedRecIds);
 
 				// 更新本地缓存
@@ -5080,8 +5062,7 @@ function withTimeout(promise, ms) {
 			        try {
 			          that.incrementalCartUpdate(res.data);
 			        } catch (error) {
-			          // 降级到全量更新
-			          that.$store.commit('goodsCartList', { data: res.data });
+			          that.$store.commit('goodsCartList', { data: res.data, preserveSelection: true });
 			        }
 			      }
 			      finishLoading();
@@ -5141,26 +5122,20 @@ function withTimeout(promise, ms) {
 			
 			this.checkedShop.splice(index, 1, !checked)
 			if (!checked) {
-				// 选中店铺：如果有"查看更多"，自动加载更多商品
+				this.checkedGoods[index] = [];
 				if (shop.ishas_more_goods === true) {
-						// 先设置选中状态
 						shop.new_list.forEach((act) => {
 							act.act_goods_list.forEach((g) => {
-								// 只选中有效且有货的商品，排除失效商品
 								if (g.is_invalid != 1 && g.product_number > 0) {
 									this.checkedGoods[index].push(g.rec_id)
 									g.checked = true;
 								}
 							})
 						})
-						
-						// 然后加载更多商品（loadMoreGoods 内部会自动选中新加载的商品）
 						this.loadMoreGoods(index, shop);
 					} else {
-						// 没有更多商品，正常选中
 						shop.new_list.forEach((act) => {
 							act.act_goods_list.forEach((g) => {
-								// 只选中有效且有货的商品，排除失效商品
 								if (g.is_invalid != 1 && g.product_number > 0) {
 									this.checkedGoods[index].push(g.rec_id)
 								}
@@ -5257,23 +5232,17 @@ function withTimeout(promise, ms) {
 		}
 	}
 
-			//获取店铺下商品数量
-			this.goodsCartList.forEach((v, index) => {
-				let arr = []
-				v.new_list.forEach((act) => {
-					act.act_goods_list.forEach((g) => {
-						arr.push(g)
-					})
-				})
-
-				clength.push(arr.length)
-			})
-
-			// 直接设置新的选中状态，而不是根据当前状态切换
 			this.goodsCartList[index].new_list[listIndex].act_goods_list[actIndex].checked = newCheckedState;
-			
-			//商品勾选状态 改变店铺勾选状态
-			this.checkedShop[index] = (clength[index] == this.checkedGoods[index].length)
+
+			let selectableCount = 0;
+			this.goodsCartList[index].new_list.forEach((act) => {
+				act.act_goods_list.forEach((g) => {
+					if (g.is_invalid != 1 && Number(g.product_number || 0) > 0) {
+						selectableCount++;
+					}
+				});
+			});
+			this.checkedShop[index] = (selectableCount > 0 && selectableCount == this.checkedGoods[index].length)
 			
 			// 确保在调用 changeGoods 之前，状态已经更新完成
 			// 使用 $nextTick 确保 Vue 的响应式更新已完成
@@ -6183,20 +6152,53 @@ function withTimeout(promise, ms) {
 		},
 		
 		// 新增方法：立即检查选中状态
+		applySelectionSummaryFromCheckedState() {
+			if (!Array.isArray(this.goodsCartList)) return;
+			let totalCount = 0;
+			let totalTypes = 0;
+			const checkedGoodsId = [];
+
+			this.goodsCartList.forEach((store, storeIndex) => {
+				const checkedList = Array.isArray(this.checkedGoods[storeIndex]) ? this.checkedGoods[storeIndex] : [];
+				let selectableCount = 0;
+				let selectedCount = 0;
+				const actList = Array.isArray(store.new_list) ? store.new_list : [];
+				actList.forEach((act) => {
+					const goodsList = Array.isArray(act.act_goods_list) ? act.act_goods_list : [];
+					goodsList.forEach((item) => {
+						if (!item) return;
+						const isSelectable = item.is_invalid != 1 && Number(item.product_number || 0) > 0;
+						const isSelected = checkedList.includes(item.rec_id);
+						item.checked = isSelected;
+						if (isSelectable) {
+							selectableCount++;
+							if (isSelected) {
+								selectedCount++;
+								totalTypes++;
+								totalCount += parseInt(item.goods_number) || 0;
+								checkedGoodsId.push(item.rec_id);
+							}
+						} else {
+							item.checked = false;
+						}
+					});
+				});
+				this.$set(this.checkedShop, storeIndex, selectableCount > 0 && selectedCount === selectableCount);
+			});
+
+			this.checkedGoodsId = checkedGoodsId;
+			this.count = totalCount;
+			this.nums = totalTypes;
+			this.checkAllOper();
+		},
 		immediatelyCheckSelectedGoods() {
-		  // 直接检查商品的实际选中状态，排除失效商品
-		  for (let i = 0; i < this.goodsCartList.length; i++) {
-		    for (let j = 0; j < this.goodsCartList[i].new_list.length; j++) {
-		      for (let z = 0; z < this.goodsCartList[i].new_list[j].act_goods_list.length; z++) {
-		        const item = this.goodsCartList[i].new_list[j].act_goods_list[z]
-		        // 确保商品选中、有货且未失效
-		        if (item.checked && item.product_number > 0 && item.is_invalid != 1) {
-		          return true // 至少有一个选中的有效商品
-		        }
-		      }
+		  if (!Array.isArray(this.checkedGoods)) return false;
+		  for (let i = 0; i < this.checkedGoods.length; i++) {
+		    if (Array.isArray(this.checkedGoods[i]) && this.checkedGoods[i].length > 0) {
+		      return true;
 		    }
 		  }
-		  return false // 没有选中的有效商品
+		  return false;
 		},
 		
 		// 新增方法：统计当前选中的店铺数量
@@ -7808,10 +7810,9 @@ function withTimeout(promise, ms) {
 
 											return copy;
 										});
-										that.$store.commit('goodsCartList', { data: fallbackList });
+										that.$store.commit('goodsCartList', { data: fallbackList, preserveSelection: true });
 										const lastRecId = that.calculateLastRecId(fallbackList);
 										that.lastRecId = lastRecId;
-										// 使用组件已有的登录判断逻辑，避免调用不存在的方法
 										if (that.$isLogin && that.$isLogin()) {
 											that.saveCartCache(fallbackList, lastRecId);
 										}
@@ -7847,9 +7848,8 @@ function withTimeout(promise, ms) {
 										if (storeList.length === 0) {
 											// 从本地购物车列表中删除该店铺
 											const removedList = currentGoodsCartList.filter((_, idx) => idx !== targetStoreIndex);
-											that.$store.commit('goodsCartList', { data: removedList });
+											that.$store.commit('goodsCartList', { data: removedList, preserveSelection: true });
 
-											// 重新计算 lastRecId 并更新缓存
 											const lastRecId = that.calculateLastRecId(removedList);
 											that.lastRecId = lastRecId;
 											if (that.$isLogin && that.$isLogin()) {
@@ -7913,9 +7913,8 @@ function withTimeout(promise, ms) {
 											return updatedStore;
 										});
 
-										that.$store.commit('goodsCartList', { data: mergedList });
+										that.$store.commit('goodsCartList', { data: mergedList, preserveSelection: true });
 
-										// 更新缓存：只保存合并后的整车数据
 										const lastRecId = that.calculateLastRecId(mergedList);
 										that.lastRecId = lastRecId;
 										// 使用组件已有的登录判断逻辑，避免调用不存在的方法
@@ -8808,31 +8807,28 @@ function withTimeout(promise, ms) {
 	        this.loading3 = false;
 	        this.dataLoading = false;
 
-	        // 数据处理延迟执行，避免阻塞UI和tab切换
 	        setTimeout(() => {
+	          this.processCartData(cache.goodsCartList || []);
 	          this.handleSelectionAfterFetch();
 	          if (hasData) {
-	            // 有数据时，执行价格计算和订单验证
-	            // 【临时注释】异步验证订单状态
+	            this.changeGoods(true);
 	            setTimeout(() => {
-	              console.log('[onShow] 缓存有效，开始异步验证订单状态');
 	              this.verifyOrderedItems().then(orderedItems => {
 	                if (orderedItems && orderedItems.length > 0) {
-	                  console.log('[onShow] 缓存有效但发现过期商品:', orderedItems.length, '个');
 	                  this.removeOrderedItems(orderedItems);
-	                } else {
-	                  console.log('[onShow] 缓存有效，订单状态正常');
 	                }
 	              }).catch(error => {
 	                console.error('[onShow] 异步验证订单状态失败:', error);
 	              });
-	            }, 1500); // 延迟1.5秒，避免影响页面首次渲染
+	            }, 1500);
 	          } else {
-	            // 【核心修复】有缓存但无数据时，不显示loading，直接显示空状态
 	            this.loading = false;
+	            this.totalPriceTiping = true;
+	            this.totalPrice = '0.00';
+	            this.count = 0;
+	            this.nums = 0;
 	          }
 
-	          // 有缓存也始终做一次静默全量更新，保证“缓存无字段但接口有字段”能够更新显示
 	          this.isSilentUpdating = true;
 	          this.goodsList(true, true).finally(() => {
 	            this.isSilentUpdating = false;
