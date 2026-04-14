@@ -5683,6 +5683,9 @@ function withTimeout(promise, ms) {
 						});
 					}
 				};
+
+				// 先把 item.checked 与 checkedGoods 对齐，确保后续是否有选中、参数拼装都基于同一状态源
+				that.applySelectionSummaryFromCheckedState();
 				
 				// 立即检查是否有选中商品 - 这是关键修复
 				const hasSelected = that.immediatelyCheckSelectedGoods();
@@ -5765,7 +5768,6 @@ function withTimeout(promise, ms) {
 			that.checkedGoodsId = arr.filter(item => !toRemove.includes(item));
 			that.checkAllOper();
 			that.saveSelectionState();
-				
 			// 判断是否全选（这里的 checkedAll 结合 checkedShop/checkedGoods 才是真正的业务含义）
 			const isAllChecked = that.checkedAll;
 			// 全局全选模式必须以“当前仍是全选”作为前提，避免返回页面时误传整店 ru_id
@@ -5909,6 +5911,14 @@ function withTimeout(promise, ms) {
 			// 普通模式：只有非全选时才传递商品ID
 			if (!inGlobalAllMode && !isAllChecked && recIdList.length > 0) {
 				requestParams.rec_id = recIdList.join(',');
+			}
+			// 防止参数退化为仅 app_version：有选中商品时必须至少携带 ru_id 或 rec_id
+			if (indexOne > 0 && !requestParams.ru_id && !requestParams.rec_id) {
+				that.loading = false;
+				that.totalPriceTiping = true;
+				that.disabled = true;
+				finishReckon();
+				return;
 			}
 
 			// 保存indexOne的值，用于价格计算完成后的回调
