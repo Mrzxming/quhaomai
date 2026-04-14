@@ -147,18 +147,24 @@ const mutations = {
 		//清除购物车数据
 		store.commit(GOODS_CART_LIST, { data: [] });
 		
-		//清除购物车缓存数据
 		try {
 			if (userId) {
-				const cartCacheKey = `cart_cache_${userId}`;
-				uni.removeStorageSync(cartCacheKey);
-				console.log('[USER_LOGOUT] 已清除购物车缓存:', cartCacheKey);
+				uni.removeStorageSync(`cart_cache_${userId}`);
+				uni.removeStorageSync(`cart_selection_state_${userId}`);
+				uni.removeStorageSync(`cart_address_cache_${userId}`);
 			}
-			// 清除购物车数量缓存
 			uni.removeStorageSync('cartNumber');
-			// 清除购物车首次加载标记
 			uni.removeStorageSync('cart_first_loaded');
-			console.log('[USER_LOGOUT] 已清除所有购物车相关缓存');
+			uni.removeStorageSync('__cart_sync_fresh_ts__');
+			uni.removeStorageSync('cat_rec_id');
+			uni.removeStorageSync('allprice');
+			if (typeof getApp === 'function') {
+				const app = getApp();
+				if (app && app.globalData) {
+					delete app.globalData['__cartSelectionState__'];
+					delete app.globalData['__cartAppSessionId__'];
+				}
+			}
 		} catch (error) {
 			console.error('[USER_LOGOUT] 清除购物车缓存失败:', error);
 		}

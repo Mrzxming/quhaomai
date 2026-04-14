@@ -1338,12 +1338,8 @@ function readSavedSelectionState() {
 	const storageKey = getSelectionStorageKey();
 	const memoryState = container[CART_SELECTION_STATE_KEY];
 	if (memoryState && typeof memoryState === 'object') {
-		if (Object.prototype.hasOwnProperty.call(memoryState, 'storageKey')) {
-			if (memoryState.storageKey === storageKey) {
-				return memoryState.value || null;
-			}
-		} else {
-			return memoryState || null;
+		if (memoryState.storageKey === storageKey) {
+			return memoryState.value || null;
 		}
 	}
 	try {
@@ -1607,7 +1603,8 @@ function withTimeout(promise, ms) {
 				flashSaleNowTs: Math.floor(Date.now() / 1000), // 秒级当前时间戳（驱动限时抢倒计时刷新）
 				flashSaleTimer: null,
 				flashSaleRemainSeedMap: {},
-				cartDataUpdatedHandler: null
+				cartDataUpdatedHandler: null,
+				_lastCartUserId: ''
 			};
 		},
 
@@ -8744,18 +8741,22 @@ function withTimeout(promise, ms) {
 	    this.disabled = true;
 	    // 注意：loading 状态稍后根据是否有缓存来决定是否设置
 	    
-	    // 继续执行后续逻辑
-	    // 检查用户ID是否变化（账号切换）
 	    const currentUserId = String(uni.getStorageSync('user_id') || '');
-	    const cacheKey = this.getCartCacheKey();
-	    const cachedUserId = cacheKey.replace('cart_cache_', '');
-	    
-	    // 统一转换为字符串后比较，避免类型不一致导致误判
-	    if (currentUserId && cachedUserId && currentUserId !== cachedUserId) {
-	      // 用户ID变化，清除旧缓存
+	    const lastUserId = this._lastCartUserId || '';
+	    if (lastUserId && currentUserId && currentUserId !== lastUserId) {
 	      this.clearCartCache();
 	      this.clearAddressCache();
+	      clearSavedSelectionState();
+	      this.$store.commit('goodsCartList', { data: [] });
+	      this.totalPrice = '0.00';
+	      this.totalPriceTiping = true;
+	      this.count = 0;
+	      this.nums = 0;
+	      this.checkedGoodsId = [];
+	      this.checkedAll = false;
+	      this._globalAllSelectedMode = false;
 	    }
+	    this._lastCartUserId = currentUserId;
 	    
 	    // 先检查是否有缓存，决定是否显示 loading3 和 loading
 	    const token = uni.getStorageSync('token');
