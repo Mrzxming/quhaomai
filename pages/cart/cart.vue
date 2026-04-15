@@ -5685,9 +5685,18 @@ function withTimeout(promise, ms) {
 
 	const localGoodsCount = snum;
 	const localGoodsTypes = nums;
-	
-	that.count = localGoodsCount; // 购物车勾选商品数量
-	that.nums = localGoodsTypes;
+
+	if (inGlobalAllMode) {
+		if (typeof that._lastFullSelectionCount === 'number') {
+			that.count = that._lastFullSelectionCount;
+		}
+		if (typeof that._lastFullSelectionTypes === 'number') {
+			that.nums = that._lastFullSelectionTypes;
+		}
+	} else {
+		that.count = localGoodsCount;
+		that.nums = localGoodsTypes;
+	}
 
 			// 生成版本号
 			const version = incrementVersion();
@@ -6187,8 +6196,16 @@ function withTimeout(promise, ms) {
 			});
 
 			this.checkedGoodsId = checkedGoodsId;
-			this.count = totalCount;
-			this.nums = totalTypes;
+			if (this._globalAllSelectedMode && typeof this._lastFullSelectionCount === 'number') {
+				this.count = this._lastFullSelectionCount;
+			} else {
+				this.count = totalCount;
+			}
+			if (this._globalAllSelectedMode && typeof this._lastFullSelectionTypes === 'number') {
+				this.nums = this._lastFullSelectionTypes;
+			} else {
+				this.nums = totalTypes;
+			}
 			this.checkAllOper();
 		},
 		immediatelyCheckSelectedGoods() {
@@ -8667,9 +8684,11 @@ function withTimeout(promise, ms) {
 	        this.isFirstLoad = false;
 	        if (!Number.isNaN(cache.count)) {
 	        	this.count = cache.count;
+	        	this._lastFullSelectionCount = cache.count;
 	        }
 	        if (!Number.isNaN(cache.nums)) {
 	        	this.nums = cache.nums;
+	        	this._lastFullSelectionTypes = cache.nums;
 	        }
 
 	        // 标记为已初始化，避免 goodsList() 中重复处理
@@ -8686,6 +8705,8 @@ function withTimeout(promise, ms) {
 	          this.processCartData(cache.goodsCartList || []);
 	          this.handleSelectionAfterFetch();
 	          if (hasData) {
+	            this.disabled = true;
+	            this.totalPriceTiping = false;
 	            this.changeGoods(true);
 	            setTimeout(() => {
 	              this.verifyOrderedItems().then(orderedItems => {
@@ -8893,17 +8914,7 @@ function withTimeout(promise, ms) {
 			    immediate: false,
 			    deep: false
 			  },
-		count() {
-			//获取购物车数量
-			// 只有在价格计算完成后才更新 disabled 状态
-			if (this.totalPriceTiping) {
-				if (this.count > 0) {
-					this.disabled = false
-				} else {
-					this.disabled = true
-				}
-			}
-		},
+		count() {},
 			regionShow() {
 				if (this.regionShow) {
 					this.regionLoading = true
