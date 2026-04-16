@@ -1338,12 +1338,8 @@ function readSavedSelectionState() {
 	const storageKey = getSelectionStorageKey();
 	const memoryState = container[CART_SELECTION_STATE_KEY];
 	if (memoryState && typeof memoryState === 'object') {
-		if (Object.prototype.hasOwnProperty.call(memoryState, 'storageKey')) {
-			if (memoryState.storageKey === storageKey) {
-				return memoryState.value || null;
-			}
-		} else {
-			return memoryState || null;
+		if (memoryState.storageKey === storageKey) {
+			return memoryState.value || null;
 		}
 	}
 	try {
@@ -1607,7 +1603,8 @@ function withTimeout(promise, ms) {
 				flashSaleNowTs: Math.floor(Date.now() / 1000), // 秒级当前时间戳（驱动限时抢倒计时刷新）
 				flashSaleTimer: null,
 				flashSaleRemainSeedMap: {},
-				cartDataUpdatedHandler: null
+				cartDataUpdatedHandler: null,
+				_lastCartUserId: ''
 			};
 		},
 
@@ -2579,11 +2576,7 @@ function withTimeout(promise, ms) {
 			snapshot.storeSelectableCounts.forEach((count, idx) => {
 				const selected = perStoreSelectedCounts[idx] || 0;
 				const shopChecked = count > 0 && selected === count;
-				if (shopChecked && Array.isArray(this.shopInvalidArr) && this.shopInvalidArr[idx] === true) {
-					this.$set(this.checkedShop, idx, false);
-				} else {
-					this.$set(this.checkedShop, idx, shopChecked);
-				}
+				this.$set(this.checkedShop, idx, shopChecked);
 			});
 
 			const allFullySelected = snapshot.storeSelectableCounts.every((count, idx) => {
@@ -2944,8 +2937,7 @@ function withTimeout(promise, ms) {
 							return hasGoods;
 						});
 
-						// 更新 Vuex store
-						that.$store.commit('goodsCartList', { data: filteredList });
+						that.$store.commit('goodsCartList', { data: filteredList, preserveSelection: true });
 
 						// 使用 $nextTick 确保 Vue 响应式系统已更新视图
 						that.$nextTick(() => {
@@ -4300,9 +4292,8 @@ function withTimeout(promise, ms) {
 						}
 					} else {
 						// 店铺不存在，插入新店铺到购物车列表的第一个位置
-						// 使用 Vuex mutation 来更新，确保响应式
 						const newList = [newStore, ...this.goodsCartList];
-						this.$store.commit('goodsCartList', { data: newList });
+						this.$store.commit('goodsCartList', { data: newList, preserveSelection: true });
 					}
 				});
 				
@@ -4398,8 +4389,7 @@ function withTimeout(promise, ms) {
 
 					// 5. 触发价格重计算
 				} catch (error) {
-					// 降级到全量更新
-					this.$store.commit('goodsCartList', { data: newServerData });
+					this.$store.commit('goodsCartList', { data: newServerData, preserveSelection: true });
 					this.ensureBasePriceFieldsForAllGoods();
 				}
 			},
@@ -4646,44 +4636,36 @@ function withTimeout(promise, ms) {
 			 * 移除店铺
 			 */
 			removeShops(shopIds) {
+				const removedIndices = [];
+				this.goodsCartList.forEach((shop, index) => {
+					if (shopIds.includes(shop.store_id)) {
+						removedIndices.push(index);
+					}
+				});
+
+				removedIndices.sort((a, b) => b - a).forEach(index => {
+					this.checkedShop.splice(index, 1);
+					this.checkedGoods.splice(index, 1);
+					this.allGoodsListId.splice(index, 1);
+				});
+
 				const filteredList = this.goodsCartList.filter(shop =>
 					!shopIds.includes(shop.store_id)
 				);
-
-				this.$store.commit('goodsCartList', { data: filteredList });
-
-				// 同步更新选中状态数组
-				if (shopIds.length > 0) {
-					const removedIndices = [];
-					this.goodsCartList.forEach((shop, index) => {
-						if (shopIds.includes(shop.store_id)) {
-							removedIndices.push(index);
-						}
-					});
-
-					// 从后往前删除，避免索引错乱
-					removedIndices.sort((a, b) => b - a).forEach(index => {
-						this.checkedShop.splice(index, 1);
-						this.checkedGoods.splice(index, 1);
-						this.allGoodsListId.splice(index, 1);
-					});
-				}
+				this.$store.commit('goodsCartList', { data: filteredList, preserveSelection: true });
 			},
 
 			/**
 			 * 添加新店铺
 			 */
 			addShops(newShops) {
-				// 添加到列表末尾
 				const updatedList = [...this.goodsCartList, ...newShops];
-				this.$store.commit('goodsCartList', { data: updatedList });
-
-				// 初始化选中状态数组
 				newShops.forEach(() => {
 					this.checkedShop.push(false);
 					this.checkedGoods.push([]);
 					this.allGoodsListId.push([]);
 				});
+				this.$store.commit('goodsCartList', { data: updatedList, preserveSelection: true });
 			},
 
 			/**
@@ -4812,10 +4794,7 @@ function withTimeout(promise, ms) {
 					return cleanedShop;
 				}).filter(shop => shop.new_list && shop.new_list.length > 0);
 
-				// 更新Vuex store
-				this.$store.commit('goodsCartList', { data: cleanedList });
-
-				// 【关键修复】同步更新选中状态数组
+				this.$store.commit('goodsCartList', { data: cleanedList, preserveSelection: true });
 				this.syncSelectionArraysAfterRemoval(cleanedList, orderedRecIds);
 
 				// 更新本地缓存
@@ -5031,39 +5010,36 @@ function withTimeout(promise, ms) {
 			  
 			  // 使用 nextTick 确保数据更新后立即渲染，复杂计算延迟执行
 			const finishLoading = () => {
-			    // 【修改】静默模式下不关闭 dataLoading，由调用方控制
 			    if (!silent) {
-			      // 立即关闭 loading，让 UI 先渲染
-			      // 注意：不在 goodsList 中关闭 loading3，由 showEvery 的 Promise.all 统一管理
-			      // 接口已经返回，无论数据是否为空，都应该立即关闭数据加载状态
-			      // 因为 finishLoading 是在接口的 .then() 回调中调用的，说明数据已经更新完成
 			      that.dataLoading = false;
 			    }
 
-			    // 计算并保存 lastRecId
 			    const lastRecId = that.calculateLastRecId(that.goodsCartList);
 			    that.lastRecId = lastRecId;
 
-			    // 只有用户已登录时才保存缓存
 			    if (isLoggedInForSave) {
 			      that.saveCartCache(that.goodsCartList, lastRecId);
 			    }
 			    that.ensureBasePriceFieldsForAllGoods();
 
-
-			    // 【优化问题2】延迟执行复杂的数据处理，避免阻塞渲染
-			    // 【修复问题3】确保 processCartData() 在数据加载完成后被调用，更新 shopInvalidArr
 			    if (that.processCartData && that.goodsCartList && that.goodsCartList.length > 0) {
 			      that.processCartData(that.goodsCartList);
 			    }
-			    
-			    // 【修复】购物车数据加载完成后立即关闭全屏 loading，价格计算用静默模式（底部显示"计算中"）
+
+			    if (silent) {
+			      that._initialized = true;
+			      that.applySelectionSummaryFromCheckedState();
+			      if (that.immediatelyCheckSelectedGoods()) {
+			        that.saveSelectionState();
+			      }
+			      return;
+			    }
+
 			    that.loading = false;
 			    that.$nextTick(() => {
 			      that.handleSelectionAfterFetch();
 			      that._initialized = true;
 			      if (that.goodsCartList && that.goodsCartList.length > 0) {
-			        // 静默模式：不显示全屏 loading，底部价格区域显示"计算中"
 			        that.changeGoods(true);
 			      } else {
 			        that.loading = false;
@@ -5080,8 +5056,7 @@ function withTimeout(promise, ms) {
 			        try {
 			          that.incrementalCartUpdate(res.data);
 			        } catch (error) {
-			          // 降级到全量更新
-			          that.$store.commit('goodsCartList', { data: res.data });
+			          that.$store.commit('goodsCartList', { data: res.data, preserveSelection: true });
 			        }
 			      }
 			      finishLoading();
@@ -5141,26 +5116,20 @@ function withTimeout(promise, ms) {
 			
 			this.checkedShop.splice(index, 1, !checked)
 			if (!checked) {
-				// 选中店铺：如果有"查看更多"，自动加载更多商品
+				this.checkedGoods[index] = [];
 				if (shop.ishas_more_goods === true) {
-						// 先设置选中状态
 						shop.new_list.forEach((act) => {
 							act.act_goods_list.forEach((g) => {
-								// 只选中有效且有货的商品，排除失效商品
 								if (g.is_invalid != 1 && g.product_number > 0) {
 									this.checkedGoods[index].push(g.rec_id)
 									g.checked = true;
 								}
 							})
 						})
-						
-						// 然后加载更多商品（loadMoreGoods 内部会自动选中新加载的商品）
 						this.loadMoreGoods(index, shop);
 					} else {
-						// 没有更多商品，正常选中
 						shop.new_list.forEach((act) => {
 							act.act_goods_list.forEach((g) => {
-								// 只选中有效且有货的商品，排除失效商品
 								if (g.is_invalid != 1 && g.product_number > 0) {
 									this.checkedGoods[index].push(g.rec_id)
 								}
@@ -5257,23 +5226,17 @@ function withTimeout(promise, ms) {
 		}
 	}
 
-			//获取店铺下商品数量
-			this.goodsCartList.forEach((v, index) => {
-				let arr = []
-				v.new_list.forEach((act) => {
-					act.act_goods_list.forEach((g) => {
-						arr.push(g)
-					})
-				})
-
-				clength.push(arr.length)
-			})
-
-			// 直接设置新的选中状态，而不是根据当前状态切换
 			this.goodsCartList[index].new_list[listIndex].act_goods_list[actIndex].checked = newCheckedState;
-			
-			//商品勾选状态 改变店铺勾选状态
-			this.checkedShop[index] = (clength[index] == this.checkedGoods[index].length)
+
+			let selectableCount = 0;
+			this.goodsCartList[index].new_list.forEach((act) => {
+				act.act_goods_list.forEach((g) => {
+					if (g.is_invalid != 1 && Number(g.product_number || 0) > 0) {
+						selectableCount++;
+					}
+				});
+			});
+			this.checkedShop[index] = (selectableCount > 0 && selectableCount == this.checkedGoods[index].length)
 			
 			// 确保在调用 changeGoods 之前，状态已经更新完成
 			// 使用 $nextTick 确保 Vue 的响应式更新已完成
@@ -5722,9 +5685,18 @@ function withTimeout(promise, ms) {
 
 	const localGoodsCount = snum;
 	const localGoodsTypes = nums;
-	
-	that.count = localGoodsCount; // 购物车勾选商品数量
-	that.nums = localGoodsTypes;
+
+	if (inGlobalAllMode) {
+		if (typeof that._lastFullSelectionCount === 'number') {
+			that.count = that._lastFullSelectionCount;
+		}
+		if (typeof that._lastFullSelectionTypes === 'number') {
+			that.nums = that._lastFullSelectionTypes;
+		}
+	} else {
+		that.count = localGoodsCount;
+		that.nums = localGoodsTypes;
+	}
 
 			// 生成版本号
 			const version = incrementVersion();
@@ -6183,20 +6155,67 @@ function withTimeout(promise, ms) {
 		},
 		
 		// 新增方法：立即检查选中状态
+		applySelectionSummaryFromCheckedState() {
+			if (!Array.isArray(this.goodsCartList)) return;
+			let totalCount = 0;
+			let totalTypes = 0;
+			const checkedGoodsId = [];
+
+			this.goodsCartList.forEach((store, storeIndex) => {
+				const checkedList = Array.isArray(this.checkedGoods[storeIndex]) ? this.checkedGoods[storeIndex] : [];
+				let selectableCount = 0;
+				let selectedCount = 0;
+				const validRecIds = [];
+				const actList = Array.isArray(store.new_list) ? store.new_list : [];
+				actList.forEach((act) => {
+					const goodsList = Array.isArray(act.act_goods_list) ? act.act_goods_list : [];
+					goodsList.forEach((item) => {
+						if (!item) return;
+						const isSelectable = item.is_invalid != 1 && Number(item.product_number || 0) > 0;
+						const isSelected = checkedList.includes(item.rec_id);
+						if (isSelectable && isSelected) {
+							item.checked = true;
+							selectableCount++;
+							selectedCount++;
+							totalTypes++;
+							totalCount += parseInt(item.goods_number) || 0;
+							checkedGoodsId.push(item.rec_id);
+							validRecIds.push(item.rec_id);
+						} else if (isSelectable) {
+							item.checked = false;
+							selectableCount++;
+						} else {
+							item.checked = false;
+						}
+					});
+				});
+				if (validRecIds.length !== checkedList.length) {
+					this.$set(this.checkedGoods, storeIndex, validRecIds);
+				}
+				this.$set(this.checkedShop, storeIndex, selectableCount > 0 && selectedCount === selectableCount);
+			});
+
+			this.checkedGoodsId = checkedGoodsId;
+			if (this._globalAllSelectedMode && typeof this._lastFullSelectionCount === 'number') {
+				this.count = this._lastFullSelectionCount;
+			} else {
+				this.count = totalCount;
+			}
+			if (this._globalAllSelectedMode && typeof this._lastFullSelectionTypes === 'number') {
+				this.nums = this._lastFullSelectionTypes;
+			} else {
+				this.nums = totalTypes;
+			}
+			this.checkAllOper();
+		},
 		immediatelyCheckSelectedGoods() {
-		  // 直接检查商品的实际选中状态，排除失效商品
-		  for (let i = 0; i < this.goodsCartList.length; i++) {
-		    for (let j = 0; j < this.goodsCartList[i].new_list.length; j++) {
-		      for (let z = 0; z < this.goodsCartList[i].new_list[j].act_goods_list.length; z++) {
-		        const item = this.goodsCartList[i].new_list[j].act_goods_list[z]
-		        // 确保商品选中、有货且未失效
-		        if (item.checked && item.product_number > 0 && item.is_invalid != 1) {
-		          return true // 至少有一个选中的有效商品
-		        }
-		      }
+		  if (!Array.isArray(this.checkedGoods)) return false;
+		  for (let i = 0; i < this.checkedGoods.length; i++) {
+		    if (Array.isArray(this.checkedGoods[i]) && this.checkedGoods[i].length > 0) {
+		      return true;
 		    }
 		  }
-		  return false // 没有选中的有效商品
+		  return false;
 		},
 		
 		// 新增方法：统计当前选中的店铺数量
@@ -6418,13 +6437,11 @@ function withTimeout(promise, ms) {
 					}
 				})
 			},
-			//修改购物车商品数量
 			goodsNumberhandle(e, id, act_id, store_id, listIndex, actIndex, index, goods_price) {
-				// 防止并发请求：如果已有请求正在进行，则忽略本次请求
 				if (this._isUpdatingNumber) {
 					return;
 				}
-				
+
 				this.stepDisabled.forEach((v, i) => {
 					v.forEach((s, d) => {
 						if (s.id == id) {
@@ -6436,83 +6453,29 @@ function withTimeout(promise, ms) {
 				const targetGoodsItem = this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index];
 				const previousGoodsNumber = this.normalizeNumericValue(targetGoodsItem.goods_number);
 				const wasGoodsSelected = targetGoodsItem.checked === true && targetGoodsItem.is_invalid != 1;
-				
-				// 注意：不要在这里立即更新 goods_number，等待接口返回后再更新
-				// 这样可以确保在库存不足时，数量不会先被设置为错误的值
-				// targetGoodsItem.goods_number = e
 
 				this.goodsnumber = e
 				this.pricenum = goods_price
 				this.allprice = this.goodsnumber * this.pricenum
 				uni.setStorageSync('allprice', this.allprice)
 				const version = incrementVersion();
-				
-				// 设置请求锁
-				this._isUpdatingNumber = true;	
-				
-				// 商品未选中时，只调用 setUpdateNumber，不计算价格，也不修改价格显示状态
-				if (!wasGoodsSelected) {
-					this.$store.dispatch('setUpdateNumber', {
-						rec_id: id,
-						num: e,
-						district_id: this.regionData.district.id,
-						app_version: version,
-					}).then(({
-						data: data
-					}) => {
-						this.stepDisabled.forEach((v, i) => {
-							v.forEach((s, d) => {
-								if (s.id == id) {
-									this.stepDisabled[i][d].type = false
-								}
-							})
-						});
-						if (data.error == 0) {
-							// 数量更新成功，更新本地数量
-							this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].goods_number = e;
-							// 同步到缓存，避免切页返回时显示旧数量
-							if (this.$isLogin && this.$isLogin()) {
-								this.saveCartCache(this.goodsCartList, this.lastRecId);
+
+				this._isUpdatingNumber = true;
+
+				const unlockStep = () => {
+					this.stepDisabled.forEach((v, i) => {
+						v.forEach((s, d) => {
+							if (s.id == id) {
+								this.stepDisabled[i][d].type = false
 							}
-						} else {
-							// 处理库存不足的情况：使用后端返回的实际可购买数量
-							if (data.number !== undefined && data.number !== null) {
-								// 优先使用后端返回的 number（实际可购买数量）
-								this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].goods_number = data.number
-							} else if (this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].xiangou_num > 0) {
-								// 如果没有返回 number，则使用限购数量
-								this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].goods_number =
-									this.goodsCartList[listIndex].new_list[actIndex].act_goods_list[index].xiangou_num
-							}
-							// 同步到缓存（数量已被修正）
-							if (this.$isLogin && this.$isLogin()) {
-								this.saveCartCache(this.goodsCartList, this.lastRecId);
-							}
-							uni.showToast({
-								title: data.msg,
-								icon: 'none'
-							});
-						}
-						// 释放请求锁
-						this._isUpdatingNumber = false;
-						uni.hideKeyboard()
-					}).catch((err) => {
-						// 请求失败时也要释放锁
-						this._isUpdatingNumber = false;
-						this.stepDisabled.forEach((v, i) => {
-							v.forEach((s, d) => {
-								if (s.id == id) {
-									this.stepDisabled[i][d].type = false
-								}
-							})
-						});
-					})
-					return;
+						})
+					});
+				};
+
+				if (wasGoodsSelected) {
+					this.totalPriceTiping = false;
 				}
-				
-				// 商品已选中时，调用 setUpdateNumber，在现有总价基础上增减
-				// 只有商品已选中时才设置计算中状态
-				this.totalPriceTiping = false;
+
 				this.$store.dispatch('setUpdateNumber', {
 					rec_id: id,
 					num: e,
@@ -6521,108 +6484,35 @@ function withTimeout(promise, ms) {
 				}).then(({
 					data: data
 				}) => {
-					this.stepDisabled.forEach((v, i) => {
-						v.forEach((s, d) => {
-							if (s.id == id) {
-								this.stepDisabled[i][d].type = false
-							}
-						})
-					});
-				
+					unlockStep();
 					if (data.error == 0) {
-						// 数量更新成功，先更新本地数量，然后重新计算价格
-						targetGoodsItem.goods_number = e;
-						// 同步到缓存，避免切页返回时显示旧数量
-						if (this.$isLogin && this.$isLogin()) {
-							this.saveCartCache(this.goodsCartList, this.lastRecId);
-						}
-						// 释放请求锁
-						this._isUpdatingNumber = false;
-						uni.hideKeyboard();
-						// 使用 $nextTick 确保数量更新已经同步到视图
-						this.$nextTick(() => {
-							// 重新计算总价和总数量，确保与后端数据一致
-							this.changeGoods();
-						});
-						return;
-
+						this.$set(targetGoodsItem, 'goods_number', e);
 					} else {
-						// 处理库存不足的情况：使用后端返回的实际可购买数量
-						const actualNumber = (data.number !== undefined && data.number !== null) 
-							? data.number 
-							: (targetGoodsItem.xiangou_num > 0 ? targetGoodsItem.xiangou_num : targetGoodsItem.goods_number);
-						
-						// 更新商品数量为实际可购买数量（使用 $set 确保 Vue 响应式更新）
-						this.$set(targetGoodsItem, 'goods_number', actualNumber);
-
-						uni.showToast({
-							title: data.msg,
-							icon: 'none'
-						});
-						
-						// 如果商品已选中，需要重新计算价格（因为数量已被修正为实际可购买数量）
-						if (wasGoodsSelected) {
-							// 关键修复：库存不足时，后端购物车可能还是旧数据
-							// 需要先用实际可购买数量更新后端，确保后端数据正确，然后再计算价格
-							const updateVersion = incrementVersion();
-							this.$store.dispatch('setUpdateNumber', {
-								rec_id: id,
-								num: actualNumber, // 使用实际可购买数量更新后端
-								district_id: this.regionData.district.id,
-								app_version: updateVersion,
-							}).then(({ data: updateData }) => {
-								// 检查第二次更新是否成功
-								if (updateData.error == 0) {
-									// 后端已更新为实际数量，同步到缓存
-									if (this.$isLogin && this.$isLogin()) {
-										this.saveCartCache(this.goodsCartList, this.lastRecId);
-									}
-									// 释放请求锁
-									this._isUpdatingNumber = false;
-									uni.hideKeyboard();
-									// 使用 $nextTick 确保数量更新已经同步到视图
-									this.$nextTick(() => {
-										// 重新计算总价和总数量，此时后端数据已经是正确的数量了
-										this.changeGoods();
-									});
-								} else {
-									// 第二次更新也失败了，但本地数量已经更新，同步缓存后计算价格
-									if (this.$isLogin && this.$isLogin()) {
-										this.saveCartCache(this.goodsCartList, this.lastRecId);
-									}
-									this._isUpdatingNumber = false;
-									uni.hideKeyboard();
-									this.$nextTick(() => {
-										this.changeGoods();
-									});
-								}
-							}).catch((updateErr) => {
-								// 即使更新失败，也同步缓存并释放锁（使用本地已更新的数量）
-								if (this.$isLogin && this.$isLogin()) {
-									this.saveCartCache(this.goodsCartList, this.lastRecId);
-								}
-								this._isUpdatingNumber = false;
-								uni.hideKeyboard();
-								this.$nextTick(() => {
-									this.changeGoods();
-								});
-							});
-						} else {
-							// 释放请求锁
-							this._isUpdatingNumber = false;
-							uni.hideKeyboard();
+						const correctedNumber = (data.number !== undefined && data.number !== null)
+							? parseInt(data.number)
+							: previousGoodsNumber;
+						this.$set(targetGoodsItem, 'goods_number', correctedNumber);
+						if (data.msg) {
+							uni.showToast({ title: data.msg, icon: 'none', duration: 2000 });
 						}
 					}
-				}).catch((err) => {
-					// 请求失败时也要释放锁
+					if (this.$isLogin && this.$isLogin()) {
+						this.saveCartCache(this.goodsCartList, this.lastRecId);
+					}
 					this._isUpdatingNumber = false;
-					this.stepDisabled.forEach((v, i) => {
-						v.forEach((s, d) => {
-							if (s.id == id) {
-								this.stepDisabled[i][d].type = false
-							}
-						})
-					});
+					uni.hideKeyboard();
+					if (wasGoodsSelected) {
+						this.$nextTick(() => {
+							this.changeGoods();
+						});
+					}
+				}).catch((err) => {
+					this.$set(targetGoodsItem, 'goods_number', previousGoodsNumber);
+					unlockStep();
+					this._isUpdatingNumber = false;
+					if (wasGoodsSelected) {
+						this.totalPriceTiping = true;
+					}
 				})
 				//}, 1000)
 			},
@@ -7808,10 +7698,9 @@ function withTimeout(promise, ms) {
 
 											return copy;
 										});
-										that.$store.commit('goodsCartList', { data: fallbackList });
+										that.$store.commit('goodsCartList', { data: fallbackList, preserveSelection: true });
 										const lastRecId = that.calculateLastRecId(fallbackList);
 										that.lastRecId = lastRecId;
-										// 使用组件已有的登录判断逻辑，避免调用不存在的方法
 										if (that.$isLogin && that.$isLogin()) {
 											that.saveCartCache(fallbackList, lastRecId);
 										}
@@ -7847,9 +7736,8 @@ function withTimeout(promise, ms) {
 										if (storeList.length === 0) {
 											// 从本地购物车列表中删除该店铺
 											const removedList = currentGoodsCartList.filter((_, idx) => idx !== targetStoreIndex);
-											that.$store.commit('goodsCartList', { data: removedList });
+											that.$store.commit('goodsCartList', { data: removedList, preserveSelection: true });
 
-											// 重新计算 lastRecId 并更新缓存
 											const lastRecId = that.calculateLastRecId(removedList);
 											that.lastRecId = lastRecId;
 											if (that.$isLogin && that.$isLogin()) {
@@ -7913,9 +7801,8 @@ function withTimeout(promise, ms) {
 											return updatedStore;
 										});
 
-										that.$store.commit('goodsCartList', { data: mergedList });
+										that.$store.commit('goodsCartList', { data: mergedList, preserveSelection: true });
 
-										// 更新缓存：只保存合并后的整车数据
 										const lastRecId = that.calculateLastRecId(mergedList);
 										that.lastRecId = lastRecId;
 										// 使用组件已有的登录判断逻辑，避免调用不存在的方法
@@ -8742,18 +8629,22 @@ function withTimeout(promise, ms) {
 	    this.disabled = true;
 	    // 注意：loading 状态稍后根据是否有缓存来决定是否设置
 	    
-	    // 继续执行后续逻辑
-	    // 检查用户ID是否变化（账号切换）
 	    const currentUserId = String(uni.getStorageSync('user_id') || '');
-	    const cacheKey = this.getCartCacheKey();
-	    const cachedUserId = cacheKey.replace('cart_cache_', '');
-	    
-	    // 统一转换为字符串后比较，避免类型不一致导致误判
-	    if (currentUserId && cachedUserId && currentUserId !== cachedUserId) {
-	      // 用户ID变化，清除旧缓存
+	    const lastUserId = this._lastCartUserId || '';
+	    if (lastUserId && currentUserId && currentUserId !== lastUserId) {
 	      this.clearCartCache();
 	      this.clearAddressCache();
+	      clearSavedSelectionState();
+	      this.$store.commit('goodsCartList', { data: [] });
+	      this.totalPrice = '0.00';
+	      this.totalPriceTiping = true;
+	      this.count = 0;
+	      this.nums = 0;
+	      this.checkedGoodsId = [];
+	      this.checkedAll = false;
+	      this._globalAllSelectedMode = false;
 	    }
+	    this._lastCartUserId = currentUserId;
 	    
 	    // 先检查是否有缓存，决定是否显示 loading3 和 loading
 	    const token = uni.getStorageSync('token');
@@ -8793,9 +8684,11 @@ function withTimeout(promise, ms) {
 	        this.isFirstLoad = false;
 	        if (!Number.isNaN(cache.count)) {
 	        	this.count = cache.count;
+	        	this._lastFullSelectionCount = cache.count;
 	        }
 	        if (!Number.isNaN(cache.nums)) {
 	        	this.nums = cache.nums;
+	        	this._lastFullSelectionTypes = cache.nums;
 	        }
 
 	        // 标记为已初始化，避免 goodsList() 中重复处理
@@ -8808,31 +8701,30 @@ function withTimeout(promise, ms) {
 	        this.loading3 = false;
 	        this.dataLoading = false;
 
-	        // 数据处理延迟执行，避免阻塞UI和tab切换
 	        setTimeout(() => {
+	          this.processCartData(cache.goodsCartList || []);
 	          this.handleSelectionAfterFetch();
 	          if (hasData) {
-	            // 有数据时，执行价格计算和订单验证
-	            // 【临时注释】异步验证订单状态
+	            this.disabled = true;
+	            this.totalPriceTiping = false;
+	            this.changeGoods(true);
 	            setTimeout(() => {
-	              console.log('[onShow] 缓存有效，开始异步验证订单状态');
 	              this.verifyOrderedItems().then(orderedItems => {
 	                if (orderedItems && orderedItems.length > 0) {
-	                  console.log('[onShow] 缓存有效但发现过期商品:', orderedItems.length, '个');
 	                  this.removeOrderedItems(orderedItems);
-	                } else {
-	                  console.log('[onShow] 缓存有效，订单状态正常');
 	                }
 	              }).catch(error => {
 	                console.error('[onShow] 异步验证订单状态失败:', error);
 	              });
-	            }, 1500); // 延迟1.5秒，避免影响页面首次渲染
+	            }, 1500);
 	          } else {
-	            // 【核心修复】有缓存但无数据时，不显示loading，直接显示空状态
 	            this.loading = false;
+	            this.totalPriceTiping = true;
+	            this.totalPrice = '0.00';
+	            this.count = 0;
+	            this.nums = 0;
 	          }
 
-	          // 有缓存也始终做一次静默全量更新，保证“缓存无字段但接口有字段”能够更新显示
 	          this.isSilentUpdating = true;
 	          this.goodsList(true, true).finally(() => {
 	            this.isSilentUpdating = false;
@@ -9022,17 +8914,7 @@ function withTimeout(promise, ms) {
 			    immediate: false,
 			    deep: false
 			  },
-		count() {
-			//获取购物车数量
-			// 只有在价格计算完成后才更新 disabled 状态
-			if (this.totalPriceTiping) {
-				if (this.count > 0) {
-					this.disabled = false
-				} else {
-					this.disabled = true
-				}
-			}
-		},
+		count() {},
 			regionShow() {
 				if (this.regionShow) {
 					this.regionLoading = true

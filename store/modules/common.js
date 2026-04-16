@@ -61,8 +61,15 @@ const mutations = {
 				console.log(JSON.stringify(data))
 			}
 		} else {
-			//清除购物车数据（登录成功后清除旧数据，准备加载新用户的购物车）
 			store.commit(GOODS_CART_LIST, { data: [] });
+			try {
+				if (typeof getApp === 'function') {
+					const app = getApp();
+					if (app && app.globalData) {
+						delete app.globalData['__cartSelectionState__'];
+					}
+				}
+			} catch (e) {}
 			
 			//存本地token
 			uni.setStorage({

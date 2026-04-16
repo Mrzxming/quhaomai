@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <meta http-equiv="Content-Language" content="zh-CN" />
+
+    <title>CMS系统管理平台</title>
+
+    <link rel="stylesheet" href="<{$pager.url}>/style/common.css" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" href="<{$pager.url}>/style/captcha_slide.css" type="text/css" charset="utf-8" />
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+
+    <script type="text/javascript">if (window.parent != window){window.top.location.href = location.href;}</script>
+
+</head>
+
+<style type="text/css">
+
+    .inpImg { line-height: 58px; margin-top: 8px;}
+
+    input { vertical-align: top;}
+
+    /* 登录按钮加载态 */
+    .new_shop_loginBtn.btn-loading {
+        background: #88adf5;
+        cursor: not-allowed;
+        opacity: .85;
+    }
+
+</style>
+
+<body style="background:#F3F9FA;">
+
+
+    <div class="new_shops_login">
+
+        <form action="?index-login" method="post" id="loginForm">
+
+            <div class="new_shops_loginIn">
+
+                <div class="n_shops_l">
+
+                    <img src="/admin/images/login/peitu@3x.png"/>
+
+                </div>
+
+                <div class="n_shops_r">
+
+                    <h1 class="n_shops_title">后台管理系统</h1>
+
+                    <div class="n_shop_inp">
+
+                        <div class="n_shop_li">
+
+                            <div class="inpImg"><img src="/admin/images/login/zhanghao@1x.png" width="25" height="25"/></div>
+
+                            <input type="text" value="" name="admin_name" id="admin_name"/>
+
+                        </div>
+
+                        <div class="n_shop_li">
+
+                            <div class="inpImg"><img src="/admin/images/login/mima@1x.png" width="19" height="25"/></div>
+
+                            <input type="password" value="" name="admin_pwd" autocomplete="new-password"/>
+
+                        </div>
+
+                    </div>
+
+                    <input type="submit" value="登录" class="new_shop_loginBtn" id="loginBtn" />
+
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+<script type="text/javascript" src="<{$pager.url}>/script/captcha_slide.js"></script>
+
+<script type="text/javascript">
+
+    document.getElementById('admin_name').focus();
+
+    /* 拦截表单提交：点击登录 → 弹出验证码 → 通过后自动登录 */
+    CaptchaSlide.interceptForm('#loginForm', { width: 320, height: 160 });
+
+</script>
+
+</body>
+
+</html>
+

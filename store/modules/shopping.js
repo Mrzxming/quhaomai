@@ -50,13 +50,20 @@ const state = {
 
 const mutations = {
 	[GOODS_CART_LIST](state, o){
-	  state.checkedShop = [];
 	  state.goodsCartList = o.data ? o.data : [];
 
-	  // 只初始化空数组，不立即计算
-	  state.checkedGoods = state.goodsCartList.map(() => []);
-	  state.allGoodsListId = state.goodsCartList.map(() => []);
-	  state.checkedShop = state.goodsCartList.map(store => store.checked);
+	  if (o.preserveSelection) {
+	    const len = state.goodsCartList.length;
+	    while (state.checkedGoods.length < len) state.checkedGoods.push([]);
+	    if (state.checkedGoods.length > len) state.checkedGoods.splice(len);
+	    while (state.checkedShop.length < len) state.checkedShop.push(false);
+	    if (state.checkedShop.length > len) state.checkedShop.splice(len);
+	    state.allGoodsListId = state.goodsCartList.map(() => []);
+	  } else {
+	    state.checkedGoods = state.goodsCartList.map(() => []);
+	    state.allGoodsListId = state.goodsCartList.map(() => []);
+	    state.checkedShop = state.goodsCartList.map(store => store.checked);
+	  }
 	},
 	[STORE_ALL](state,o){
 		for(let i = 0; i<state.goodsCartList.length; i++){
