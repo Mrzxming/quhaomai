@@ -171,14 +171,12 @@ export default {
     },
     captchaError: function (e) {
       console.error('[captcha4] captchaError:', JSON.stringify(e));
-      uni.showToast({ title: "验证失败，请重试", icon: "none", duration: 2000 });
       this.$emit("captchaError", e);
       this._destroyWebview();
     },
     captchaFail() {
-      console.log('[captcha4] captchaFail');
+      console.log('[captcha4] captchaFail — 不关闭弹窗，SDK 自动刷新验证码');
       this.$emit("captchaFail");
-      this._destroyWebview();
     },
     getUuid() {
       return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(

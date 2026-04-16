@@ -750,6 +750,8 @@
 			       
 			       // #ifdef APP-PLUS
 			       this.aliCaptchaResult = null;
+			       this.button_type = false;
+			       this.button_text = '请稍后...';
 			       console.log('[login] 准备弹出阿里验证码, captchaId:', this.aliConfig.captchaId, 'ref存在:', !!this.$refs.captcha);
 			       setTimeout(() => {
 			         if (this.$refs.captcha) {
@@ -757,6 +759,7 @@
 			           this.$refs.captcha.showCaptcha();
 			         } else {
 			           console.error('[login] captcha ref 不存在！');
+			           this.button_type = true;
 			         }
 			       }, 500);
 			       // #endif
@@ -876,10 +879,7 @@
 			        uni.showToast({ title: '验证失败，请重试', icon: "none" });
 			      },
 			      captchaFail() {
-			        console.log('[login] captchaFail');
-			        this.aliCaptchaResult = null;
-			        this.button_type = true;
-			        uni.showToast({ title: '验证失败', icon: "none" });
+			        console.log('[login] captchaFail — 弹窗内自动刷新，不关闭');
 			      },
 			      captchaReady() {
 			        console.log('[login] captchaReady — 阿里验证码准备就绪');
