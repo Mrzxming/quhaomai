@@ -6,13 +6,14 @@ export default {
   data() {
     return {
       wv: null,
+      _parentWebview: null,
       lastTime: "",
       _plusMessageHandler: null,
       _safetyTimer: null,
       defaultConfig: {
         clientVersion: "uniapp-v1.0",
         clientType: uni.getSystemInfoSync().platform,
-        protocol: "http://",
+        protocol: "https://",
         mi: {
           geeid: {
             bd: "",
@@ -58,7 +59,7 @@ export default {
         challenge: this.getUuid(),
       });
 
-      console.log('[captcha4] showCaptcha 开始, captchaId:', mergedConfig.captchaId);
+      console.log('[captcha4] showCaptcha, captchaId:', mergedConfig.captchaId, 'protocol:', mergedConfig.protocol);
 
       var wvId = "gt_webview_" + Date.now();
       this.wv = plus.webview.create(
@@ -73,29 +74,24 @@ export default {
         }
       );
 
-      console.log('[captcha4] webview 已创建, id:', wvId);
-
-      var currentWebview;
       try {
-        currentWebview = this.$root.$scope.$getAppWebview();
+        this._parentWebview = this.$root.$scope.$getAppWebview();
       } catch (e) {
-        console.error('[captcha4] 获取当前 webview 失败:', e);
-        this._destroyWebview();
+        console.error('[captcha4] 获取父 webview 失败:', e);
+        this._forceCleanWv();
         this.$emit("captchaError", { msg: "获取页面 webview 失败" });
         return;
       }
-      currentWebview.append(this.wv);
-      console.log('[captcha4] webview 已 append 到页面');
+      this._parentWebview.append(this.wv);
+      console.log('[captcha4] webview 已 append, id:', wvId);
 
       this._plusMessageHandler = function (msg) {
         if (!msg || !msg.data || !msg.data.args || !msg.data.args.data) return;
         var result = msg.data.args.data;
         if (result.name == "postMessage") {
-          if (result.arg.time === that.lastTime) {
-            return;
-          }
+          if (result.arg.time === that.lastTime) return;
           that.lastTime = result.arg.time;
-          console.log('[captcha4] 收到消息, type:', result.arg.type);
+          console.log('[captcha4] 收到消息:', result.arg.type);
           switch (result.arg.type) {
             case "ready":
               that.captchaReady();
@@ -121,22 +117,27 @@ export default {
 
       this.wv.overrideUrlLoading(
         { mode: "reject" },
-        function (e) {
-          plus.runtime.openURL(e.url);
-        }
+        function (e) { plus.runtime.openURL(e.url); }
       );
 
-      // 15秒安全超时：如果 SDK 加载失败或消息丢失，自动销毁 webview 防止卡死
       this._safetyTimer = setTimeout(function () {
         if (that.wv) {
-          console.warn('[captcha4] 安全超时(15s)，自动销毁 webview');
+          console.warn('[captcha4] 安全超时(15s)，强制销毁');
           that.$emit("captchaError", { msg: "验证码加载超时" });
           that._destroyWebview();
         }
       }, 15000);
-
       // #endif
     },
+
+    _forceCleanWv() {
+      if (this.wv) {
+        try { this.wv.setStyle({ width: "0px", height: "0px", left: "-9999px" }); } catch (e) {}
+        try { this.wv.close(); } catch (e) {}
+        this.wv = null;
+      }
+    },
+
     _destroyWebview() {
       // #ifdef APP-PLUS
       if (this._safetyTimer) {
@@ -144,28 +145,44 @@ export default {
         this._safetyTimer = null;
       }
       if (this._plusMessageHandler) {
-        try {
-          plus.globalEvent.removeEventListener("plusMessage", this._plusMessageHandler);
-        } catch (e) {}
+        try { plus.globalEvent.removeEventListener("plusMessage", this._plusMessageHandler); } catch (e) {}
         this._plusMessageHandler = null;
       }
       if (this.wv) {
-        console.log('[captcha4] 销毁 webview');
-        try {
-          this.wv.close("none");
-        } catch (e) {
-          console.warn('[captcha4] webview.close 异常:', e);
-          try {
-            this.wv.hide();
-          } catch (e2) {}
-        }
+        console.log('[captcha4] _destroyWebview 开始');
+        var wv = this.wv;
         this.wv = null;
+
+        // 1) 立即把 webview 缩到 0x0 并移到屏幕外，解除触摸拦截
+        try { wv.setStyle({ width: "0px", height: "0px", left: "-9999px", top: "-9999px" }); } catch (e) {}
+
+        // 2) 尝试从父 webview 移除（部分 runtime 版本支持 remove）
+        if (this._parentWebview) {
+          try { this._parentWebview.remove(wv); } catch (e) {}
+          this._parentWebview = null;
+        }
+
+        // 3) 关闭 webview
+        try { wv.close(); } catch (e) {
+          try { wv.close("none"); } catch (e2) {}
+        }
+
+        // 4) 再通过全局 API 兜底关闭
+        try {
+          var id = wv.id;
+          if (id) {
+            var found = plus.webview.getWebviewById(id);
+            if (found) found.close();
+          }
+        } catch (e) {}
+
+        console.log('[captcha4] _destroyWebview 完成');
       }
       // #endif
     },
+
     captchaReady() {
-      console.log('[captcha4] captchaReady, 即将调用 showBox');
-      // ready 收到了，取消安全超时，验证码已成功加载
+      console.log('[captcha4] captchaReady → showBox');
       if (this._safetyTimer) {
         clearTimeout(this._safetyTimer);
         this._safetyTimer = null;
@@ -187,11 +204,7 @@ export default {
     },
     captchaError: function (e) {
       console.error('[captcha4] captchaError:', JSON.stringify(e));
-      uni.showToast({
-        title: JSON.stringify(e),
-        icon: "none",
-        duration: 2000,
-      });
+      uni.showToast({ title: "验证失败，请重试", icon: "none", duration: 2000 });
       this.$emit("captchaError", e);
       this._destroyWebview();
     },
@@ -211,8 +224,8 @@ export default {
       return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
         /[xy]/g,
         function (c) {
-          const r = (Math.random() * 16) | 0;
-          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          var r = (Math.random() * 16) | 0;
+          var v = c === "x" ? r : (r & 0x3) | 0x8;
           return v.toString(16);
         }
       );
@@ -227,7 +240,6 @@ function _assign(target) {
   if (target == null) {
     throw new Error("Cannot convert undefined or null to object");
   }
-
   var newTarget = Object(target);
   for (var index = 1; index < arguments.length; index++) {
     var source = arguments[index];
