@@ -871,6 +871,7 @@
 			      },
 			      captchaClose() {
 			        console.log('阿里验证码关闭');
+			        this.aliCaptchaResult = null;
 			      },
 				  
 				  
