@@ -206,6 +206,7 @@
 	import jyfParser from "@/components/jyf-parser/jyf-parser";
 	import captcha from "@/components/captcha4/index.vue";
 	var graceChecker = require("@/common/graceChecker.js");
+	import { incrementVersion } from '@/utils/version.js';
 
 	// #ifdef APP-PLUS
 	var jpushModule = uni.requireNativePlugin("JG-JPush")
@@ -749,7 +750,10 @@
 			       // #endif
 			       
 			       // #ifdef APP-PLUS
-			       this.$refs.captcha.showCaptcha();
+			       uni.hideKeyboard && uni.hideKeyboard();
+			       setTimeout(() => {
+			         this.$refs.captcha && this.$refs.captcha.showCaptcha();
+			       }, 120);
 			       // #endif
 				   
 				
@@ -855,29 +859,82 @@
 			      },
 			      
 			      // APP验证码回调方法
-			      captchaSuccess(result) {
-			        this.aliCaptchaResult = result;
-			        this.sendSmsAfterCaptcha();
-			      },
-			      captchaError(e) {
-			        console.error('验证码错误:', e);
-			        uni.showToast({ title: '验证失败，请重试', icon: "none" });
-			      },
-			      captchaFail() {
-			        uni.showToast({ title: '验证失败', icon: "none" });
-			      },
-			      captchaReady() {
-			        console.log('阿里验证码准备就绪');
-			      },
-			      captchaClose() {
-			        console.log('阿里验证码关闭');
-			      },
-				  
-				  
-				  
-				  
-			// 检查网络状态
-			    checkNetwork() {
+			                  captchaSuccess(result) {
+        this.aliCaptchaResult = result;
+        this.sendSmsAfterCaptcha();
+      },
+      captchaError(e) {
+        console.error('captcha error:', e);
+        uni.showToast({ title: '验证失败，请重试', icon: 'none' });
+        try { this.$refs.captcha && this.$refs.captcha.cleanupCaptcha && this.$refs.captcha.cleanupCaptcha(); } catch (err) {}
+        this.forceCleanupCaptchaOverlays();
+      },
+      captchaFail() {
+        console.log('captcha fail: keep dialog for retry');
+      },
+      captchaReady() {
+        console.log('captcha ready');
+      },
+      captchaClose() {
+        console.log('captcha close');
+        try { this.$refs.captcha && this.$refs.captcha.cleanupCaptcha && this.$refs.captcha.cleanupCaptcha(); } catch (err) {}
+        this.forceCleanupCaptchaOverlays();
+      },
+      forceCleanupCaptchaOverlays() {
+        // #ifdef APP-PLUS
+        const sweep = (tag) => {
+          try {
+            try { plus.nativeUI.closeWaiting(); } catch (e) {}
+            let currentId = '';
+            try {
+              const cur = plus.webview.currentWebview();
+              currentId = cur && cur.id ? String(cur.id) : '';
+            } catch (e) {}
+            const list = plus.webview.all() || [];
+            try {
+              const snapshot = list.map((item) => {
+                let id = '';
+                let url = '';
+                try { id = item && item.id ? item.id : ''; } catch (e) {}
+                try { url = item && item.getURL ? item.getURL() : ''; } catch (e) {}
+                return { id, url };
+              });
+              console.log('[captcha-force-clean][' + tag + '][current=' + currentId + ']', JSON.stringify(snapshot));
+            } catch (e) {}
+            list.forEach((item) => {
+              let id = '';
+              let url = '';
+              try { id = item && item.id ? item.id : ''; } catch (e) {}
+              try { url = item && item.getURL ? item.getURL() : ''; } catch (e) {}
+              const byId = id.indexOf('gt_webview') === 0;
+              const byUrl = url.indexOf('hybrid/html/captcha4/index.html') !== -1;
+              if (!byId && !byUrl) return;
+              try { item.hide(); } catch (e) {}
+              try { item.close('none'); } catch (e) {}
+            });
+            // Android 某些机型会残留透明 __uniappview 触摸层，这里在收尾阶段定向清掉非当前页面的同类层
+            if (tag === 't500') {
+              list.forEach((item) => {
+                let id = '';
+                let url = '';
+                try { id = item && item.id ? String(item.id) : ''; } catch (e) {}
+                try { url = item && item.getURL ? item.getURL() : ''; } catch (e) {}
+                const isUniAppView = url.indexOf('/www/__uniappview.html') !== -1;
+                if (!isUniAppView) return;
+                if (id === currentId) return;
+                try { item.hide(); } catch (e) {}
+                try { item.close('none'); } catch (e) {}
+              });
+            }
+          } catch (e) {}
+        };
+        sweep('t0');
+        setTimeout(() => sweep('t50'), 50);
+        setTimeout(() => sweep('t200'), 200);
+        setTimeout(() => sweep('t500'), 500);
+        // #endif
+      },
+      checkNetwork() {
 			      return new Promise((resolve) => {
 			        // 使用uni-app内置的网络状态API
 			        uni.getNetworkType({
@@ -926,21 +983,22 @@
 			//比如调用接口loginIn
 			handleToLogin(code) {
 				var that = this
+				const h5WechatPayload = {
+					code: code,
+					type: 'weixin',
+					platform: 'H5',
+					app_version: incrementVersion()
+				}
+				console.log('[login][h5_wechat_login] 提交参数', h5WechatPayload)
 				uni.request({
 					url: 'https://www.ok9288.com/api/oauth/h5_wechat_login',
 					method: 'POST',
 					header: {
 						"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 					},
-					data: {
-						code: code,
-						type: 'weixin',
-						platform: 'H5'
-					},
+					data: h5WechatPayload,
 					success: (res_1) => {
-						console.log("这里")
-						console.log(res_1)
-						console.log(res_1.data)
+						console.log('[login][h5_wechat_login] 响应', res_1 && res_1.data)
 						// if (res_1.data.error == '0') {
 						if (res_1.data.data.login === 1) {
 							uni.setStorageSync("token", res_1.data.data.token)
@@ -1337,14 +1395,21 @@ console.log(o)
 									data: infoRes.userInfo
 								});
 
-								// 验证授权用户
+								// 验证授权用户（含 /api/oauth/callback 所需 app_version）
 								let data = {
 									userInfo: infoRes.userInfo,
 									type: value,
-									platform: uni.getStorageSync('platform')
+									platform: uni.getStorageSync('platform'),
+									app_version: incrementVersion()
 								}
+								console.log('[login][userCallback] 提交参数', {
+									type: data.type,
+									platform: data.platform,
+									app_version: data.app_version,
+									userInfo: data.userInfo
+								});
 								if (value === 'apple') {
-									console.log('[苹果登录] 发起请求参数:', JSON.stringify(data, null, 2));
+									console.log('[苹果登录] 发起请求参数(JSON):', JSON.stringify(data, null, 2));
 								}
 								this.$store.dispatch("userCallback", data).then(result => {
 									uni.hideLoading();
@@ -1381,80 +1446,18 @@ console.log(o)
 											if (result.data.code == 42201) {
 												uni.showModal({
 													content: result.data.msg,
-													cancelText: '跳过',
+													cancelText: '取消',
 													confirmText: '去绑定',
 													success: (modelResult) => {
-														if (modelResult
-															.confirm) {
+														if (modelResult.confirm) {
 															uni.navigateTo({
 																url: '/pagesB/login/bindUser/bindUser?params=' +
-																	JSON
-																	.stringify(
-																		o
-																	) +
+																	JSON.stringify(o) +
 																	'&delta=' +
-																	this
-																	.delta
+																	this.delta
 															})
-														} else if (modelResult
-															.cancel) {
-															//添加跳过参数
-															o.step = 0;
-															uni.showLoading({
-																title: this
-																	.$t(
-																		'lang.login_loading'
-																	)
-															});
-															this.$store
-																.dispatch(
-																	'bindRegister',
-																	o).then(
-																	bindResult => {
-																		uni
-																			.hideLoading();
-																		if (bindResult
-																			.status ==
-																			'success'
-																		) {
-																			if (bindResult
-																				.data
-																				.login ===
-																				1
-																			) {
-																				uni.setStorageSync(
-																					"token",
-																					bindResult
-																						.data
-																						.token
-																				);
-																				// 如果来自新人优惠券页面，登录成功后跳转到首页而不是返回
-																				if (this.fromNewPerson) {
-																					uni.switchTab({
-																						url: '/pages/middles/middles'
-																					})
-																				} else if (this
-																					.delta
-																				) {
-																					uni.navigateBack({
-																						delta: 1
-																					})
-																				} else {
-																					uni.switchTab({
-																						url: '/pages/user/user'
-																					})
-																				}
-																			}
-																		} else {
-																			uni.showModal({
-																				content: bindResult
-																					.errors
-																					.message ||
-																					'error'
-																			})
-																		}
-																	});
 														}
+														// 取消：仅关闭弹窗，留在登录页（不再调用 bindRegister 跳过绑定）
 													}
 												})
 											}
@@ -1674,13 +1677,17 @@ console.log(o)
 				// #endif
 				if (uni.getSystemInfoSync().platform == "ios") {
 					console.log(uni.getSystemInfoSync().platform == "ios")
+					// 主题红与登录页主色一致 #D23328 → 0xAARRGGBB
+					const themeRed = 0xffD23328
 					// jv.setCustomUIWithConfigiOS(JVerifyUIConfig)
 					jv.setCustomUIWithConfigiOS({
-						navColor: 0xff5C93FF,
-						logBtnText: " 庆趣一键登录 ",
-						logBtnTextColor: 0xff5C93FF,
+						navColor: themeRed,
+						/* 导航栏标题：[文案, 颜色, 字号] — 见极光插件 doc/IOS.md */
+						navText: ['趣好卖登录', 0xffffffff, 18],
+						logBtnText: '趣好卖一键登录',
+						logBtnTextColor: themeRed,
 						privacyState: true,
-						appPrivacyColor: [0xff000000, 0xff5C93FF]
+						appPrivacyColor: [0xff000000, themeRed]
 					})
 				} else {
 					console.log('else ')
@@ -1688,12 +1695,15 @@ console.log(o)
 					// jv.setCustomUIWithConfigAndroid(JVerifyUIConfig)
 					// 设置两个 config 时，前者应用与竖屏配置，后者应用与横屏配置
 					// jv.setCustomUIWithConfigAndroid(JVerifyUIConfig,JVerifyUIConfig)
+					const themeRed = 0xffD23328
 					jv.setCustomUIWithConfigAndroid({
-						setNavColor: 0xff5C93FF,
-						setLogBtnText: " 庆趣一键登录 ",
-						logBtnTextColor: 0xff5C93FF,
+						setNavColor: themeRed,
+						setNavText: '趣好卖登录',
+						setNavTextColor: 0xffffffff,
+						setLogBtnText: '趣好卖一键登录',
+						logBtnTextColor: themeRed,
 						setPrivacyState: true,
-						setAppPrivacyColor: [0xff000000, 0xff5C93FF]
+						setAppPrivacyColor: [0xff000000, themeRed]
 					})
 				}
 				
