@@ -749,7 +749,12 @@
 			       // #endif
 			       
 			       // #ifdef APP-PLUS
-			       this.$refs.captcha.showCaptcha();
+			       this.aliCaptchaResult = null;
+			       setTimeout(() => {
+			         if (this.$refs.captcha) {
+			           this.$refs.captcha.showCaptcha();
+			         }
+			       }, 500);
 			       // #endif
 				   
 				
@@ -861,9 +866,13 @@
 			      },
 			      captchaError(e) {
 			        console.error('验证码错误:', e);
+			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			        uni.showToast({ title: '验证失败，请重试', icon: "none" });
 			      },
 			      captchaFail() {
+			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			        uni.showToast({ title: '验证失败', icon: "none" });
 			      },
 			      captchaReady() {
@@ -872,6 +881,7 @@
 			      captchaClose() {
 			        console.log('阿里验证码关闭');
 			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			      },
 				  
 				  
