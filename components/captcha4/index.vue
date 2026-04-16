@@ -6,9 +6,6 @@ export default {
   data() {
     return {
       wv: null,
-      _parentWebview: null,
-      lastTime: "",
-      _plusMessageHandler: null,
       _safetyTimer: null,
       defaultConfig: {
         clientVersion: "uniapp-v1.0",
@@ -59,67 +56,48 @@ export default {
         challenge: this.getUuid(),
       });
 
-      console.log('[captcha4] showCaptcha, captchaId:', mergedConfig.captchaId, 'protocol:', mergedConfig.protocol);
+      console.log('[captcha4] showCaptcha, captchaId:', mergedConfig.captchaId);
 
-      var wvId = "gt_webview_" + Date.now();
-      this.wv = plus.webview.create(
-        "hybrid/html/captcha4/index.html?data=" + encodeURIComponent(
-          JSON.stringify(mergedConfig)
-        ),
-        wvId,
-        {
-          background: "transparent",
-          width: "100%",
-          height: "100%",
-        }
+      var wvId = "gt_captcha_" + Date.now();
+      var url = "hybrid/html/captcha4/index.html?data=" + encodeURIComponent(
+        JSON.stringify(mergedConfig)
       );
 
-      try {
-        this._parentWebview = this.$root.$scope.$getAppWebview();
-      } catch (e) {
-        console.error('[captcha4] 获取父 webview 失败:', e);
-        this._forceCleanWv();
-        this.$emit("captchaError", { msg: "获取页面 webview 失败" });
-        return;
-      }
-      this._parentWebview.append(this.wv);
-      console.log('[captcha4] webview 已 append, id:', wvId);
+      // 用 plus.webview.open 代替 create+append
+      // open 创建独立 webview 窗口，close 时能彻底释放触摸
+      this.wv = plus.webview.create(url, wvId, {
+        background: "transparent",
+        width: "100%",
+        height: "100%",
+        popGesture: "none",
+        bounce: "none",
+        dock: "top",
+        position: "absolute"
+      });
 
-      this._plusMessageHandler = function (msg) {
-        if (!msg || !msg.data || !msg.data.args || !msg.data.args.data) return;
-        var result = msg.data.args.data;
-        if (result.name == "postMessage") {
-          if (result.arg.time === that.lastTime) return;
-          that.lastTime = result.arg.time;
-          console.log('[captcha4] 收到消息:', result.arg.type);
-          switch (result.arg.type) {
-            case "ready":
-              that.captchaReady();
-              break;
-            case "error":
-              that.captchaError(result.arg.data);
-              break;
-            case "fail":
-              that.captchaFail();
-              break;
-            case "close":
-              that.captchaClose();
-              break;
-            case "result":
-              that.captchaSuccess(result.arg.data);
-              break;
-            default:
-              break;
+      // 通过 URL scheme 接收子 webview 消息
+      this.wv.overrideUrlLoading({ mode: "reject" }, function (e) {
+        var reqUrl = e.url || '';
+        if (reqUrl.indexOf('gt4bridge://msg?') === 0) {
+          try {
+            var jsonStr = decodeURIComponent(reqUrl.replace('gt4bridge://msg?', ''));
+            var data = JSON.parse(jsonStr);
+            console.log('[captcha4] 收到消息:', data.type);
+            that._handleMessage(data);
+          } catch (err) {
+            console.error('[captcha4] 解析消息失败:', err, reqUrl);
           }
+          return;
         }
-      };
-      plus.globalEvent.addEventListener("plusMessage", this._plusMessageHandler);
+        // 非 bridge URL，交给系统浏览器
+        plus.runtime.openURL(reqUrl);
+      });
 
-      this.wv.overrideUrlLoading(
-        { mode: "reject" },
-        function (e) { plus.runtime.openURL(e.url); }
-      );
+      // 显示 webview
+      this.wv.show("none");
+      console.log('[captcha4] webview 已显示, id:', wvId);
 
+      // 安全超时
       this._safetyTimer = setTimeout(function () {
         if (that.wv) {
           console.warn('[captcha4] 安全超时(15s)，强制销毁');
@@ -130,11 +108,26 @@ export default {
       // #endif
     },
 
-    _forceCleanWv() {
-      if (this.wv) {
-        try { this.wv.setStyle({ width: "0px", height: "0px", left: "-9999px" }); } catch (e) {}
-        try { this.wv.close(); } catch (e) {}
-        this.wv = null;
+    _handleMessage(data) {
+      if (!data || !data.type) return;
+      switch (data.type) {
+        case "ready":
+          this.captchaReady();
+          break;
+        case "error":
+          this.captchaError(data.data);
+          break;
+        case "fail":
+          this.captchaFail();
+          break;
+        case "close":
+          this.captchaClose();
+          break;
+        case "result":
+          this.captchaSuccess(data.data);
+          break;
+        default:
+          break;
       }
     },
 
@@ -144,39 +137,13 @@ export default {
         clearTimeout(this._safetyTimer);
         this._safetyTimer = null;
       }
-      if (this._plusMessageHandler) {
-        try { plus.globalEvent.removeEventListener("plusMessage", this._plusMessageHandler); } catch (e) {}
-        this._plusMessageHandler = null;
-      }
       if (this.wv) {
-        console.log('[captcha4] _destroyWebview 开始');
+        console.log('[captcha4] _destroyWebview');
         var wv = this.wv;
         this.wv = null;
-
-        // 1) 立即把 webview 缩到 0x0 并移到屏幕外，解除触摸拦截
-        try { wv.setStyle({ width: "0px", height: "0px", left: "-9999px", top: "-9999px" }); } catch (e) {}
-
-        // 2) 尝试从父 webview 移除（部分 runtime 版本支持 remove）
-        if (this._parentWebview) {
-          try { this._parentWebview.remove(wv); } catch (e) {}
-          this._parentWebview = null;
+        try { wv.close("none"); } catch (e) {
+          console.warn('[captcha4] close 异常:', e);
         }
-
-        // 3) 关闭 webview
-        try { wv.close(); } catch (e) {
-          try { wv.close("none"); } catch (e2) {}
-        }
-
-        // 4) 再通过全局 API 兜底关闭
-        try {
-          var id = wv.id;
-          if (id) {
-            var found = plus.webview.getWebviewById(id);
-            if (found) found.close();
-          }
-        } catch (e) {}
-
-        console.log('[captcha4] _destroyWebview 完成');
       }
       // #endif
     },
@@ -212,13 +179,6 @@ export default {
       console.log('[captcha4] captchaFail');
       this.$emit("captchaFail");
       this._destroyWebview();
-    },
-    getAppWebview(that) {
-      if (that.$scope) {
-        return that.$scope.$getAppWebview();
-      } else {
-        this.getAppWebview(that.$parent);
-      }
     },
     getUuid() {
       return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
