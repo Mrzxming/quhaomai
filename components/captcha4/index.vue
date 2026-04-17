@@ -93,6 +93,9 @@ export default {
           }
           plus.runtime.openURL(reqUrl);
         });
+
+        this.wv.show("none");
+        console.log('[captcha4] webview 已显示(独立窗口), id:', wvId);
       } else {
         this._plusMsgHandler = function (msg) {
           try {
@@ -114,10 +117,11 @@ export default {
         this.wv.overrideUrlLoading({ mode: "reject" }, function (e) {
           plus.runtime.openURL(e.url);
         });
-      }
 
-      this.wv.show("none");
-      console.log('[captcha4] webview 已显示, id:', wvId);
+        var currentWebview = that.$root.$scope.$getAppWebview();
+        currentWebview.append(that.wv);
+        console.log('[captcha4] webview 已显示(子窗口 append), id:', wvId);
+      }
 
       this._safetyTimer = setTimeout(function () {
         if (that.wv) {
@@ -168,7 +172,10 @@ export default {
         console.log('[captcha4] _destroyWebview');
         var wv = this.wv;
         this.wv = null;
-        try { wv.close("none"); } catch (e) {
+        try {
+          wv.hide();
+          wv.close("none");
+        } catch (e) {
           console.warn('[captcha4] close 异常:', e);
         }
       }
