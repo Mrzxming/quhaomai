@@ -1342,6 +1342,9 @@ console.log(o)
 				uni.login({
 					provider: value,
 					success: (res) => {
+						if (value === 'apple') {
+							console.log('[苹果登录] uni.login 返回:', JSON.stringify(res, null, 2));
+						}
 						uni.setStorageSync("isLogin", 1)
 						uni.showLoading({
 							title: this.$t('lang.synchronous_login')
@@ -1349,6 +1352,9 @@ console.log(o)
 						uni.getUserInfo({
 							provider: value,
 							success: (infoRes) => {
+								if (value === 'apple') {
+									console.log('[苹果登录] uni.getUserInfo 返回:', JSON.stringify(infoRes, null, 2));
+								}
 								uni.setStorage({
 									key: 'scopeUserInfo',
 									data: infoRes.userInfo
