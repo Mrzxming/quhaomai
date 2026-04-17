@@ -8,90 +8,119 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no, viewport-fit=cover" />
     <title>请通过以下验证</title>
     <style>
-        body { margin: 0; }
-        .title { height: 18px; margin: 15px; font-size: 18px; line-height: 18px; }
-        #log { display: none; margin: 0; word-break: break-all; }
-        #log.log { display: block; }
-        #captcha_index_loading { position: fixed; top: 50%; left: 50%; overflow: hidden; transform: translate(-50%, -50%); }
-        #captcha { position: absolute; top: 50%; left: 50%; width: 260px; height: 50px; transform: translate(-50%, -50%); }
-        .loader { width: 40px; height: 40px; }
-        svg path, svg rect { fill: #3973ff; }
+        body {
+            margin: 0;
+        }
+
+        .title {
+            height: 18px;
+            margin: 15px;
+            font-size: 18px;
+            line-height: 18px;
+        }
+
+        #log {
+            display: none;
+            margin: 0;
+            word-break: break-all;
+        }
+
+        #log.log {
+            display: block;
+        }
+
+        #captcha_index_loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            overflow: hidden;
+            transform: translate(-50%, -50%);
+        }
+
+        #captcha {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 260px;
+            height: 50px;
+            transform: translate(-50%, -50%);
+        }
+
+        /* loading */
+        .loader {
+            width: 40px;
+            height: 40px;
+        }
+
+        svg path,
+        svg rect {
+            fill: #3973ff;
+        }
     </style>
 </head>
 
 <body>
     <div id="log"></div>
     <div id="captcha"></div>
+
     <div id="captcha_index_loading">
         <img class="captcha_index_img loader" id="captcha_img_loading" alt="加载中" style="display: none;">
     </div>
-
     <script>
         var debug = false;
         var logEle = document.getElementById('log');
         var isOffline = false;
         var indexVersion = '1.0.0';
-
         function log(str) {
-            if (!debug) return;
+            if (!debug) {
+                return;
+            }
             var p = document.createElement('p');
             p.appendChild(document.createTextNode(str));
             logEle.insertBefore(p, logEle.firstChild);
             console.log(str);
         }
-
         function newError(msg, code, detail) {
-            return { desc: { indexVersion: indexVersion, detail: detail }, msg: msg, code: code }
-        }
-
-        (function () {
-            // ===== 通信桥：iOS 走 uni.postMessage，Android 走 URL scheme =====
-            var isAndroid = /android/i.test(navigator.userAgent);
-
-            // URL scheme 通信（Android 专用）
-            function sendViaScheme(data) {
-                try {
-                    var url = 'gt4bridge://msg?' + encodeURIComponent(JSON.stringify(data));
-                    var f = document.createElement('iframe');
-                    f.style.cssText = 'display:none;width:0;height:0;';
-                    f.src = url;
-                    document.body.appendChild(f);
-                    setTimeout(function(){ try{ document.body.removeChild(f); }catch(e){} }, 200);
-                } catch(e) {}
+                return {
+                    desc: {
+                        indexVersion: indexVersion,
+                        detail: detail
+                    },
+                    msg: msg,
+                    code: code
+                }
             }
 
-            // uni.postMessage 通信（iOS 专用）
-            var uniReady = false;
-            var plusReady = function (callback) {
-                if (window.plus) { callback(); }
-                else { document.addEventListener('plusready', callback); }
-            };
-
+        (function () {
             var jsBridge = (function () {
+
                 var callbacks = {
                     showBox: function () {
-                        captchaObj.showBox && captchaObj.showBox();
+                        captchaObj.showBox &&  captchaObj.showBox();
                     }
                 };
+
+                // URL scheme 通信：通过 iframe 导航触发 overrideUrlLoading
+                function sendViaScheme(data) {
+                    try {
+                        var url = 'gt4bridge://msg?' + encodeURIComponent(JSON.stringify(data));
+                        var f = document.createElement('iframe');
+                        f.style.cssText = 'display:none;width:0;height:0;';
+                        f.src = url;
+                        document.body.appendChild(f);
+                        setTimeout(function(){ try{ document.body.removeChild(f); }catch(e){} }, 200);
+                    } catch(e) {
+                        console.error('sendViaScheme error:', e);
+                    }
+                }
 
                 return {
                     callback: function (type, data) {
                         return callbacks[type](data);
                     },
-                    callNative: function(data) {
-                        if (isAndroid) {
-                            sendViaScheme(data);
-                        } else {
-                            // iOS: 用 uni.postMessage
-                            plusReady(function () {
-                                try {
-                                    uni.postMessage({ data: data });
-                                } catch(e) {
-                                    // 降级到 URL scheme
-                                    sendViaScheme(data);
-                                }
-                            });
-                        }
+                    callNative: function(data){
+                        // 优先走 URL scheme（最可靠）
+                        sendViaScheme(data);
                     }
                 }
             })();
@@ -100,7 +129,7 @@
             if (window.addEventListener) {
                 window.addEventListener('error', function (e) {
                     jsBridge.callNative({
-                        time: new Date().getTime(),
+                        time:new Date().getTime(),
                         type: 'error',
                         data: newError("gt4-index error", 60302, e.message)
                     });
@@ -108,7 +137,7 @@
             } else {
                 window.onerror = function (e) {
                     jsBridge.callNative({
-                        time: new Date().getTime(),
+                        time:new Date().getTime(),
                         type: 'error',
                         data: newError("gt4-index error", 60302, e.message)
                     });
@@ -118,8 +147,6 @@
     </script>
 
     <script src="./ct4.js"></script>
-    <!-- iOS 需要 uni.webview.js 提供 uni.postMessage -->
-    <script src="./uni.webview.1.5.1.js"></script>
     <script>
         (function () {
             var startTime = 0;
@@ -133,53 +160,90 @@
             if(/Android/.test(window.navigator.userAgent) && /android\s([\w.]+)/.exec(ua) && /android\s([\w.]+)/.exec(ua)[1] <= 4.3) {
                 loadingEle.style.left = '45%';
             }
-
+            
             if (typeof Object.assign != 'function') {
                 Object.defineProperty(Object, "assign", {
                     value: function assign(target, varArgs) {
-                    if (target == null) { throw new TypeError('Cannot convert undefined or null to object'); }
+                    if (target == null) {
+                        throw new TypeError('Cannot convert undefined or null to object');
+                    }
+
                     var to = Object(target);
+
                     for (var index = 1; index < arguments.length; index++) {
                         var nextSource = arguments[index];
+
                         if (nextSource != null) {
                         for (var nextKey in nextSource) {
-                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) { to[nextKey] = nextSource[nextKey]; }
+                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                            }
                         }
                         }
                     }
                     return to;
                     },
-                    writable: true, configurable: true
+                    writable: true,
+                    configurable: true
                 });
             }
-
             var config = {
                 product: 'bind',
                 onError: function (e) {
                     e.desc = Object.assign({}, e.desc, { indexVersion: indexVersion });
-                    jsBridge.callNative({ time: new Date().getTime(), type: 'error', data: e });
+                    jsBridge.callNative({
+						time:new Date().getTime(),
+                        type: 'error',
+                        data: e
+                    });
                 }
             };
-
-            function setDebug() { debug = true; logEle.className = 'log'; }
-
-            function paseURI() { return JSON.parse(decodeURIComponent(query.split('=')[1])); }
+            function setDebug() {
+                debug = true;
+                logEle.className = 'log';
+            }
+            
+            function paseURI() {
+                return JSON.parse(decodeURIComponent(query.split('=')[1]));
+            }
 
             function checkArgs(args) {
                 img.src = args['loading'] ? args['loading'] : './gt4-loading.gif';
-                clearID = setTimeout(function () { img.style.display = 'inline-block'; }, 200);
-                if (args['debug']) { setDebug(true); startTime = (new Date()).getTime(); log(JSON.stringify(args)) }
+
+                clearID = setTimeout(function () {
+                    img.style.display = 'inline-block';
+                }, 200);
+
+                if (args['debug']) {
+                    setDebug(true);
+                    startTime = (new Date()).getTime();
+                    log(JSON.stringify(args))
+                }
+
                 if (args['title'] && args['title'] != "") {
-                    var h3 = document.createElement('h3'); h3.className = 'title';
+                    var h3 = document.createElement('h3');
+                    h3.className = 'title';
                     h3.appendChild(document.createTextNode(decodeURIComponent(args['title'])));
                     captcha.appendChild(h3);
                 }
-                if (!args['captchaId']) { log('args error: ' + query); }
+
+                if (!args['captchaId']) {
+                    log('args error: ' + query);
+                }
+
                 if (args['useLocalOffline']) {
                     config.offlineCb = function () {
+
                         isOffline = true;
-                        jsBridge.callNative({ time: new Date().getTime(), type: 'result',
-                            data: { captcha_id: args['captchaId'], challenge: args['challenge'], offline: true }
+
+                        jsBridge.callNative({
+							time:new Date().getTime(),
+                            type: 'result',
+                            data: {
+                                captcha_id: args['captchaId'],
+                                challenge: args['challenge'],
+                                offline: true
+                            }
                         });
                     }
                 }
@@ -187,11 +251,18 @@
 
             function mergeOptions(args) {
                 for (var k in args) {
-                    if (args.hasOwnProperty(k) && ['debug', 'title', args['type']].indexOf(k) === -1) { config[k] = args[k]; }
+                    if (args.hasOwnProperty(k) &&
+                        ['debug', 'title',  args['type']].indexOf(k) === -1) {
+                        config[k] = args[k];
+                    }
                 }
             }
 
-            if (!query) { setDebug(); log('no query: ' + location.href); return false; }
+            if (!query) {
+                setDebug();
+                log('no query: ' + location.href);
+                return false;
+            }
 
             var args = paseURI(query);
             checkArgs(args);
@@ -204,37 +275,72 @@
                     .onSuccess(function () {
                         var result = captchaObj.getValidate();
                         log('Success validate: ' + result);
-                        jsBridge.callNative({ time: new Date().getTime(), type: 'result', data: result });
+                        jsBridge.callNative({
+							time:new Date().getTime(),
+                            type: 'result',
+                            data: result
+                        });
+
                     })
                     .onReady(function () {
                         log('load time: ' + ((new Date()).getTime() - (startTime || 0)));
-                        jsBridge.callNative({ time: new Date().getTime(), type: 'ready', data: { ready: 0 } })
+                        
+                        jsBridge.callNative({
+							time:new Date().getTime(),
+                            type: 'ready',
+                            data: {
+                                ready: 0
+                            }
+                        })
+
                         if (!isOffline) {
-                            jsBridge.callNative({ time: new Date().getTime(), type: 'get' })
+                            jsBridge.callNative({
+								time:new Date().getTime(),
+                                type: 'get'
+                            })
                         }
+
                         clearTimeout(clearID);
                         loadingEle.style.display = 'none';
                     })
                     .onClose(function () {
-                        jsBridge.callNative({ time: new Date().getTime(), type: 'close' });
+
+                        jsBridge.callNative({
+							time:new Date().getTime(),
+                            type: 'close'
+                        });
                     })
                     .onError(function (e) {
                         e.desc && (e.desc.indexVersion = indexVersion);
-                        jsBridge.callNative({ time: new Date().getTime(), type: 'error', data: e });
+                     
+                        jsBridge.callNative({
+							time:new Date().getTime(),
+                            type: 'error',
+                            data: e
+                        });
                     })
                     .onFail(function (e) {
-                        jsBridge.callNative({ time: new Date().getTime(), type: 'fail', data: e });
+                    
+                        jsBridge.callNative({
+							time:new Date().getTime(),
+                            type: 'fail',
+                            data: e
+                        });
                     })
             };
-
+            
             try {
               window.initAlicom4(config, handler);
             } catch (error) {
-              jsBridge.callNative({ time: new Date().getTime(), type: 'error',
+              jsBridge.callNative({
+				  time:new Date().getTime(),
+                  type: 'error',
                   data: newError("gt4-index error", 60302, '加载验证过程中报错')
               });
             }
+
         })();
+
     </script>
 </body>
 
