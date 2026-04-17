@@ -6,11 +6,11 @@ export default {
   data() {
     return {
       wv: null,
-      lastTime: "",
+      _safetyTimer: null,
       defaultConfig: {
         clientVersion: "uniapp-v1.0",
         clientType: uni.getSystemInfoSync().platform,
-        protocol: "http://",
+        protocol: "https://",
         mi: {
           geeid: {
             bd: "",
@@ -42,111 +42,148 @@ export default {
     },
   },
   mounted() {},
+  beforeDestroy() {
+    this._destroyWebview();
+  },
   methods: {
     showCaptcha() {
       var that = this;
       // #ifdef APP-PLUS
+      this._destroyWebview();
 
-      // 合并参数
-      _assign(this.defaultConfig, this.config, {
+      var mergedConfig = {};
+      _assign(mergedConfig, this.defaultConfig, this.config, {
         challenge: this.getUuid(),
-      }); //每次更新challenge
-
-      // 创建webview
-      this.wv = plus.webview.create(
-        `hybrid/html/captcha4/index.html?data=${encodeURIComponent(
-          JSON.stringify(this.defaultConfig)
-        )}`,
-        "gt_webview",
-        {
-          background: "transparent",
-          width: "100%", //String类型,窗口的宽度.支持百分比、像素值，默认为100%.未设置width属性值时,可同时设置left和right属性值改变窗口的默认宽度.
-          height: "100%",
-        }
-      );
-
-      // 获取webview
-      var currentWebview = this.$root.$scope.$getAppWebview(); //此对象相当于html5plus里的plus.webview.currentWebview()。在uni-app里vue页面直接使用plus.webview.currentWebview()无效
-      currentWebview.append(this.wv);
-
-      plus.globalEvent.addEventListener("plusMessage", (msg) => {
-        //有重复推送问题
-        const result = msg.data.args.data;
-        if (result.name == "postMessage") {
-          if (result.arg.time === that.lastTime) {
-            // 处理uni连续推送bug
-            return;
-          }
-          that.lastTime = result.arg.time;
-          switch (result.arg.type) {
-            case "ready":
-              that.captchaReady();
-              break;
-            case "error":
-              that.captchaError(result.arg.data);
-              break;
-            case "fail":
-              that.captchaFail();
-              break;
-            case "close":
-              that.captchaClose();
-              break;
-            case "result":
-              that.captchaSuccess(result.arg.data);
-              break;
-            default:
-              break;
-          }
-        }
       });
 
-      this.wv.overrideUrlLoading(
-        {
-          mode: "reject",
-        },
-        (e) => {
-          plus.runtime.openURL(e.url);
-        }
+      console.log('[captcha4] showCaptcha, captchaId:', mergedConfig.captchaId);
+
+      var wvId = "gt_captcha_" + Date.now();
+      var url = "hybrid/html/captcha4/index.html?data=" + encodeURIComponent(
+        JSON.stringify(mergedConfig)
       );
+
+      // 用 plus.webview.open 代替 create+append
+      // open 创建独立 webview 窗口，close 时能彻底释放触摸
+      this.wv = plus.webview.create(url, wvId, {
+        background: "transparent",
+        width: "100%",
+        height: "100%",
+        popGesture: "none",
+        bounce: "none",
+        dock: "top",
+        position: "absolute"
+      });
+
+      // 通过 URL scheme 接收子 webview 消息
+      this.wv.overrideUrlLoading({ mode: "reject" }, function (e) {
+        var reqUrl = e.url || '';
+        if (reqUrl.indexOf('gt4bridge://msg?') === 0) {
+          try {
+            var jsonStr = decodeURIComponent(reqUrl.replace('gt4bridge://msg?', ''));
+            var data = JSON.parse(jsonStr);
+            console.log('[captcha4] 收到消息:', data.type);
+            that._handleMessage(data);
+          } catch (err) {
+            console.error('[captcha4] 解析消息失败:', err, reqUrl);
+          }
+          return;
+        }
+        // 非 bridge URL，交给系统浏览器
+        plus.runtime.openURL(reqUrl);
+      });
+
+      // 显示 webview
+      this.wv.show("none");
+      console.log('[captcha4] webview 已显示, id:', wvId);
+
+      // 安全超时
+      this._safetyTimer = setTimeout(function () {
+        if (that.wv) {
+          console.warn('[captcha4] 安全超时(15s)，强制销毁');
+          that.$emit("captchaError", { msg: "验证码加载超时" });
+          that._destroyWebview();
+        }
+      }, 15000);
       // #endif
     },
+
+    _handleMessage(data) {
+      if (!data || !data.type) return;
+      switch (data.type) {
+        case "ready":
+          this.captchaReady();
+          break;
+        case "error":
+          this.captchaError(data.data);
+          break;
+        case "fail":
+          this.captchaFail();
+          break;
+        case "close":
+          this.captchaClose();
+          break;
+        case "result":
+          this.captchaSuccess(data.data);
+          break;
+        default:
+          break;
+      }
+    },
+
+    _destroyWebview() {
+      // #ifdef APP-PLUS
+      if (this._safetyTimer) {
+        clearTimeout(this._safetyTimer);
+        this._safetyTimer = null;
+      }
+      if (this.wv) {
+        console.log('[captcha4] _destroyWebview');
+        var wv = this.wv;
+        this.wv = null;
+        try { wv.close("none"); } catch (e) {
+          console.warn('[captcha4] close 异常:', e);
+        }
+      }
+      // #endif
+    },
+
     captchaReady() {
+      console.log('[captcha4] captchaReady → showBox');
+      if (this._safetyTimer) {
+        clearTimeout(this._safetyTimer);
+        this._safetyTimer = null;
+      }
       this.$emit("captchaReady");
-      this.wv.evalJS("jsBridge.callback('showBox')");
+      if (this.wv) {
+        this.wv.evalJS("jsBridge.callback('showBox')");
+      }
     },
     captchaSuccess(data) {
+      console.log('[captcha4] captchaSuccess');
       this.$emit("captchaSuccess", data);
-      this.wv.hide();
+      this._destroyWebview();
     },
     captchaClose() {
+      console.log('[captcha4] captchaClose');
       this.$emit("captchaClose");
-      this.wv.hide();
+      this._destroyWebview();
     },
     captchaError: function (e) {
-      uni.showToast({
-        title: JSON.stringify(e),
-        icon: "none",
-        duration: 2000,
-      });
+      console.error('[captcha4] captchaError:', JSON.stringify(e));
       this.$emit("captchaError", e);
-      this.wv.hide();
+      this._destroyWebview();
     },
     captchaFail() {
+      console.log('[captcha4] captchaFail — 不关闭弹窗，SDK 自动刷新验证码');
       this.$emit("captchaFail");
-    },
-    getAppWebview(that) {
-      if (that.$scope) {
-        return that.$scope.$getAppWebview();
-      } else {
-        this.getAppWebview(that.$parent);
-      }
     },
     getUuid() {
       return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
         /[xy]/g,
         function (c) {
-          const r = (Math.random() * 16) | 0;
-          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          var r = (Math.random() * 16) | 0;
+          var v = c === "x" ? r : (r & 0x3) | 0x8;
           return v.toString(16);
         }
       );
@@ -161,12 +198,11 @@ function _assign(target) {
   if (target == null) {
     throw new Error("Cannot convert undefined or null to object");
   }
-
-  const newTarget = Object(target);
-  for (let index = 1; index < arguments.length; index++) {
-    const source = arguments[index];
-    if (source !== null) {
-      for (const key in source) {
+  var newTarget = Object(target);
+  for (var index = 1; index < arguments.length; index++) {
+    var source = arguments[index];
+    if (source !== null && source !== undefined) {
+      for (var key in source) {
         if (Object.prototype.hasOwnProperty.call(source, key)) {
           newTarget[key] = source[key];
         }
