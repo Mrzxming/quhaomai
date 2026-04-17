@@ -749,7 +749,19 @@
 			       // #endif
 			       
 			       // #ifdef APP-PLUS
-			       this.$refs.captcha.showCaptcha();
+			       this.aliCaptchaResult = null;
+			       this.button_type = false;
+			       this.button_text = '请稍后...';
+			       console.log('[login] 准备弹出阿里验证码, captchaId:', this.aliConfig.captchaId, 'ref存在:', !!this.$refs.captcha);
+			       setTimeout(() => {
+			         if (this.$refs.captcha) {
+			           console.log('[login] 调用 showCaptcha');
+			           this.$refs.captcha.showCaptcha();
+			         } else {
+			           console.error('[login] captcha ref 不存在！');
+			           this.button_type = true;
+			         }
+			       }, 500);
 			       // #endif
 				   
 				
@@ -856,21 +868,26 @@
 			      
 			      // APP验证码回调方法
 			      captchaSuccess(result) {
+			        console.log('[login] captchaSuccess 收到结果:', JSON.stringify(result));
 			        this.aliCaptchaResult = result;
 			        this.sendSmsAfterCaptcha();
 			      },
 			      captchaError(e) {
-			        console.error('验证码错误:', e);
+			        console.error('[login] captchaError:', JSON.stringify(e));
+			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			        uni.showToast({ title: '验证失败，请重试', icon: "none" });
 			      },
 			      captchaFail() {
-			        uni.showToast({ title: '验证失败', icon: "none" });
+			        console.log('[login] captchaFail — 弹窗内自动刷新，不关闭');
 			      },
 			      captchaReady() {
-			        console.log('阿里验证码准备就绪');
+			        console.log('[login] captchaReady — 阿里验证码准备就绪');
 			      },
 			      captchaClose() {
-			        console.log('阿里验证码关闭');
+			        console.log('[login] captchaClose — 阿里验证码关闭');
+			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			      },
 				  
 				  
