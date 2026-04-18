@@ -216,6 +216,29 @@
 	  <view class="king-kong-wrap">
 	  <view class="nav king-kong-nav king-kong-nav-float" :class="aClass">
 		  <view class="nav-label">
+			  <!-- #ifdef MP-WEIXIN -->
+			  <!-- 小程序专版：固定尺寸图标 + animationfinish 落位，避免快速连滑陷入循环 -->
+			  <swiper class="king-kong-swiper-mp" :indicator-dots="false" :autoplay="false"
+				  :current="navKongCurrent" :duration="300" :circular="false"
+				  @change="onNavKongSwiperChange" @animationfinish="onNavKongAnimationFinish">
+				  <swiper-item v-for="(page, pageIndex) in navSwiperPages" :key="pageIndex">
+					  <view class="nav-list-mp">
+						  <view class="kk-cell-mp"
+							  v-for="(items, indexs) in page"
+							  :key="(items && (items.cat_id || items.id)) || (pageIndex + '-' + indexs)"
+							  @click="linknav(items)">
+							  <view class="kk-icon-mp">
+								  <image :src="items.img || imagePath.defaultImg" mode="aspectFit" class="kk-image-mp"></image>
+							  </view>
+							  <view class="kk-con-mp">
+								  <block v-if="items.desc">{{ items.desc }}</block>
+							  </view>
+						  </view>
+					  </view>
+				  </swiper-item>
+			  </swiper>
+			  <!-- #endif -->
+			  <!-- #ifndef MP-WEIXIN -->
 			  <swiper class="king-kong-swiper" :indicator-dots="false" :autoplay="false"
 				  :current="navKongCurrent" @change="onNavKongSwiperChange">
 				  <swiper-item v-for="(page, pageIndex) in navSwiperPages" :key="pageIndex">
@@ -236,6 +259,7 @@
 			  </view>
 				  </swiper-item>
 			  </swiper>
+			  <!-- #endif -->
 			  <!-- 自定义轮播指示：选中=横杠，未选中=点 -->
 			  <view class="king-kong-indicator" v-if="navSwiperPages.length > 1">
 				  <view v-for="(page, idx) in navSwiperPages" :key="idx"
@@ -2674,8 +2698,25 @@
 
 
 		  onNavKongSwiperChange(e) {
+			  // #ifdef MP-WEIXIN
+			  // 【小程序兼容】change 在快速连滑时会多次触发，且与 :current 形成反向驱动；
+			  // 这里统一忽略 change 的回写，真正落位交给 animationfinish 做一次
+			  return
+			  // #endif
+			  // #ifndef MP-WEIXIN
 			  this.navKongCurrent = e.detail.current;
+			  // #endif
 		  },
+		  // #ifdef MP-WEIXIN
+		  onNavKongAnimationFinish(e) {
+			  // 【小程序兼容】动画真正结束时才回写 current，一次手势一次 setData，
+			  // 杜绝微信 swiper 在快速连滑时因中间态回写导致的来回自切换
+			  const next = e && e.detail ? e.detail.current : 0
+			  if (this.navKongCurrent !== next) {
+				  this.navKongCurrent = next
+			  }
+		  },
+		  // #endif
 		  startTimer() {
 			  // 初始化结束时间戳（10分钟后）
 			  if (!this.endTime) {
@@ -7426,6 +7467,62 @@
 	  .king-kong-swiper {
 		  height: 360rpx; /* 两排高度 */
 	  }
+
+	  /* #ifdef MP-WEIXIN */
+	  /* 小程序专版：独立类名，避免被旧的 .nav .list .icon .image 规则覆盖 */
+	  .king-kong-swiper-mp {
+		  width: 100%;
+		  height: 360rpx;
+	  }
+	  .nav-list-mp {
+		  width: 100%;
+		  height: 360rpx;
+		  display: flex;
+		  flex-wrap: wrap;
+		  align-content: flex-start;
+		  overflow: hidden;
+		  box-sizing: border-box;
+		  line-height: 1.5;
+	  }
+	  .kk-cell-mp {
+		  width: 20%;
+		  height: 180rpx;
+		  box-sizing: border-box;
+		  display: flex;
+		  flex-direction: column;
+		  align-items: center;
+		  justify-content: flex-start;
+	  }
+	  .kk-icon-mp {
+		  width: 96rpx;
+		  height: 96rpx;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  overflow: hidden;
+		  margin: 12rpx auto 0;
+	  }
+	  .kk-image-mp {
+		  width: 96rpx;
+		  height: 96rpx;
+		  display: block;
+	  }
+	  .kk-con-mp {
+		  margin-top: 6rpx;
+		  font-size: 24rpx;
+		  color: #2D2D2D;
+		  font-weight: 500;
+		  text-align: center;
+		  line-height: 1.3;
+		  max-width: 100%;
+		  padding: 0 4rpx;
+		  box-sizing: border-box;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+		  white-space: nowrap;
+	  }
+	  /* #endif */
+
 	  /* 金刚区轮播指示：选中=横杠，未选中=点 */
 	  .king-kong-indicator {
 		  display: flex;
