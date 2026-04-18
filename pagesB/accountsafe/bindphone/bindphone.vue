@@ -38,6 +38,9 @@
 	import uniIcons from '@/components/uni-icons/uni-icons.vue';
 	var graceChecker = require("@/common/graceChecker.js");
 		import captcha from "@/components/captcha4/index.vue";
+	// #ifdef H5
+	import { initAliCaptchaH5, cleanupAliCaptchaDom } from '@/utils/aliCaptcha.js'
+	// #endif
 	export default {
 		data() {
 			return {
@@ -68,10 +71,14 @@
 		},
 		mounted() {
 		     this.detectAliPlatform();
-		     // #ifdef H5
-		     this.initH5AliCaptcha();
-		     // #endif
+		     // 【H5】改为用户点击"发送验证码"时按需初始化
 		   },
+		 onUnload() {
+		     // #ifdef H5
+		     try { cleanupAliCaptchaDom() } catch (e) {}
+		     this.h5Captcha = null
+		     // #endif
+		 },
 		computed:{
 			...mapState({
 				// captcha: state => state.common.imgVerify.captcha, // 【已注释】旧的图形验证码，现在使用阿里验证码
@@ -97,6 +104,10 @@
 		      this.$refs.captcha.$off('captchaFail', this.captchaFail);
 		      this.$refs.captcha.$off('captchaClose', this.captchaClose);
 		    }
+		    // #ifdef H5
+		    try { cleanupAliCaptchaDom() } catch (e) {}
+		    this.h5Captcha = null
+		    // #endif
 		  },
 		methods:{
 			
@@ -159,48 +170,21 @@
 			       // #endif
 			     },
 			     
-			     // 修改initH5AliCaptcha方法
+			     // H5 阿里验证码按需初始化 —— 统一走 utils/aliCaptcha.js
 			     initH5AliCaptcha() {
 			       // #ifdef H5
-			       // 清理旧的验证码实例
-			       const oldCaptcha = document.getElementById('captcha');
-			       if (oldCaptcha) {
-			         oldCaptcha.innerHTML = ''; // 清空容器
-			       }
-			       
-			       // 创建新的容器
-			       const newContainer = document.createElement('div');
-			       newContainer.id = 'captcha';
-			       document.body.appendChild(newContainer);
-			       
-			       // 重新加载脚本
-			       const script = document.createElement('script');
-			       script.src = "../../../static/ct4.js";
-			       script.onload = () => {
-			         initAlicom4({
-			           captchaId: this.aliConfig.captchaId,
-			           product: 'popup'
-			         }, (captcha) => {
-			           this.h5Captcha = captcha; // 保存实例引用
-			           captcha.appendTo("#captcha");
-			           
-			           // 添加重置方法（如果SDK未提供）
-			           if (!captcha.reset) {
-			             captcha.reset = function() {
-			               this.appendTo("#captcha");
-			               this.verify();
-			             }.bind(captcha);
-			           }
-			           
-			           captcha.onSuccess(() => {
-						   console.log("h5de 成功")
-						 var result = captcha.getValidate();	
-			             this.aliCaptchaResult = result;
-			             this.sendSmsAfterCaptcha();
-			           });
-			         });
-			       };
-			       document.body.appendChild(script);
+			       initAliCaptchaH5({
+			         captchaId: this.aliConfig.captchaId,
+			         scriptSrc: '/static/ct4.js',
+			         onSuccess: (result) => {
+			           this.aliCaptchaResult = result
+			           this.sendSmsAfterCaptcha()
+			         }
+			       }).then((captcha) => {
+			         this.h5Captcha = captcha
+			       }).catch((e) => {
+			         console.warn('[bindphone] H5 aliCaptcha init failed:', e)
+			       })
 			       // #endif
 			     },
 			     

@@ -410,6 +410,9 @@ color: #FE2F02;">查看教程</text>
 	import dscNotContent from '@/components/dsc-not-content.vue';
 	import captcha from "@/components/captcha4/index.vue";
 	import { incrementVersion } from '@/utils/version.js';
+	// #ifdef H5
+	import { initAliCaptchaH5, cleanupAliCaptchaDom } from '@/utils/aliCaptcha.js'
+	// #endif
 	export default {
 		components: {
 			dscNotContent,
@@ -778,134 +781,50 @@ color: #FE2F02;">查看教程</text>
 				console.log('阿里验证码平台:', this.aliPlatform, 'captchaId:', this.aliConfig.captchaId);
 			},
 			
-			// 初始化H5阿里验证码
+			// 初始化H5阿里验证码 —— 统一走 utils/aliCaptcha.js（硬清 DOM + 单例 script）
 			initH5AliCaptcha() {
 				// #ifdef H5
-				// 清理旧的验证码实例
-				this.clearH5AliCaptcha();
-				
-				// 创建新的容器，并立即隐藏
-				const newContainer = document.createElement('div');
-				newContainer.id = 'captcha';
-				newContainer.style.display = 'none'; // 关键：立即隐藏容器
-				document.body.appendChild(newContainer);
-				
-				// 重新加载脚本
-				const script = document.createElement('script');
-				script.src = "../../static/ct4.js";
-				script.onload = () => {
-					if (window.initAlicom4) {
-						window.initAlicom4({
-							captchaId: this.aliConfig.captchaId,
-							product: 'popup'
-						}, (captcha) => {
-							this.h5Captcha = captcha; // 保存实例引用
-							captcha.appendTo("#captcha");
-							
-							// 确保容器保持隐藏状态
-							const captchaEl = document.getElementById('captcha');
-							if (captchaEl) {
-								captchaEl.style.display = 'none';
-							}
-							
-							// 添加重置方法（如果SDK未提供）
-							if (!captcha.reset) {
-								captcha.reset = function() {
-									this.appendTo("#captcha");
-									this.verify();
-								}.bind(captcha);
-							}
-							
-							captcha.onSuccess(() => {
-								var result = captcha.getValidate();	
-								this.aliCaptchaResult = result;
-								// 验证成功后立即清理验证码容器和按钮
-								setTimeout(() => {
-									this.clearH5AliCaptcha();
-								}, 50);
-								this.sendSmsAfterCaptcha();
-							});
-							
-							// 监听验证码关闭/取消事件
-							if (captcha.onClose) {
-								captcha.onClose(() => {
-									// 弹窗关闭时立即清理
-									this.clearH5AliCaptcha();
-								});
-							}
-							
-							// 监听验证码错误事件
-							if (captcha.onError) {
-								captcha.onError(() => {
-									// 验证失败时也清理
-									setTimeout(() => {
-										this.clearH5AliCaptcha();
-									}, 100);
-								});
-							}
-						});
-					} else {
-						console.error('initAlicom4 未定义，脚本可能加载失败');
-						uni.showToast({ title: '验证码加载失败，请刷新重试', icon: 'none' });
+				initAliCaptchaH5({
+					captchaId: this.aliConfig.captchaId,
+					scriptSrc: '/static/ct4.js',
+					onSuccess: (result) => {
+						this.aliCaptchaResult = result
+						// 成功后立即清理，避免残留
+						setTimeout(() => {
+							this.clearH5AliCaptcha()
+						}, 50)
+						this.sendSmsAfterCaptcha()
+					},
+					onReady: (captcha) => {
+						// 监听关闭/错误事件（如果 SDK 提供）
+						if (captcha.onClose) {
+							captcha.onClose(() => this.clearH5AliCaptcha())
+						}
+						if (captcha.onError) {
+							captcha.onError(() => setTimeout(() => this.clearH5AliCaptcha(), 100))
+						}
 					}
-				};
-				script.onerror = () => {
-					console.error('ct4.js 脚本加载失败');
-					uni.showToast({ title: '验证码脚本加载失败，请检查网络', icon: 'none' });
-				};
-				document.body.appendChild(script);
+				}).then((captcha) => {
+					this.h5Captcha = captcha
+				}).catch((e) => {
+					console.error('[waimaibinding] ct4.js/验证码加载失败:', e)
+					uni.showToast({ title: '验证码加载失败，请刷新重试', icon: 'none' })
+				})
 				// #endif
 			},
 			
-			// 清理H5阿里验证码
+			// 清理H5阿里验证码 —— 统一走 utils/aliCaptcha.js 的硬清实现
 			clearH5AliCaptcha() {
 				// #ifdef H5
-				// 清理验证码实例
 				if (this.h5Captcha) {
 					try {
 						if (this.h5Captcha.destroy) {
 							this.h5Captcha.destroy();
 						}
-					} catch (e) {
-						console.log('清理验证码实例失败:', e);
-					}
+					} catch (e) {}
 					this.h5Captcha = null;
 				}
-				
-				// 清理所有验证码相关的DOM元素（包括按钮、容器、弹窗等）
-				// 先清理按钮和弹窗
-				const captchaButtons = document.querySelectorAll('.captcha4_btn_click, .captcha4_container, .captcha4_popup, .captcha4_wrapper, [class*="captcha4"]');
-				captchaButtons.forEach(el => {
-					if (el) {
-						el.style.display = 'none';
-						if (el.parentNode) {
-							el.parentNode.removeChild(el);
-						}
-					}
-				});
-				
-				// 清理验证码容器
-				const captcha = document.getElementById('captcha');
-				if (captcha) {
-					captcha.style.display = 'none';
-					captcha.innerHTML = ''; // 清空内容
-					if (captcha.parentNode) {
-						captcha.parentNode.removeChild(captcha);
-					}
-				}
-				
-				// 清理所有id包含captcha的元素
-				const allCaptchaElements = document.querySelectorAll('[id*="captcha"], [class*="captcha"]');
-				allCaptchaElements.forEach(el => {
-					if (el && el.id && el.id.includes('captcha')) {
-						el.style.display = 'none';
-						if (el.parentNode) {
-							el.parentNode.removeChild(el);
-						}
-					}
-				});
-				
-				// 重置验证码结果
+				try { cleanupAliCaptchaDom() } catch (e) {}
 				this.aliCaptchaResult = null;
 				// #endif
 			},

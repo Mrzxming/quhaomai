@@ -35,6 +35,9 @@
 	import { mapState } from 'vuex'
 	import captcha from '@/components/captcha4/index.vue';
 	import * as localConfig from '@/config/local/config'
+	// #ifdef H5
+	import { initAliCaptchaH5, cleanupAliCaptchaDom } from '@/utils/aliCaptcha.js'
+	// #endif
 	var graceChecker = require("@/common/graceChecker.js");
 	export default {
 		data() {
@@ -62,8 +65,16 @@
 		},
 		mounted() {
 			this.detectAliPlatform();
+			// 【H5】不在 mounted 里无条件初始化阿里验证码。
+			// 旧逻辑导致用户"只要路过绑定页"就往 document.body 注入 SDK DOM，
+			// beforeDestroy 又没清理 → 首页/详情页会看到残留的
+			// ".captcha4_btn_click 点击按钮开始验证"。
+			// 现改为用户点击"获取验证码"时按需初始化（见 handleSendSmsCode / initH5AliCaptcha）。
+		},
+		onUnload() {
 			// #ifdef H5
-			this.initH5AliCaptcha();
+			try { cleanupAliCaptchaDom() } catch (e) {}
+			this.h5Captcha = null
 			// #endif
 		},
 		computed:{
@@ -86,6 +97,11 @@
 				this.$refs.captcha.$off('captchaFail', this.captchaFail);
 				this.$refs.captcha.$off('captchaClose', this.captchaClose);
 			}
+			// #ifdef H5
+			// 硬清 body 上所有 captcha4 相关 DOM，避免 SPA 下首页/详情页残留
+			try { cleanupAliCaptchaDom() } catch (e) {}
+			this.h5Captcha = null
+			// #endif
 		},
 		methods:{
 			detectAliPlatform() {
@@ -137,38 +153,24 @@
 				// #endif
 			},
 
+			// H5 阿里验证码按需初始化 —— 统一走 utils/aliCaptcha.js
+			//   1) 硬清 body 上所有遗留 DOM，避免多实例/多 #captcha
+			//   2) ct4.js 单例加载（window.initAlicom4 存在则复用）
+			//   3) 用户"点击获取验证码"时调用本方法；beforeDestroy/onUnload 负责销毁
 			initH5AliCaptcha() {
 				// #ifdef H5
-				const oldCaptcha = document.getElementById('captcha');
-				if (oldCaptcha) {
-					oldCaptcha.innerHTML = '';
-				}
-				const newContainer = document.createElement('div');
-				newContainer.id = 'captcha';
-				document.body.appendChild(newContainer);
-				const script = document.createElement('script');
-				script.src = "../../../static/ct4.js";
-				script.onload = () => {
-					initAlicom4({
-						captchaId: this.aliConfig.captchaId,
-						product: 'popup'
-					}, (captcha) => {
-						this.h5Captcha = captcha;
-						captcha.appendTo("#captcha");
-						if (!captcha.reset) {
-							captcha.reset = function() {
-								this.appendTo("#captcha");
-								this.verify();
-							}.bind(captcha);
-						}
-						captcha.onSuccess(() => {
-							var result = captcha.getValidate();
-							this.aliCaptchaResult = result;
-							this.sendSmsAfterCaptcha();
-						});
-					});
-				};
-				document.body.appendChild(script);
+				initAliCaptchaH5({
+					captchaId: this.aliConfig.captchaId,
+					scriptSrc: '/static/ct4.js',
+					onSuccess: (result) => {
+						this.aliCaptchaResult = result
+						this.sendSmsAfterCaptcha()
+					}
+				}).then((captcha) => {
+					this.h5Captcha = captcha
+				}).catch((e) => {
+					console.warn('[bindUser] H5 aliCaptcha init failed:', e)
+				})
 				// #endif
 			},
 

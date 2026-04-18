@@ -212,6 +212,9 @@
 	import jyfParser from "@/components/jyf-parser/jyf-parser";
 	import captchaAndroid from "@/components/captcha4/android.vue";
 	import captchaIos from "@/components/captcha4/ios.vue";
+	// #ifdef H5
+	import { initAliCaptchaH5, cleanupAliCaptchaDom } from '@/utils/aliCaptcha.js'
+	// #endif
 	var graceChecker = require("@/common/graceChecker.js");
 
 	// #ifdef APP-PLUS
@@ -557,10 +560,25 @@
 		},
 		 mounted() {
 		      this.detectAliPlatform();
-		      // #ifdef H5
-		      this.initH5AliCaptcha();
-		      // #endif
+		      // 【H5】不再在 mounted 里无条件初始化阿里验证码。
+		      // 旧逻辑导致用户"只要路过登录页"就往 document.body 注入 SDK DOM，
+		      // 且 beforeDestroy 没清理，SPA 下首页 / 详情页会出现残留的
+		      // ".captcha4_btn_click 点击按钮开始验证"。
+		      // 现在改为：用户点击"发送短信验证码"按钮时按需初始化（见 handleSendSmsCode）。
 		    },
+		 // 【H5】页面销毁时硬清 body 上所有 captcha4 相关 DOM，避免首页/详情残留
+		 beforeDestroy() {
+		     // #ifdef H5
+		     try { cleanupAliCaptchaDom() } catch (e) {}
+		     this.h5Captcha = null
+		     // #endif
+		 },
+		 onUnload() {
+		     // #ifdef H5
+		     try { cleanupAliCaptchaDom() } catch (e) {}
+		     this.h5Captcha = null
+		     // #endif
+		 },
 		watch: {
 			username() {
 				this.updateLoginDisabled()
@@ -777,54 +795,24 @@
 				
 			     },
 			     
-			     // 修改initH5AliCaptcha方法
+			     // H5 阿里验证码按需初始化 —— 统一走 utils/aliCaptcha.js
+			     //   1) 硬清 body 上所有遗留 DOM，避免多实例/多 #captcha
+			     //   2) ct4.js 单例加载（window.initAlicom4 存在则复用）
+			     //   3) 用户"点击发送验证码"时调用本方法；beforeDestroy/onUnload 负责销毁
 			     initH5AliCaptcha() {
 			       // #ifdef H5
-			       // 清理旧的验证码实例
-			       const oldCaptcha = document.getElementById('captcha');
-			       if (oldCaptcha) {
-			         oldCaptcha.innerHTML = ''; // 清空容器
-			       }
-			       
-			       // 创建新的容器
-			       const newContainer = document.createElement('div');
-			       newContainer.id = 'captcha';
-			       document.body.appendChild(newContainer);
-			       
-			       // 重新加载脚本
-			       const script = document.createElement('script');
-			       script.src = "../../static/ct4.js";
-			       script.onload = () => {
-			         initAlicom4({
-			           captchaId: this.aliConfig.captchaId,
-			           product: 'popup'
-			         }, (captcha) => {
-			           this.h5Captcha = captcha; // 保存实例引用
-			           captcha.appendTo("#captcha");
-
-			           // 隐藏 SDK 默认触发按钮，避免在页面上直接展示或误触
-			           const btn = document.querySelector('#captcha .captcha4_btn_click');
-			           if (btn) {
-			             btn.style.display = 'none';
-			             btn.style.pointerEvents = 'none';
-			           }
-			           
-			           // 添加重置方法（如果SDK未提供）
-			           if (!captcha.reset) {
-			             captcha.reset = function() {
-			               this.appendTo("#captcha");
-			               this.verify();
-			             }.bind(captcha);
-			           }
-			           
-			           captcha.onSuccess(() => {
-						 var result = captcha.getValidate();	
-			             this.aliCaptchaResult = result;
-			             this.sendSmsAfterCaptcha();
-			           });
-			         });
-			       };
-			       document.body.appendChild(script);
+			       initAliCaptchaH5({
+			         captchaId: this.aliConfig.captchaId,
+			         scriptSrc: '/static/ct4.js',
+			         onSuccess: (result) => {
+			           this.aliCaptchaResult = result
+			           this.sendSmsAfterCaptcha()
+			         }
+			       }).then((captcha) => {
+			         this.h5Captcha = captcha
+			       }).catch((e) => {
+			         console.warn('[login] H5 aliCaptcha init failed:', e)
+			       })
 			       // #endif
 			     },
 			      // 验证短信输入
