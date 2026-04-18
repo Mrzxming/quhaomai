@@ -6,18 +6,18 @@
 			<!-- #endif -->
 			<!-- #ifndef MP-WEIXIN -->
 			<!-- 这里是状态栏 -->
-			<view class="status_bar" style="height: 40px;"></view>
+			<view class="status_bar" :style="{ height: statusBarHeight + 'px' }"></view>
 			<!-- #endif -->
-			<view class="chat_1" :style="{ height: gaodu + 'px' }">
-				<view @click="navigateBack">
+			<view class="chat_1" :style="{ minHeight: gaodu + 'px' }">
+				<view class="nav-side nav-side-left" @click="navigateBack">
 					<image
 						src="https://images.eqingqu.com/attachs/photo/202404/20240416_89BF6904E05EEE5119E0BC3F987C8640.png"
 						style="width: 30rpx;height: 30rpx;">
 					</image>
 				</view>
 
-				<view class="banbtn" style="margin-top: -20rpx;font-size: 32rpx;margin-left: 70rpx;">商品搬家</view>
-				<view class="search_submit">
+				<view class="banbtn">商品搬家</view>
+				<view class="search_submit nav-side nav-side-right">
 					<!-- <view style="padding-right: 30rpx;" @click="toknow">
 						<image src="/pagesC/static/guide/quesGuide.png" style="width: 40rpx;height: 40rpx;"></image>
 					</view> -->
@@ -30,12 +30,11 @@
 			</view>
 		</view>
 		<!-- </view> -->
-		<view class="banvideo" style=""></view>
-		<!-- #ifdef MP-WEIXIN -->
+				<!-- #ifdef MP-WEIXIN -->
 		<view class="bantop" style=""></view>
 		<!-- #endif -->
 		<!-- <view :class="revertShow==true?'swiper-boxs':'swiper-box'"> -->
-			<scroll-view class="main-content" scroll-y="true" :style="{ height: `calc(100vh - ${navHeight}px)` }">
+			<scroll-view class="main-content" scroll-y="true" :style="{ height: `calc(100vh - ${navHeight}px)`, marginTop: navHeight + `px` }">
 					<view class="content-wrapper">
 			<!-- <view style="width: 100%; height: 570rpx;margin: 0rpx 30rpx 100rpx 0rpx;position: relative;top: 0%;">
 				<image
@@ -420,6 +419,7 @@ color: #FE2F02;">查看教程</text>
 			data() {
 			return {
 				navHeight: 0, // 添加导航栏总高度
+				statusBarHeight: 0,
 				shop_id: '',
 				merchant_id: '',
 				shop_dpid: '',
@@ -462,6 +462,7 @@ color: #FE2F02;">查看教程</text>
 			this.menuButtonInfo = uni.getMenuButtonBoundingClientRect();
 			uni.getSystemInfo({
 				success: res => {
+					this.statusBarHeight = res.statusBarHeight || 0;
 					this.gaodu = this.menuButtonInfo.height + (this.menuButtonInfo.top - res.statusBarHeight) * 2;
 					// 计算导航栏总高度
 					this.navHeight = this.menuButtonInfo.top + this.gaodu;
@@ -472,8 +473,9 @@ color: #FE2F02;">查看教程</text>
 			// #ifndef MP-WEIXIN
 			uni.getSystemInfo({
 				success: res => {
+					this.statusBarHeight = res.statusBarHeight || 0;
 					this.gaodu = 44; // 假设导航栏内容高度为44px
-					this.navHeight = 40 + this.gaodu; // 状态栏40px + 导航栏内容高度
+					this.navHeight = this.statusBarHeight + this.gaodu;
 				}
 			})
 			// #endif
@@ -1361,23 +1363,32 @@ color: #FE2F02;">查看教程</text>
 
 	.status_bar {
 		background-color: #f5f5f5;
-		height: var(--status-bar-height);
+		min-height: var(--status-bar-height);
 		width: 100%;
 	}
 
 	.chat_1 {
-		display: flex;
-		flex-direction: row;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
-		justify-content: space-between;
-		/* #ifndef MP-WEIXIN */
-		width: 92%;
-		padding: 0rpx 20rpx 10rpx 30rpx;
-		/* #endif */
-		/* #ifdef MP-WEIXIN */
-		width: 75%;
-		padding: 0rpx 40rpx 10rpx 30rpx;
-		/* #endif */
+		width: 100%;
+		padding: 0rpx 30rpx 10rpx;
+		box-sizing: border-box;
+	}
+
+	.nav-side {
+		height: 44px;
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-side-left {
+		justify-content: flex-start;
+	}
+
+	.nav-side-right,
+	.search_submit {
+		justify-content: flex-end;
 	}
 
 	.chat_2 {
@@ -1459,22 +1470,16 @@ color: #FE2F02;">查看教程</text>
 	}
 
 	.banbtn {
-		/* #ifndef MP-WEIXIN */
-		margin-top: -20rpx;
 		font-size: 32rpx;
-		margin-left: 70rpx;
-		/* #endif */
-		/* #ifdef MP-WEIXIN */
-		margin-top: -20rpx;
-		font-size: 32rpx;
-		margin-left: 70rpx;
-		/* #endif */
+		text-align: center;
+		justify-self: center;
+		align-self: center;
+		line-height: 1.2;
+		white-space: nowrap;
 	}
 
 	.banvideo {
-		margin-top: 144rpx;
-		background-color: #f5f5f5;
-
+		display: none;
 	}
 
 	.bantop {
@@ -1653,7 +1658,7 @@ color: #FE2F02;">查看教程</text>
 .bind-actions.vertical > view:not(:last-child) {
   margin-bottom: 30rpx;
 }
-/* #endif
+/* #endif */
 
 .bind-btn {
   background-color: #FE0302;
@@ -1862,11 +1867,10 @@ height: 80rpx;
 .main-content {
 	width: 100%;
 	flex: 1;
-	/* 移除可能干扰滚动的样式 */
+	box-sizing: border-box;
 }
 .content-wrapper {
-	/* 确保内容正常排列 */
-	padding-top: 40rpx;
+	padding-top: 0;
 	padding-bottom: 20rpx; /* 添加底部间距 */
 }
 
