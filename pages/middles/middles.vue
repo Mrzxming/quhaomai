@@ -38,7 +38,10 @@
 		  <!-- #endif   -->
 		  <!-- <view class="search" :class="{'position-fixed':scrollFixed}"
 			  :style="{'background-color':'#F9F9F9',opacity: navOpacity == 1 ?0.9 :1, }"> -->
-			<view class="search" :class="{'position-fixed':scrollFixed}" :style="searchHeaderStyle">
+			<view class="search" :class="{'position-fixed':scrollFixed, 'mp-bg-scrolled': mpNavScrolled}" :style="searchHeaderStyle">
+			  <!-- #ifdef MP-WEIXIN -->
+			  <view class="mp-header-bg" v-show="!mpNavScrolled" :style="mpGradientBgStyle"></view>
+			  <!-- #endif -->
 			  <!-- #ifdef APP-PLUS -->
 			  <!-- 这里是状态栏（动态高度，适配灵动岛等设备） -->
 			  <view class="status_bar" :style="{ height: statusBarHeight + 'px' }"></view>
@@ -107,12 +110,12 @@
 			  </view>
 			  <view class="search_all_categories"
 				  :style="searchCategoriesStyle">
-				  <view class="scroll-view" style="width: 97%;">
+				  <view class="scroll-view tab-scroll-view" style="width: 100%;">
 					  <view class="tab-bar1">
 
 						  <view v-for="(tab,index) in search_keywords_five" :key="index"
-							  :class="['tab-item',tabIndex==index ? 'active' : '']" @click="searchTag(tab,index)">
-							  <text>{{ tab }}</text>
+							  :class="['tab-item',tabIndex==index ? 'active' : '']" @click="searchTag(formatTabText(tab),index)">
+							  <text>{{ formatTabText(tab) }}</text>
 						  </view>
 						  <view class="all-text">
 							  <text @click="tapAllCategories()">全部分类</text>
@@ -127,45 +130,45 @@
 			  <view class="all_categories_popops" v-show="allCategoriesType">
 				  <!-- :class="['all_categories_label', localshow ? '' : 'local_show_false']"   -->
 				  <!-- #ifdef H5 -->
-				  <view class="all_categories_label-h5" :class="{local_show_false:!localShow}">
+				  <view class="all_categories_label-h5" :class="{local_show_false:!localShow}" :style="{top: topVal + 'px'}">
 					  <view class="all_categories_label_top" @click="tapAllCategories()">
 						  <text>全部分类</text>
 						  <text class="iconfont icon-more size_24"></text>
 					  </view>
 					  <view class="all_categories_label_list">
 						  <view class="all_categories_label_tag" v-for="(tab,index) in search_keywords" :key="index">
-							  <text @click="tapAllCategoriesItem(tab)" class="all_categories_text">{{ tab }}</text>
+							  <text @click="tapAllCategoriesItem(formatTabText(tab))" class="all_categories_text">{{ formatTabText(tab) }}</text>
 						  </view>
 					  </view>
 				  </view>
 				  <!-- #endif -->
 				  <!-- #ifdef APP-PLUS -->
-				  <view class="all_categories_label">
+				  <view class="all_categories_label" :style="{top: topVal + 'px'}">
 					  <view class="all_categories_label_top" @click="tapAllCategories()">
 						  <text>全部分类</text>
 						  <text class="iconfont icon-more size_24"></text>
 					  </view>
 					  <view class="all_categories_label_list">
 						  <view class="all_categories_label_tag" v-for="(tab,index) in search_keywords" :key="index">
-							  <text @click="tapAllCategoriesItem(tab)" class="all_categories_text">{{ tab }}</text>
+							  <text @click="tapAllCategoriesItem(formatTabText(tab))" class="all_categories_text">{{ formatTabText(tab) }}</text>
 						  </view>
 					  </view>
 				  </view>
 				  <!-- #endif -->
 				  <!-- #ifdef MP-WEIXIN -->
-				  <view class="all_categories_label" :style="{top:topVal + 'px'}">
+				  <view class="all_categories_label" :style="{top: topVal + 'px'}">
 					  <view class="all_categories_label_top" @click="tapAllCategories()">
 						  <text>全部分类</text>
 						  <text class="iconfont icon-more size_24"></text>
 					  </view>
 					  <view class="all_categories_label_list">
 						  <view class="all_categories_label_tag" v-for="(tab,index) in search_keywords" :key="index">
-							  <text @click="tapAllCategoriesItem(tab)" class="all_categories_text">{{ tab }}</text>
+							  <text @click="tapAllCategoriesItem(formatTabText(tab))" class="all_categories_text">{{ formatTabText(tab) }}</text>
 						  </view>
 					  </view>
 				  </view>
 				  <!-- #endif -->
-				  <view class="popops_mack" @click="tapAllCategories()"></view>
+				  <view class="popops_mack" :style="{top: topVal + 'px'}" @click="tapAllCategories()"></view>
 			  </view>
 			  <!-- 全部分类弹框 end -->
 
@@ -215,36 +218,118 @@
 
 	  <view class="king-kong-wrap">
 	  <view class="nav king-kong-nav king-kong-nav-float" :class="aClass">
-		  <view class="nav-label">
-			  <swiper class="king-kong-swiper" :indicator-dots="false" :autoplay="false"
-				  :current="navKongCurrent" @change="onNavKongSwiperChange">
-				  <swiper-item v-for="(page, pageIndex) in navSwiperPages" :key="pageIndex">
-					  <view class="nav-list">
-				  <view class="list" :class="{'list1': indexs === 0}"
-							  v-for="(items, indexs) in page" :key="pageIndex + '-' + indexs"
-					  @click="linknav(items)">
-					  <view class="icon" v-if="items.img">
-						  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+		  <view class="nav-label king-kong-gesture-zone"
+			  :class="{'nav-label-expanded': kingKongIsExpanded}"
+			  :style="kingKongNavLabelStyle"
+			  @touchstart="onKingKongGestureStart"
+			  @touchmove="onKingKongGestureMove"
+			  @touchend="onKingKongGestureEnd"
+			  @touchcancel="onKingKongGestureEnd">
+			  <!-- #ifndef MP-WEIXIN -->
+			  <view class="king-kong-track" :class="{'dragging': kingKongTrackDragging}" :style="kingKongTrackStyle">
+				  <view class="king-kong-panel king-kong-panel-preview">
+					  <view class="king-kong-preview-clip">
+						  <view class="nav-list nav-list-preview">
+								  <view class="list list-preview" :class="{'list1': indexs === 0}"
+									  v-for="(items, indexs) in kingKongPreviewData" :key="indexs"
+									  @click="linknav(items)">
+								  <view class="icon" v-if="items.img">
+									  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+								  </view>
+								  <view class="icon" v-if="!items.img">
+									  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
+								  </view>
+								  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+									  <block v-if="items.desc">{{ items.desc }}</block>
+								  </view>
+							  </view>
+							  <view class="preview-tail"></view>
+						  </view>
 					  </view>
-					  <view class="icon" v-if="!items.img">
+				  </view>
+				  <view class="king-kong-panel king-kong-panel-expanded">
+					  <view class="nav-list nav-list-expanded">
+							  <view class="list list-expanded" :class="{'list1': indexs === 0}"
+								  v-for="(items, indexs) in kingKongExpandedData" :key="indexs"
+								  @click="linknav(items)">
+							  <view class="icon" v-if="items.img">
+								  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+							  </view>
+							  <view class="icon" v-if="!items.img">
 								  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
-					  </view>
-					  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
-						  <block v-if="items.desc">{{ items.desc }}</block>
+							  </view>
+							  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+								  <block v-if="items.desc">{{ items.desc }}</block>
+							  </view>
+						  </view>
 					  </view>
 				  </view>
 			  </view>
+			  <!-- #endif -->
+			  <!-- #ifdef MP-WEIXIN -->
+			  <!-- 小程序金刚区：原生 swiper，两个事件分工明确：
+			       @change       → 用户滑动时立即触发，同步高度（instant）
+			       @animationfinish → 动画结束后兜底同步，防止快速滑动边缘态不一致 -->
+			  <swiper class="king-kong-mp-swiper"
+				  :current="kingKongMpSwiperCurrent"
+				  :duration="250"
+				  :circular="false"
+				  :style="mpKingKongSwiperStyle"
+				  @change="onMpKingKongSwiperChange"
+				  @animationfinish="onMpKingKongSwiperAnimationFinish">
+				  <swiper-item>
+					  <view class="king-kong-mp-panel king-kong-panel-preview">
+						  <view class="king-kong-preview-clip">
+							  <view class="nav-list nav-list-preview">
+								  <view class="list list-preview" :class="{'list1': indexs === 0}"
+									  v-for="(items, indexs) in kingKongPreviewData" :key="indexs" wx:key="indexs"
+									  @click="linknav(items)">
+									  <view class="icon" v-if="items.img">
+										  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+									  </view>
+									  <view class="icon" v-if="!items.img">
+										  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
+									  </view>
+									  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+										  <block v-if="items.desc">{{ items.desc }}</block>
+									  </view>
+								  </view>
+								  <view class="preview-tail"></view>
+							  </view>
+						  </view>
+					  </view>
+				  </swiper-item>
+				  <swiper-item>
+					  <view class="king-kong-mp-panel king-kong-panel-expanded">
+						  <view class="nav-list nav-list-expanded">
+							  <view class="list list-expanded" :class="{'list1': indexs === 0}"
+								  v-for="(items, indexs) in kingKongExpandedData" :key="indexs" wx:key="indexs"
+								  @click="linknav(items)">
+								  <view class="icon" v-if="items.img">
+									  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+								  </view>
+								  <view class="icon" v-if="!items.img">
+									  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
+								  </view>
+								  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+									  <block v-if="items.desc">{{ items.desc }}</block>
+								  </view>
+							  </view>
+						  </view>
+					  </view>
 				  </swiper-item>
 			  </swiper>
-			  <!-- 自定义轮播指示：选中=横杠，未选中=点 -->
-			  <view class="king-kong-indicator" v-if="navSwiperPages.length > 1">
-				  <view v-for="(page, idx) in navSwiperPages" :key="idx"
-					  :class="['king-kong-indicator-item', navKongCurrent === idx ? 'bar' : 'dot']"></view>
-					  </view>
-					  </view>
-					  </view>
-				  </view>
+			  <!-- #endif -->
+			  <view class="king-kong-toggle-indicator">
+				  <view class="king-kong-toggle-item preview"
+					  :class="{'active': kingKongPanelIndex === 0}"></view>
+				  <view class="king-kong-toggle-item expanded"
+					  :class="{'active': kingKongPanelIndex === 1}"></view>
 			  </view>
+		  </view>
+	  </view>
+  </view>
+	</view>
 		<!-- /header-with-bg -->
 
 	  <!-- 新人优惠区域 -->
@@ -257,7 +342,7 @@
 				  <text class="time mr8">{{ formatTime(minutes) }}</text> :
 				  <text class="time mr8 ml8">{{ formatTime(seconds) }}</text> .
 				  <text class="time mr8 ml8">{{ formatTime(milliseconds, true) }}</text>
-				  <text class="mr8"> 后过期</text>
+                  <text class="mr8"> 后过期</text>
 			  </view>
 			  <view class="one-more">
 				  <image
@@ -322,7 +407,7 @@
 
 
 	  <!-- 横向滑动商品：isStyleSel 0=轮播 1=分开 -->
-	  <view class="visual-adv" :class="[visualAdvIsCarousel ? 'visual-adv-swiper' : 'visual-adv-lie']">
+	  <view v-if="visualAdvHasBanner" class="visual-adv" :class="[visualAdvIsCarousel ? 'visual-adv-swiper' : 'visual-adv-lie']">
 		  <!-- isStyleSel=0：banner 轮播左右滑动 -->
 		  <block v-if="visualAdvIsCarousel">
 			  <view class="visual-adv-swiper-wrap">
@@ -330,10 +415,10 @@
 					  :autoplay="true" :interval="5000" :duration="500"
 					  :circular="true" :indicator-dots="false"
 					  @change="visualAdvSwiperChange">
-					  <swiper-item v-for="(items, indexs) in visualdvAList" :key="indexs">
+					  <swiper-item v-for="(items, indexs) in visualdvAList" :key="indexs" wx:key="indexs">
 			  <view class="bg-img" @click="linkvisualadv(items.data.allValue)">
 				  <image :src="items.data.allValue.titleImg" mode="widthFix" class="img"
-							  v-if="items.data.allValue.titleImg" @load="visualAdvImageLoad"></image>
+							  v-if="items.data.allValue.titleImg" @load="visualAdvImageLoad($event, indexs)"></image>
 						  <view v-if="visualdvAList.length > 1 && indexs === visualAdvSwiperCurrent"
 							  class="visual-adv-dots">
 							  <view v-for="(ad, idx) in visualdvAList" :key="idx"
@@ -371,10 +456,10 @@
 				  </swiper-item>
 			  </swiper>
 			  </view>
-				  </block>
+		  </block>
 		  <!-- isStyleSel=1：banner 竖向排列 -->
 				  <block v-else>
-			  <block v-for="(items, indexs) in visualdvAList" :key="indexs">
+			  <view class="visual-adv-group" v-for="(items, indexs) in visualdvAList" :key="indexs" wx:key="indexs">
 				  <view class="bg-img" @click="linkvisualadv(items.data.allValue)">
 					  <image :src="items.data.allValue.titleImg" mode="widthFix" class="img"
 						  v-if="items.data.allValue.titleImg"></image>
@@ -407,8 +492,8 @@
 						  </view>
 					  </view>
 			  </view>
+			  </view>
 			  </block>
-		  </block>
 	  </view>
 
 	  <!-- 轮播图 -->
@@ -437,7 +522,7 @@
 		  <!-- 新品 热销 -->
 
 		  <view
-			  style=" display: flex;justify-content: space-between;margin:16rpx 16rpx 16rpx 16rpx;margin-right: 16px;">
+			  style=" display: flex;justify-content: space-between;margin:20rpx 40rpx 20rpx 20rpx;">
 
 			  <view class="shipin_1" :style="{
   backgroundImage: shipinswiperCurrent === 0 
@@ -462,10 +547,11 @@
 								  <view class="newPrice">
 									  <text class="newPrice-currency">￥</text>
 									  <text v-if="goodsItem.shop_price" class="newPrice-num">{{ goodsItem.shop_price }}</text>
-								  </view>
 							  </view>
 						  </view>
-					  </swiper-item>
+				  </view>
+				  </swiper-item>
+				  </block>
 
 				  </swiper>
 				  <view class="dots-containerz_1">
@@ -1090,13 +1176,13 @@
 					 <view class="newuser-glow-ring newuser-glow-ring-2"></view>
 					 <view class="newuser-glow-ring newuser-glow-ring-3"></view>
 					 <view class="newuser-light-rays">
-						 <view class="newuser-ray" v-for="i in 6" :key="'ray'+i"></view>
+							<view class="newuser-ray" v-for="i in 6" :key="i"></view>
 						</view>
 					 <view class="newuser-popup-box">
 						 <view class="newuser-popup-header">
 							 <view class="newuser-shine-effect"></view>
 							 <view class="newuser-coins">
-								 <view class="newuser-coin" v-for="i in 6" :key="'coin'+i">¥</view>
+							<view class="newuser-coin" v-for="i in 6" :key="i">¥</view>
 								</view>
 							 <text class="newuser-header-title">新人限时专享</text>
 							 <text class="newuser-header-subtitle">现在下单锁定优惠</text>
@@ -1141,7 +1227,7 @@
 					 <view class="store-coupon-ripple-ring"></view>
 					 <view class="store-coupon-ripple-ring store-coupon-ripple-ring-2"></view>
 					 <view class="store-coupon-ripple-ring store-coupon-ripple-ring-3"></view>
-					 <view class="store-coupon-ripple-dot" v-for="i in 6" :key="'rd'+i"></view>
+							<view class="store-coupon-ripple-dot" v-for="i in 6" :key="i"></view>
 				 </view>
 				 <!-- 样式1 清新绿色（仅绿色环，无红色波纹层） -->
 				 <view v-if="coupons_show_type === '1'" class="store-coupon-s1-wrap" @click="goStoreCoupon">
@@ -1231,7 +1317,7 @@
 					 <view class="store-coupon-s4-ring store-coupon-s4-ring-2"></view>
 					 <view class="store-coupon-s4-ring store-coupon-s4-ring-3"></view>
 					 <view class="store-coupon-s4-particles">
-						 <view class="store-coupon-s4-particle" v-for="i in 6" :key="'p'+i"></view>
+							<view class="store-coupon-s4-particle" v-for="i in 6" :key="i"></view>
 					 </view>
 					 <view class="store-coupon-s4-popup">
 						 <view class="store-coupon-s4-envelope">
@@ -1336,7 +1422,7 @@
 			  </view>
 			  <view class="all_categories_label_list" >
 				  <view class="all_categories_label_tag" v-for="(tab,index) in search_keywords" :key="index">
-					  <text class="all_categories_text">{{ tab }}</text>
+					  <text class="all_categories_text">{{ formatTabText(tab) }}</text>
 				  </view>
 			  </view>
 		  </view>
@@ -1378,7 +1464,7 @@
   import uniPopup from '@/components/uni-popup.vue'
   import service from "@/components/customer-service/customer-service.vue";
   import uniPopups from '@/components/uni-popup/uni-popup_1.vue';
-  import dscCountDown from '@/pagesD/components/visualization/count-down/Frontend.vue'
+  import dscCountDown from '@/components/visualization/count-down/Frontend.vue'
   // components/visualization/count-down/Frontend.vue
   import goodsServiceLabel from '@/components/goods-service-label/goods-service-label.vue'
   //返回顶部
@@ -1405,9 +1491,7 @@
   // #ifdef H5
   import isApp from '@/config/is-app.js'
   // #endif
-  import ImageCropper from '@/pagesD/components/invinbg-image-cropper/invinbg-image-cropper.vue'
   import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.vue';
-  import waterfall from '@/pagesD/components/waterfall.vue'
   const CONTENT_CONFIG = {
 	  TITLE_LINE_HEIGHT: 24, // 从30减小到24 (rpx)
 	  PRICE_HEIGHT: 12, // 从15减小到12 (rpx)
@@ -1417,24 +1501,22 @@
   }
   export default {
 	  mixins: [universal, createPageTrackMixin('home')],
-	  components: {
-		  uniIcons,
-		  uniPopup,
-		  service,
-		  dscFilterTop,
-		  waterfall,
-		  dscRegion,
-		  uniLoadMore,
-		  dscCountDown,
+		  components: {
+			  uniIcons,
+			  uniPopup,
+			  service,
+			  dscFilterTop,
+			  dscRegion,
+			  uniLoadMore,
+			  dscCountDown,
 		  uniPopups,
 		  sysCoupon,
 		  goodsServiceLabel,
 		  // #ifdef H5
 		  // AppDown,
 		  // #endif
-		  ImageCropper,
-		  CustomTabbar
-	  },
+			  CustomTabbar
+		  },
 	  data() {
 		  return {
 			   isDebug: false, // 开发时设为true，生产环境设为false
@@ -1443,7 +1525,6 @@
 				// GIF相关数据
 				  showingGif: null,
 					 // 观察器相关
-					 gifObserver: null,
 					 centerLine: 0,
 					 scrollTimer: null,
 					 isScrolling: false,
@@ -1571,6 +1652,7 @@
 			  cachedScreenHeight: 0,
 			  // 【性能优化】GIF 观察器初始化防抖
 			  gifObserverInitTimer: null,
+			  loadingHideTimer: null,
 
 			  navTranslateX: 0,
 			  paly: false,
@@ -1643,7 +1725,9 @@
 			  swiperCurrent: 0,
 			  shipinswiperCurrent: 0,
 			  visualAdvSwiperCurrent: 0,
-			  visualAdvBannerImgHeight: 300,
+			  visualAdvBannerImgHeight: 0,
+			  visualAdvBannerHeightMap: {},
+			  visualAdvContainerWidthPx: 0,
 			  visualAdvHasGoods: false,
 			  prolist: [],
 			  previewProlist: [],
@@ -1723,9 +1807,20 @@
 			  newArray: [], //新品轮播数组
 			  placeholder: '',
 			  mergedData: [], // 金刚区合并的数据
+			  kingKongExpanded: false, // 金刚区：默认一行预览，滑动后展开全部
+			  kingKongPanelIndex: 0, // 0=预览，1=展开
+			  kingKongMpSwiperCurrent: 0,   // 小程序 swiper :current 控制
+			  kingKongTrackWidth: 0,
+			  kingKongTrackOffsetX: 0,
+			  kingKongTrackDragging: false,
+			  kingKongGestureStartX: 0,
+			  kingKongGestureStartY: 0,
+			  kingKongGestureHandled: false,
+			  mpWindowWidth: 375,
 			  navOpacity: 0,
+			  mpNavScrolled: false,
 			  appHotId: '',
-			  topVal: '',
+			  topVal: 0,
 			  navLabelTop: '',
 			  // H5键盘检测相关
 			  initialViewportHeight: 0,
@@ -1743,6 +1838,7 @@
 			  // 获取菜单按钮和系统信息
 			  // #ifdef MP-WEIXIN
 			  that.menuButtonInfo = uni.getMenuButtonBoundingClientRect();
+			  that.mpWindowWidth = (uni.getSystemInfoSync().windowWidth || 375);
 			  uni.getSystemInfo({
 				  success: res => {
 					  that.gaodu = that.menuButtonInfo.height + (that.menuButtonInfo.top - res
@@ -1866,17 +1962,29 @@
 			  const sel = first?.data?.isStyleSel ?? first?.data?.allValue?.isStyleSel;
 			  return sel == '0' || sel === 0;
 		  },
-		  // 轮播高度：仅图片高度 + 有商品时才加商品区高度，避免无商品时空白
+		  // 仅接口返回了有效 banner 图片才渲染 visual-adv 区域
+		  visualAdvHasBanner() {
+			  if (!Array.isArray(this.visualdvAList) || this.visualdvAList.length === 0) return false;
+			  return this.visualdvAList.some((item) => {
+				  const titleImg = item?.data?.allValue?.titleImg;
+				  return !!(titleImg && String(titleImg).trim());
+			  });
+		  },
+		  // 轮播高度：严格跟随当前轮播图图片高度，避免出现空白
 		  visualAdvSwiperHeightComputed() {
-			  const goodsH = this.visualAdvHasGoods ? 260 : 0
-			  return this.visualAdvBannerImgHeight + goodsH
+			  const current = Number(this.visualAdvSwiperCurrent) || 0;
+			  const currentHeight = this.visualAdvBannerHeightMap[current];
+			  return Number(currentHeight) || Number(this.visualAdvBannerImgHeight) || 0;
 		  },
 		  // search position-fixed：H5 不加白底（避免盖 app-down），其他平台加 rgba(255,255,255,0.88)
 		  searchHeaderStyle() {
 			  // #ifdef H5
 			  return {}; // H5 不加背景
 			  // #endif
-			  // #ifndef H5
+			  // #ifdef MP-WEIXIN
+			  return {};
+			  // #endif
+			  // #ifdef APP-PLUS
 			  if (!(this.headerBgImage === 'gradient' || this.headerBgImage)) {
 				  return { 'background-color': '#F9F9F9', opacity: 1 };
 			  }
@@ -1886,7 +1994,26 @@
 			  // #endif
 		  },
 		  // input_main 和 tab-bar1 背景。APP 上 search 已有背景，子元素透明避免叠加变纯白；H5 上 search 无背景，子元素需单独设置
-		  searchInputStyle() {
+		  
+		mpGradientBgStyle() {
+			  // #ifdef MP-WEIXIN
+			  if (!(this.headerBgImage === 'gradient' || this.headerBgImage)) {
+				  return { background: '#F9F9F9' };
+			  }
+			  if (this.headerBgImage === 'gradient') {
+				  return { background: 'linear-gradient(to bottom, #FE6636 0%, #FE6636 45%, #ffffff 55%, #ffffff 100%)' };
+			  }
+			  return {
+				  backgroundImage: `url(${this.headerBgImage})`,
+				  backgroundSize: 'cover',
+				  backgroundPosition: 'center'
+			  };
+			  // #endif
+			  // #ifndef MP-WEIXIN
+			  return {};
+			  // #endif
+		},
+searchInputStyle() {
 			  // #ifdef APP-PLUS
 			  return {}; // APP: search 已有 rgba，此处不再叠加
 			  // #endif
@@ -1920,6 +2047,87 @@
 				  pages.push(list.slice(i, i + 10));
 			  }
 			  return pages.length ? pages : [[]];
+		  },
+		  kingKongPreviewData() {
+			  const list = Array.isArray(this.mergedData) ? this.mergedData : [];
+			  return list.slice(0, 6);
+		  },
+		  kingKongExpandedData() {
+			  const list = Array.isArray(this.mergedData) ? this.mergedData : [];
+			  // 展开态仅显示首屏完整展示(5个)之后的剩余项
+			  return list.slice(5);
+		  },
+		  kingKongIsExpanded() {
+			  return this.kingKongPanelIndex === 1;
+		  },
+		  kingKongTrackStyle() {
+			  const w = this.kingKongTrackWidth > 0 ? this.kingKongTrackWidth : 351;
+			  const base = -this.kingKongPanelIndex * w;
+			  const translateX = base + this.kingKongTrackOffsetX;
+			  return {
+				  transform: `translate3d(${translateX}px, 0, 0)`
+			  };
+		  },
+		  kingKongViewProgress() {
+			  // #ifdef MP-WEIXIN
+			  return this.kingKongPanelIndex === 1 ? 1 : 0;
+			  // #endif
+			  const w = this.kingKongTrackWidth > 0 ? this.kingKongTrackWidth : (this.mpWindowWidth || 351);
+			  if (!this.kingKongTrackDragging) {
+				  return this.kingKongPanelIndex === 1 ? 1 : 0;
+			  }
+			  const ratio = Math.min(1, Math.abs(this.kingKongTrackOffsetX) / w);
+			  if (this.kingKongPanelIndex === 0) {
+				  return ratio;
+			  }
+			  return 1 - ratio;
+		  },
+		  mpKingKongSwiperStyle() {
+			  // #ifdef MP-WEIXIN
+			  // 高度跟随面板状态，加 inline transition 确保小程序内平滑过渡
+			  const height = this.kingKongPanelIndex === 1 ? 420 : 152;
+			  return {
+				  height: `${height}rpx`,
+				  transition: 'height 0.25s ease'
+			  };
+			  // #endif
+			  // #ifndef MP-WEIXIN
+			  return {};
+			  // #endif
+		  },
+		  kingKongNavLabelStyle() {
+			  // #ifdef MP-WEIXIN
+			  // 小程序：inline style 直接控制 height，transition 内联确保过渡生效
+			  // height 与 mpKingKongSwiperStyle 同步（swiper内容高度 + toggle指示条 14rpx）
+			  const mpExpanded = this.kingKongPanelIndex === 1;
+			  return {
+				  height: mpExpanded ? '434rpx' : '166rpx',
+				  maxHeight: mpExpanded ? '434rpx' : '166rpx',
+				  paddingBottom: mpExpanded ? '14rpx' : '8rpx',
+				  transition: 'height 0.25s ease, max-height 0.25s ease, padding-bottom 0.2s ease',
+				  overflow: 'hidden'
+			  };
+			  // #endif
+			  // iOS 第一屏进一步收紧，减少指示条与上方内容的空白
+			  // #ifdef APP-PLUS
+			  let isIOS = false;
+			  try {
+				  const info = uni.getSystemInfoSync();
+				  isIOS = info && info.platform === 'ios';
+			  } catch (e) {}
+			  // #endif
+			  // #ifndef APP-PLUS
+			  const isIOS = false;
+			  // #endif
+			  const minHeight = isIOS ? 142 : 152;
+			  const maxHeight = 560;
+			  const minPadding = 8;
+			  const maxPadding = 14;
+			  const p = Math.max(0, Math.min(1, this.kingKongViewProgress));
+			  return {
+				  maxHeight: `${minHeight + (maxHeight - minHeight) * p}rpx`,
+				  paddingBottom: `${minPadding + (maxPadding - minPadding) * p}rpx`
+			  };
 		  },
 		  shouldShowEightJin() {
 			  // 判断是否是OPPO手机
@@ -2009,12 +2217,13 @@
 		  }
 	  },
 	  beforeDestroy() {
-		   if (this.gifObserver) {
-				this.gifObserver.disconnect();
-				this.gifObserver = null;
+		   if (this._gifObserver) {
+				this._gifObserver.disconnect();
+				this._gifObserver = null;
 			  }
 		  // 停止店铺优惠券倒计时
 		  this.stopStoreCouponTimer();
+		  this.stopNewUserTimers();
 		  // #ifdef H5
 		  // 移除键盘事件监听
 		  if (this.handleWindowResize) {
@@ -2071,12 +2280,6 @@
 		  // 	that.isshowregionsplic = true
 		  // }
 
-
-		  setTimeout(() => {
-			  this.loading = false;
-			  this.loading8 = false;
-
-		  }, 2000);
 
 		  if (parent_id) {
 			  if (parent_id != user_id) {
@@ -2202,6 +2405,18 @@
 		  that._lastHomeCacheSuffix = that.getHomeCacheUserSuffix()
 		  that.restoreHomeShellFromStorageIfNeeded()
 		  that.restoreHomeListFromStorageIfEmpty()
+		  // 有列表缓存时立即关闭瀑布骨架，避免「缓存已恢复仍被固定 2s 骨架」盖住内容；无缓存时再启动 2s 兜底关闭
+		  if (that.prolist && that.prolist.length) {
+			  that.hideHomeSkeleton()
+		  } else {
+			  if (that.loadingHideTimer) {
+				  clearTimeout(that.loadingHideTimer)
+				  that.loadingHideTimer = null
+			  }
+			  that.loadingHideTimer = setTimeout(() => {
+				  that.hideHomeSkeleton()
+			  }, 2000)
+		  }
 		  // 必须在 onShow 之前置位：onShow 里也会在 page===1 且 prolist 有数据时调 getGoodsListWithCache(1)，
 		  // 若仍 isLoadingFirstPage===false 会与下方 setTimeout 并发，触底条件 _last===page 易错乱导致首屏滑到底不翻页。
 		  that.isLoadingFirstPage = true
@@ -2279,13 +2494,14 @@
 		  // 移除事件监听（弹窗现在在消息页面和物流页面直接显示，不再在首页显示）
 		  
 		  // 彻底清理
-		   if (this.gifObserver) {
-				  this.gifObserver.disconnect();
-				  this.gifObserver = null;
+		   if (this._gifObserver) {
+				  this._gifObserver.disconnect();
+				  this._gifObserver = null;
 			  }
 		  
 		  // 停止店铺优惠券倒计时
 		  this.stopStoreCouponTimer();
+		  this.stopNewUserTimers();
 
 		  // 【性能优化】修复内存泄漏：清理所有定时器
 		  if (this.scrollTimer) {
@@ -2319,6 +2535,9 @@
 		  this.showCover = {};
 	  },
 	  onShow() {
+		  // #ifdef MP-WEIXIN
+		  this.resumeHomeMpTimers()
+		  // #endif
 		  // 调试：打印 device_id 查看值
 		  console.log('【首页】device_id:', this.device_id);
 		  const suff = this.getHomeCacheUserSuffix()
@@ -2365,6 +2584,8 @@
 			  // 只获取新人优惠券数据，不获取店铺优惠券（店铺优惠券只在应用启动时获取一次）
 			  this.getNewUserCouponsOnly();
 		  }
+		  this.measureKingKongTrackWidth();
+		  this.measureVisualAdvWidth();
 		  
 		  // 每次显示页面时，使用缓存方式获取商品列表（仅第一页）
 		  // 【修复】避免与 onLoad 重复加载：使用标志防止重复调用
@@ -2413,6 +2634,9 @@
 
 	  },
 	  onHide() {
+		  // #ifdef MP-WEIXIN
+		  this.stopHomeMpTimers()
+		  // #endif
 		  // 首页切到其他 Tab：GIF 改封面，减轻解码压力
 		  const lists = [this.leftList, this.rightList]
 		  lists.forEach(list => {
@@ -2483,6 +2707,9 @@
 		  const maxScroll = 200;
 		  const ratio = Math.min(1, e.scrollTop / maxScroll);
 		  this.navOpacity = Number(ratio.toFixed(2));
+		  // #ifdef MP-WEIXIN
+		  this.mpNavScrolled = e.scrollTop > 0;
+		  // #endif
 
 		  var that = this
 		  that.scrollState = e.scrollTop > 800 ? true : false
@@ -2577,6 +2804,33 @@
 				  }
 			  });
 		  },
+		  stopHomeMpTimers() {
+			  this.stopNewUserTimers();
+			  this.stopStoreCouponTimer();
+			  if (this.timer) {
+				  clearInterval(this.timer);
+				  this.timer = null;
+			  }
+			  if (this.intervalId) {
+				  clearInterval(this.intervalId);
+				  this.intervalId = null;
+			  }
+		  },
+		  resumeHomeMpTimers() {
+			  if (!this.timer) {
+				  this.startTimer();
+			  }
+			  if (!this.intervalId && Array.isArray(this.words) && this.words.length > 1 && !this.isFocused) {
+				  this.startRotation();
+			  }
+			  if (!this.receiveStutas) return;
+			  if (this.receiveData.length > 0 && !this.newUserCountdownTimer && !this.newUserCloseTimer) {
+				  this.startNewUserTimers();
+			  } else if (this.storeCouponData.length > 0 && !this.storeCouponTimer && !this.storeCouponCloseTimer) {
+				  this.startStoreCouponTimer();
+			  }
+		  },
+
 		  
 		  // 初始化GIF自动显示
 			initGifObserver() {
@@ -2586,19 +2840,19 @@
 			  }
 		
 			  this.gifObserverInitTimer = setTimeout(() => {
-			  if (this.gifObserver) {
-				this.gifObserver.disconnect();
-				this.gifObserver = null;
+			  if (this._gifObserver) {
+				this._gifObserver.disconnect();
+				this._gifObserver = null;
 			  }
 		  
 			  // 简单配置：只观察中心区域
-			  this.gifObserver = uni.createIntersectionObserver(this, {
+			  this._gifObserver = uni.createIntersectionObserver(this, {
 				thresholds: [0.5],
 				observeAll: true
 			  });
 		  
 			  // 观察屏幕中央50%区域
-			  this.gifObserver
+			  this._gifObserver
 				.relativeToViewport({
 				  top: -150,
 				  bottom: -150
@@ -2675,6 +2929,143 @@
 
 		  onNavKongSwiperChange(e) {
 			  this.navKongCurrent = e.detail.current;
+		  },
+
+		  // ─────────────────────────────────────────────────────────────────────
+		  // 金刚区 — APP 逻辑（不动）+ 小程序专用逻辑（#ifdef MP-WEIXIN 区块）
+		  // ─────────────────────────────────────────────────────────────────────
+		  expandKingKong() {
+			  // #ifdef MP-WEIXIN
+			  // 小程序：点击指示器展开。同时更新 panelIndex（高度）和 SwiperCurrent（swiper 滑到位）
+			  if (this.kingKongPanelIndex === 1) return;
+			  this.kingKongPanelIndex = 1;        // 立即更新高度
+			  this.kingKongMpSwiperCurrent = 1;   // 触发 swiper 动画
+			  this.syncKingKongExpandedState();
+			  return;
+			  // #endif
+			  // APP 原逻辑不变
+			  if (this.kingKongPanelIndex === 1) return;
+			  this.kingKongPanelIndex = 1;
+			  this.kingKongExpanded = true;
+		  },
+		  collapseKingKong() {
+			  // #ifdef MP-WEIXIN
+			  if (this.kingKongPanelIndex === 0) return;
+			  this.kingKongPanelIndex = 0;
+			  this.kingKongMpSwiperCurrent = 0;
+			  this.syncKingKongExpandedState();
+			  return;
+			  // #endif
+			  if (this.kingKongPanelIndex === 0) return;
+			  this.kingKongPanelIndex = 0;
+			  this.kingKongExpanded = false;
+		  },
+
+		  // ─────────────────────────────────────────────────────────────────────
+		  // 小程序金刚区 swiper 事件（APP 走自己的 touch gesture，此处仅 MP-WEIXIN）
+		  // ─────────────────────────────────────────────────────────────────────
+		  onMpKingKongSwiperChange(e) {
+			  // #ifdef MP-WEIXIN
+			  // 关键：@change 在用户滑动触发页面切换时立即回调（远早于 @animationfinish）
+			  // 在这里同时更新 panelIndex（高度）和 SwiperCurrent（:current 对齐），
+			  // swiper 已在该页，:current 设成相同值对原生 swiper 是 no-op，不会触发二次 @change。
+			  const current = Number(e && e.detail && e.detail.current) || 0;
+			  const next = current > 0 ? 1 : 0;
+			  this.kingKongPanelIndex = next;       // ← 高度立即响应
+			  this.kingKongMpSwiperCurrent = next;  // ← 防止 Vue re-render 时 :current 回跳
+			  this.syncKingKongExpandedState();
+			  // #endif
+		  },
+		  onMpKingKongSwiperAnimationFinish(e) {
+			  // #ifdef MP-WEIXIN
+			  // 兜底：@change 已处理主要状态，此处仅在快速连续滑动后确保最终一致性
+			  const current = Number(e && e.detail && e.detail.current) || 0;
+			  const next = current > 0 ? 1 : 0;
+			  // 只在与当前状态不一致时才更新，避免不必要的 setData
+			  if (this.kingKongPanelIndex !== next) this.kingKongPanelIndex = next;
+			  if (this.kingKongMpSwiperCurrent !== next) this.kingKongMpSwiperCurrent = next;
+			  this.syncKingKongExpandedState();
+			  // #endif
+		  },
+		  measureKingKongTrackWidth() {
+			  this.$nextTick(() => {
+				  const query = uni.createSelectorQuery().in(this);
+				  query.select('.king-kong-gesture-zone').boundingClientRect((rect) => {
+					  if (rect && rect.width) {
+						  this.kingKongTrackWidth = Number(rect.width) || this.kingKongTrackWidth;
+					  } else if (!this.kingKongTrackWidth) {
+						  this.kingKongTrackWidth = this.mpWindowWidth || 375;
+					  }
+				  }).exec();
+			  });
+		  },
+		  measureVisualAdvWidth() {
+			  this.$nextTick(() => {
+				  const query = uni.createSelectorQuery().in(this);
+				  query.select('.visual-adv-swiper-wrap').boundingClientRect((rect) => {
+					  if (rect && rect.width) {
+						  this.visualAdvContainerWidthPx = Number(rect.width) || 0;
+					  }
+				  }).exec();
+			  });
+		  },
+		  syncKingKongExpandedState() {
+			  this.kingKongExpanded = this.kingKongPanelIndex === 1;
+		  },
+		  onKingKongGestureStart(e) {
+			  // #ifdef MP-WEIXIN
+			  return;
+			  // #endif
+			  const t = e && e.touches && e.touches[0];
+			  if (!t) return;
+			  if (!this.kingKongTrackWidth) {
+				  this.measureKingKongTrackWidth();
+				  this.kingKongTrackWidth = this.mpWindowWidth || 375;
+			  }
+			  this.kingKongGestureStartX = Number(t.clientX) || 0;
+			  this.kingKongGestureStartY = Number(t.clientY) || 0;
+			  this.kingKongGestureHandled = false;
+			  this.kingKongTrackDragging = true;
+			  this.kingKongTrackOffsetX = 0;
+		  },
+		  onKingKongGestureMove(e) {
+			  // #ifdef MP-WEIXIN
+			  return;
+			  // #endif
+			  const t = e && e.touches && e.touches[0];
+			  if (!t) return;
+			  const dx = (Number(t.clientX) || 0) - this.kingKongGestureStartX;
+			  const dy = Math.abs((Number(t.clientY) || 0) - this.kingKongGestureStartY);
+			  // 仅处理明显横向手势，避免与页面纵向滚动冲突
+			  if (!this.kingKongGestureHandled && Math.abs(dx) <= dy) return;
+			  this.kingKongGestureHandled = true;
+			  const width = this.kingKongTrackWidth || this.mpWindowWidth || 351;
+			  if (this.kingKongPanelIndex === 0) {
+				  // 预览态只允许向左拖动进入展开态
+				  this.kingKongTrackOffsetX = Math.max(-width, Math.min(0, dx));
+			  } else {
+				  // 展开态只允许向右拖动返回预览态
+				  this.kingKongTrackOffsetX = Math.max(0, Math.min(width, dx));
+			  }
+		  },
+		  onKingKongGestureEnd() {
+			  // #ifdef MP-WEIXIN
+			  return;
+			  // #endif
+			  const width = this.kingKongTrackWidth || this.mpWindowWidth || 351;
+			  const threshold = Math.max(36, width * 0.16);
+			  const dx = this.kingKongTrackOffsetX;
+			  if (this.kingKongPanelIndex === 0) {
+				  if (dx <= -threshold) {
+					  this.kingKongPanelIndex = 1;
+				  }
+			  } else if (dx >= threshold) {
+				  this.kingKongPanelIndex = 0;
+			  }
+			  this.syncKingKongExpandedState();
+			  this.kingKongTrackOffsetX = 0;
+			  this.kingKongTrackDragging = false;
+			  this.kingKongGestureHandled = false;
 		  },
 		  startTimer() {
 			  // 初始化结束时间戳（10分钟后）
@@ -2834,9 +3225,28 @@
 		  },
 		  // 点击全部分类
 		  tapAllCategories() {
-			  this.allCategoriesType = !this.allCategoriesType;
+			  if (this.allCategoriesType) {
+				  this.allCategoriesType = false;
+				  return;
+			  }
+			  this.updateAllCategoriesTop(() => {
+				  this.allCategoriesType = true;
+			  });
+		  },
+		  updateAllCategoriesTop(done) {
+			  const fallbackTop = Number(this.topVal) || 180;
+			  uni.createSelectorQuery().in(this).select('.search_all_categories').boundingClientRect((res) => {
+				  if (res && Number.isFinite(res.top)) {
+					  this.topVal = Math.max(0, Math.floor(res.top));
+				  } else {
+					  this.topVal = fallbackTop;
+				  }
+				  if (typeof done === 'function') done();
+			  }).exec();
 		  },
 		  tapAllCategoriesItem(val) {
+			  val = this.formatTabText(val)
+			  if (!val) return
 			  if (this.shopId > 0) {
 				  uni.navigateTo({
 					  url: '/pagesD/shop/shopGoods/shopGoods?keywords=' + val +
@@ -3134,6 +3544,8 @@
 		  // 点击搜索热词
 		  searchTag(val, index) {
 			  var that = this
+			  val = this.formatTabText(val)
+			  if (!val) return
 			  // this.tabIndex = index
 			  if (index == 0) return;
 			  if (this.shopId > 0) {
@@ -3169,7 +3581,7 @@
 			  that.coupons_show_type_title = (data.coupons_show_type_title && String(data.coupons_show_type_title).trim()) || '限时红包专享'
 			  if (data.search_keywords) {
 				  const newStr = '推荐, ' + data.search_keywords
-				  const kw = newStr.split(',')
+				  const kw = that.normalizeKeywordList(newStr.split(','))
 				  that.search_keywords = kw
 				  that.search_keywords_five = kw.slice(0, 5)
 			  }
@@ -3205,6 +3617,7 @@
 				  method: 'GET',
 				  data: {
 					  app_version: incrementVersion()
+					    // app_version: '4.4.8'
 				  },
 				  header: {
 					  'Content-Type': 'application/json',
@@ -3653,8 +4066,8 @@
 			  }
 			  if (p.shop) {
 				  const s = p.shop
-				  if (Array.isArray(s.search_keywords)) this.search_keywords = s.search_keywords.slice()
-				  if (Array.isArray(s.search_keywords_five)) this.search_keywords_five = s.search_keywords_five.slice()
+				  if (Array.isArray(s.search_keywords)) this.search_keywords = this.normalizeKeywordList(s.search_keywords)
+				  if (Array.isArray(s.search_keywords_five)) this.search_keywords_five = this.normalizeKeywordList(s.search_keywords_five)
 				  if (s.hint_keywords !== undefined) this.hint_keywords = s.hint_keywords
 				  if (Array.isArray(s.words)) this.words = s.words.slice()
 				  if (s.hotImgurl !== undefined) this.hotImgurl = s.hotImgurl
@@ -3675,6 +4088,30 @@
 			  if (p.hotStrip) {
 				  if (p.hotStrip.hotListOne !== undefined) this.hotListOne = p.hotStrip.hotListOne
 				  if (p.hotStrip.hotListTwo !== undefined) this.hotListTwo = p.hotStrip.hotListTwo
+			  }
+		  },
+		  normalizeKeywordList(input) {
+			  const list = Array.isArray(input) ? input : []
+			  return list.map((item) => this.formatTabText(item)).filter((v) => v !== '')
+		  },
+		  formatTabText(tab) {
+			  if (tab == null) return ''
+			  if (typeof tab === 'string' || typeof tab === 'number' || typeof tab === 'boolean') {
+				  return String(tab)
+			  }
+			  if (typeof tab === 'object') {
+				  if (tab.name != null) return String(tab.name)
+				  if (tab.keyword != null) return String(tab.keyword)
+				  if (tab.title != null) return String(tab.title)
+			  }
+			  return ''
+		  },
+		  hideHomeSkeleton() {
+			  this.loading = false
+			  this.loading8 = false
+			  if (this.loadingHideTimer) {
+				  clearTimeout(this.loadingHideTimer)
+				  this.loadingHideTimer = null
 			  }
 		  },
 		  restoreHomeShellFromStorageIfNeeded() {
@@ -3758,6 +4195,7 @@
 			  this.hasMore = this.loadMoreStatus === 'more'
 			  this.page = 1
 			  this._lastGoodsListLoadedPage = 1
+			  this.hideHomeSkeleton()
 		  },
 		  silentRefreshHomeShellIfNeeded() {
 			  const { payload, isExpired } = this.loadHomeShellCache()
@@ -3792,7 +4230,9 @@
 			  if (!res || !res.data || !res.data.data) return
 			  that.modules = res.data.data
 			  that.visualdvAList = []
-			  that.visualAdvBannerImgHeight = 300
+			  that.visualAdvBannerImgHeight = 0
+			  that.visualAdvBannerHeightMap = {}
+			  that.visualAdvSwiperCurrent = 0
 			  that.visualAdvHasGoods = false
 			  var list
 			  var chunk
@@ -4298,8 +4738,15 @@
 			  // 		url: '/pagesC/goodsDetail/goodsDetail?id=' + goods_id
 			  // 	})
 			  // }
+			  const targetUrl = '/pagesC/goodsDetail/goodsDetail?id=' + goods_id;
+			  console.log('[middles][linkHref->goodsDetail]', {
+				  seckill_id,
+				  goods_id,
+				  goods_id_type: typeof goods_id,
+				  targetUrl
+			  });
 			  uni.navigateTo({
-				  url: '/pagesC/goodsDetail/goodsDetail?id=' + goods_id
+				  url: targetUrl
 			  })
 		  },
 		  linknav(item) {
@@ -4343,16 +4790,24 @@
 		  },
 		  visualAdvSwiperChange(e) {
 			  this.visualAdvSwiperCurrent = e.detail.current
+			  const current = Number(this.visualAdvSwiperCurrent) || 0;
+			  const currentHeight = this.visualAdvBannerHeightMap[current];
+			  this.visualAdvBannerImgHeight = Number(currentHeight) || 0;
 		  },
-		  visualAdvImageLoad(e) {
+		  visualAdvImageLoad(e, index) {
 			  const { width, height } = e.detail || {}
 			  if (!width || !height) return
 			  const sys = uni.getSystemInfoSync()
-			  const winW = (sys.windowWidth || 375) - 40
+			  const fallbackW = (sys.windowWidth || 375) - uni.upx2px(40)
+			  const winW = this.visualAdvContainerWidthPx || fallbackW
 			  const imgH = (winW / width) * height
 			  const rpxRatio = 750 / (sys.windowWidth || 375)
 			  const imgHrpx = Math.ceil(imgH * rpxRatio)
-			  if (imgHrpx > this.visualAdvBannerImgHeight) this.visualAdvBannerImgHeight = imgHrpx
+			  const idx = Number(index) || 0;
+			  this.$set(this.visualAdvBannerHeightMap, idx, imgHrpx);
+			  if (idx === (Number(this.visualAdvSwiperCurrent) || 0)) {
+				  this.visualAdvBannerImgHeight = imgHrpx;
+			  }
 		  },
 
 		  imageLoad(e) {
@@ -5784,6 +6239,8 @@
 		  
 		  // 通知TabBar首页已加载
 		  uni.$emit('home-page-ready');
+		  this.measureKingKongTrackWidth();
+		  this.measureVisualAdvWidth();
 	  },
 	  watch: {
 		  // 监听 eightJin 显示状态变化，自动重新计算高度差
@@ -6309,6 +6766,31 @@
 	    z-index: 99999 !important;
 	  // margin-top: 10rpx;
   }
+  /* #ifdef MP-WEIXIN */
+  .search {
+	  position: relative;
+	  overflow: hidden;
+  }
+  .search .status_bar,
+  .search .input_main,
+  .search .search_all_categories {
+	  position: relative;
+	  z-index: 2;
+  }
+  .search.mp-bg-scrolled {
+	  background-color: rgba(255, 255, 255, 0.92) !important;
+  }
+  .mp-header-bg {
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  width: 100%;
+	  height: 100%;
+	  z-index: 1;
+	  pointer-events: none;
+	  transition: opacity 0.2s;
+  }
+  /* #endif */
 
   .search_container {
 	  z-index: 99999 !important;
@@ -6322,6 +6804,18 @@
 	  .search_all_categories {
 		  position: relative;
 
+	  }
+
+	  .search_all_categories .tab-scroll-view {
+		  width: 702rpx;
+		  min-width: 0;
+		  max-width: calc(100% - 40rpx);
+		  margin: 0 auto;
+		  padding: 0;
+		  box-sizing: border-box;
+		  overflow-x: auto;
+		  overflow-y: hidden;
+		  -webkit-overflow-scrolling: touch;
 	  }
 
 	  .main-opacity {
@@ -6525,7 +7019,7 @@
   .all_categories_popops {
 	  .popops_mack {
 		  position: fixed;
-		  top: 300rpx;
+		  top: 180rpx;
 		  left: 0;
 		  height: 100%;
 		  width: 100%;
@@ -6603,11 +7097,7 @@
 		  }
 	  }
 
-	  .all_categories_label-h5 {
-
-		  top: 210rpx;
-
-	  }
+	  .all_categories_label-h5 {}
   }
 
   .visual-adv {
@@ -6717,12 +7207,12 @@
 	  margin-top: 0;
   }
 
-  /* 指示点叠在 banner 图片底部 20px 处，横向居中 */
+  /* 指示点叠在 banner 图片底部约 10px 处，横向居中 */
   .visual-adv-dots {
 	  position: absolute;
 	  left: 0;
 	  right: 0;
-	  bottom: 40rpx;
+	  bottom: 20rpx;
 	  display: flex;
 	  justify-content: center;
 	  z-index: 2;
@@ -6915,7 +7405,7 @@
 		  		  font-size: 24rpx;
 		  		  color: #DCAB6C;
 		  		  align-items: center;
-		  
+					margin:0rpx 10rpx 4rpx 0rpx ;
 		  		  .top-name {
 		  			  margin-right: 16rpx;
 		  		  }
@@ -6955,7 +7445,7 @@
 	  display: flex;
 	  width: 100%;
 	  justify-content: flex-start;
-	  margin-bottom: 16rpx;
+	  // margin-bottom: 16rpx;
 
 	  .label-box-line {
 		  display: flex;
@@ -7015,7 +7505,7 @@
 		  font-weight: 400;
 		  font-size: 28rpx;
 		  color: #4D4B4B;
-		  line-height: 28rpx;
+		  line-height: 40rpx;
 		  // display: inline-block;
 		  vertical-align: bottom;
 		  /* 关键：对齐底部基线 */
@@ -7035,6 +7525,7 @@
 		  display: inline-block;
 		  vertical-align: bottom;
 		  /* 关键：对齐底部基线 */
+		  margin:0rpx 4rpx 4rpx 0rpx ;
 	  }
 
 	  .is-new-goods {
@@ -7046,10 +7537,11 @@
 		  padding: 0px 4px;
 		  border-radius: 5px;
 		  margin-right: 16rpx;
-		  line-height: 28rpx;
+		  line-height: 40rpx;
 		  // display: inline-block;
 		  vertical-align: bottom;
 		  /* 关键：对齐底部基线 */
+		   margin:0rpx 10rpx 4rpx 0rpx ;
 	  }
 
 	  .yishou {
@@ -7401,18 +7893,24 @@
 	  display: flex;
 	  justify-content: center;
 	  width: 100%;
+	  background-color: #ffffff;
+	  margin-left: -20rpx;
+	  margin-right: -20rpx;
+	  padding-left: 20rpx;
+	  padding-right: 20rpx;
 	  // padding: 0 24rpx 20rpx;
   }
   /* 金刚区整体悬浮效果：整个区域像一张悬浮卡片，白底不透明 */
   .king-kong-nav-float {
 	  width: 100%;
-	  max-width: 702rpx;
-	  border-radius: 20rpx;
-	  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+	  max-width: none;
+	  border-radius: 0;
+	  box-shadow: none;
+	  // border: 1rpx solid #eeeeee;
 	  overflow: hidden;
 	  background-color: #ffffff;
   }
-  .king-kong-nav {
+	  .king-kong-nav {
 	  width: 100%;
 	  display: flex;
 	  justify-content: start;
@@ -7420,64 +7918,189 @@
 
 	  .nav-label {
 		  width: 100%;
-		  padding: 0 20rpx 20rpx;
+		  display: flex;
+		  flex-direction: column;
+		  padding: 0 0 20rpx;
 		  overflow: hidden;
+		  max-height: 188rpx;
+		  transition: max-height 0.26s cubic-bezier(0.22, 1, 0.36, 1), padding-bottom 0.2s ease;
 	  }
-	  .king-kong-swiper {
-		  height: 360rpx; /* 两排高度 */
+
+	  .nav-label.nav-label-expanded {
+		  padding-bottom: 14rpx;
+		  max-height: 560rpx;
 	  }
-	  /* 金刚区轮播指示：选中=横杠，未选中=点 */
-	  .king-kong-indicator {
+
+	  .king-kong-toggle-indicator {
 		  display: flex;
 		  justify-content: center;
 		  align-items: center;
-		  gap: 12rpx;
-		  padding-bottom: 16rpx;
+		  gap: 14rpx;
+		  padding: 8rpx 0 6rpx;
+		  position: relative;
+		  z-index: 2;
 	  }
-	  .king-kong-indicator-item.dot {
-		  width: 12rpx;
-		  height: 12rpx;
-		  border-radius: 50%;
-		  background: rgba(0, 0, 0, 0.2);
+	  .nav-label:not(.nav-label-expanded) .king-kong-toggle-indicator {
+		  padding-top: 2rpx;
 	  }
-	  .king-kong-indicator-item.bar {
-		  width: 32rpx;
+	  /* #ifdef APP-PLUS */
+	  .nav-label:not(.nav-label-expanded) .king-kong-toggle-indicator {
+		  padding-top: 0rpx;
+	  }
+	  /* #endif */
+
+	  .king-kong-toggle-item {
+		  background: rgba(0, 0, 0, 0.22);
+		  display: block;
+		  flex-shrink: 0;
+		  opacity: 1;
+		  transition: background-color 0.2s ease, opacity 0.2s ease;
+	  }
+
+	  .king-kong-toggle-item.preview {
+		  width: 8rpx;
 		  height: 8rpx;
-		  border-radius: 4rpx;
-		  background: #FE0302;
+		  min-width: 8rpx;
+		  min-height: 8rpx;
+		  border-radius: 50%;
 	  }
-	  .nav-label .nav-list {
-			  width: 100%;
-			  display: flex;
-		  flex-wrap: wrap;
-			  overflow: hidden;
-			  line-height: 1.5;
+
+	  .king-kong-toggle-item.expanded {
+		  width: 18rpx;
+		  height: 8rpx;
+		  min-width: 18rpx;
+		  min-height: 8rpx;
+		  border-radius: 8rpx;
+	  }
+
+	  .king-kong-toggle-item.active {
+		  background: #ff7a1a;
+	  }
+
+	  .king-kong-track {
+		  width: 200%;
+		  display: flex;
+		  align-items: flex-start;
+		  overflow: hidden;
+		  transform: translate3d(0, 0, 0);
+		  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+	  }
+
+
+	  .king-kong-track.dragging {
+		  transition: none;
+	  }
+
+	  .king-kong-mp-swiper {
+		  width: 100%;
+		  display: block;
+	  }
+
+	  .king-kong-mp-panel {
+		  width: 100%;
 		  height: 100%;
 		  box-sizing: border-box;
+	  }
+
+	  .king-kong-panel {
+		  width: 50%;
+		  flex: 0 0 50%;
+	  }
+
+	  .king-kong-panel-preview {
+		  overflow: visible;
+	  }
+
+	  .king-kong-preview-clip {
+		  overflow: hidden;
+		  margin-right: 24rpx;
+		  box-sizing: border-box;
+	  }
+
+	  .nav-label .nav-list-preview {
+		  display: flex;
+		  flex-wrap: nowrap;
+		  align-items: flex-start;
+		  padding: 0;
+		  line-height: 1.5;
+		  box-sizing: border-box;
+	  }
+
+	  .nav-list-preview {
+		  min-width: 0;
+	  }
+
+	  .list {
+		  width: 116rpx;
+		  flex: 0 0 116rpx;
+		  box-sizing: border-box;
+		  display: flex;
+		  flex-direction: column;
+		  align-items: center;
+		  margin-right: 8rpx;
+
+		  .icon {
+			  width: 100%;
+			  display: flex;
+			  justify-content: center;
+
+			  .image {
+				  min-width: 72px;
+				  width: 92rpx;
+			  }
 		  }
 
-		  .list {
-			  width: 20%; // 一排5个，每个占20%宽度
-			  box-sizing: border-box;
-			  // padding: 0 10rpx;
-			  display: flex;
-			  flex-direction: column;
-			  align-items: center;
-			  margin-bottom: 10rpx;
-
-			  .icon {
-				  .image {
-					  min-width: 72px;
-				  }
-			  }
-
-			  .con {
-				  white-space: normal;
-				  height: auto;
-				  width: 100%;
-				  text-align: center;
+		  .con {
+			  white-space: normal;
+			  height: auto;
+			  width: 100%;
+			  text-align: center;
+			  font-size: 22rpx;
+			  line-height: 1.35;
+			  overflow: hidden;
 		  }
 	  }
+
+	  .list:last-child {
+		  margin-right: 0;
+	  }
+
+	  .list-preview {
+		  /* 第一屏固定「5个完整 + 第6个半露」 */
+		  width: 18.18%;
+		  flex: 0 0 18.18%;
+		  margin-right: 0;
+	  }
+
+	  .preview-tail {
+		  width: 0;
+		  flex: 0 0 0;
+	  }
+
+	  .nav-label .nav-list.nav-list-expanded {
+		  width: 100%;
+		  display: flex;
+		  flex-wrap: wrap;
+		  align-items: flex-start;
+		  justify-content: flex-start;
+		  padding: 0 20rpx 0 0;
+		  line-height: 1.5;
+		  box-sizing: border-box;
+	  }
+
+	  .list-expanded {
+		  width: 20%;
+		  flex: 0 0 20%;
+		  margin-right: 0;
+		  margin-bottom: 12rpx;
+	  }
+
+	  .list-preview .icon .image,
+	  .list-expanded .icon .image {
+		  width: 92rpx !important;
+		  min-width: 72rpx;
+	  }
+
   }
 
   .nav {
@@ -8380,61 +9003,66 @@
   }
 
   .tab-bar1 {
-	  // height: 48px;
-	  // background: #FFFFFF;
-	  display: flex;
-	  // gap:30rpx;
-	  flex-direction: row;
-	  padding: 0rpx 16rpx 16rpx 32rpx;
-	  // margin-right: 16rpx;
-	  // border-top: 1px solid #f3f4f9;
-	  // border-bottom: 1px solid #F6F6F9;
-	  // position: fixed;
-	  // top: 0;
-	  // left: 0;
-	  // right: 0;
+	  display: inline-flex;
+	  align-items: center;
+	  justify-content: space-between;
+	  width: max-content;
+	  min-width: 100%;
+	  box-sizing: border-box;
+	  white-space: nowrap;
+	  gap: 24rpx;
+	  padding: 0rpx 8rpx 16rpx;
 	  z-index: 10001;
-
   }
 
   .all-text {
-	  display: flex;
+	  white-space: nowrap;
 
 	  text {
 		  font-weight: 400;
 		  font-size: 28rpx;
 		  color: #313131;
+		  white-space: nowrap;
+		  word-break: keep-all;
 	  }
 
 	  .iconfont {
 		  font-size: 20rpx;
 		  transform: rotate(90deg);
+		  flex-shrink: 0;
 	  }
   }
 
   .tab-bar1 .tab-item {
 	  display: flex;
-	  // flex: 1 1 0%;
+	  flex: 0 0 auto;
 	  justify-content: center;
 	  align-items: center;
-	  margin-right: 30rpx;
-	  // background: #FFFFFF;
+	  margin-right: 0;
   }
   .tab-bar1 .tab-item:last-child {
 	margin-right: 0;
   }
 .tab-bar1 .all-text {
-margin-left: auto; /* 让全部分类靠右 */
 display: flex;
 align-items: center;
+justify-content: center;
+margin-left: 0;
+flex: 0 0 auto;
 }
   .tab-bar1 .tab-item text {
 	  // padding: 0px 2px 10rpx;
+	  display: inline-block;
 	  font-weight: 400;
 	  font-size: 28rpx;
 	  color: #313131;
 	  font-style: normal;
 	  color: #313131;
+	  white-space: nowrap;
+	  word-break: keep-all;
+	  max-width: 100%;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
   }
 
   .tab-bar1 .tab-item.active text {
@@ -8450,11 +9078,10 @@ align-items: center;
 	  border-bottom: 4upx solid #FE0302;
 	  width: 30upx;
 	  height: 12upx;
-	  /* border-radius: 0 0 50% 50%/0 0 100% 100% ; */
 	  bottom: 0upx;
-	  left: calc(50% - 30upx);
+	  left: 50%;
+	  transform: translateX(-50%);
 	  border-top: none;
-	  left: 30%;
   }
 
   .yishou {
@@ -9964,7 +10591,7 @@ align-items: center;
 	  background: linear-gradient(138deg, #CEFFF5 0%, #FFFFFF 33%, #FFFAFA 62%, #FBD5D5 100%);
 	  border-radius: 10px;
 	  border: 1px solid #FFFFFF;
-	  margin: 16rpx;
+	  margin: 20rpx;
 	  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
 	  padding: 10rpx 10rpx;
 	  position: relative;
