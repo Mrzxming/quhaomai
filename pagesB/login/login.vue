@@ -105,12 +105,18 @@
 					<div id="captcha" style="display: none;"></div>
 					<!-- #endif -->
 					<!-- #ifdef APP-PLUS -->
-					<captcha ref="captcha" :config="aliConfig"
+					<captcha-android v-if="aliPlatform === 'Android'" ref="captchaAndroid" :config="aliConfig"
 						@captchaSuccess="captchaSuccess"
 						@captchaError="captchaError"
 						@captchaFail="captchaFail"
 						@captchaReady="captchaReady"
-						@captchaClose="captchaClose"></captcha>
+						@captchaClose="captchaClose"></captcha-android>
+					<captcha-ios v-else ref="captchaIos" :config="aliConfig"
+						@captchaSuccess="captchaSuccess"
+						@captchaError="captchaError"
+						@captchaFail="captchaFail"
+						@captchaReady="captchaReady"
+						@captchaClose="captchaClose"></captcha-ios>
 					<!-- #endif -->
 
 					<button v-if="!showOneClickPanel" class="login-btn" :class="{'btn-disabled':disabled}" :disabled="disabled" form-type="submit">登录</button>
@@ -204,7 +210,8 @@
 	import uniPopup from '@/components/uni-popup.vue';
 	import dscCommonNav from '@/components/dsc-common-nav.vue';
 	import jyfParser from "@/components/jyf-parser/jyf-parser";
-	import captcha from "@/components/captcha4/index.vue";
+	import captchaAndroid from "@/components/captcha4/android.vue";
+	import captchaIos from "@/components/captcha4/ios.vue";
 	var graceChecker = require("@/common/graceChecker.js");
 
 	// #ifdef APP-PLUS
@@ -282,7 +289,8 @@
 			uniPopup,
 			dscCommonNav,
 			jyfParser,
-			captcha
+			captchaAndroid,
+			captchaIos
 		},
 		computed: {
 			...mapState({
@@ -716,7 +724,7 @@
 			      
 			      // 处理发送短信验证码
 			    
-			     handleSendSmsCode() {
+		     handleSendSmsCode() {
 					 
 					 // #ifdef MP-WEIXIN
 					     this.sendSmsAfterCaptcha();
@@ -749,7 +757,21 @@
 			       // #endif
 			       
 			       // #ifdef APP-PLUS
-			       this.$refs.captcha.showCaptcha();
+			       this.aliCaptchaResult = null;
+			       this.button_type = false;
+			       this.button_text = '请稍后...';
+			       const captchaRef = this.getActiveCaptchaRef();
+			       console.log('[login] 准备弹出阿里验证码, captchaId:', this.aliConfig.captchaId, 'ref存在:', !!captchaRef);
+			       setTimeout(() => {
+			         const activeRef = this.getActiveCaptchaRef();
+			         if (activeRef) {
+			           console.log('[login] 调用 showCaptcha');
+			           activeRef.showCaptcha();
+			         } else {
+			           console.error('[login] captcha ref 不存在！');
+			           this.button_type = true;
+			         }
+			       }, 500);
 			       // #endif
 				   
 				
@@ -855,22 +877,33 @@
 			      },
 			      
 			      // APP验证码回调方法
+			      getActiveCaptchaRef() {
+			      	if (this.aliPlatform === 'Android') {
+			      		return this.$refs.captchaAndroid;
+			      	}
+			      	return this.$refs.captchaIos;
+			      },
 			      captchaSuccess(result) {
+			        console.log('[login] captchaSuccess 收到结果:', JSON.stringify(result));
 			        this.aliCaptchaResult = result;
 			        this.sendSmsAfterCaptcha();
 			      },
 			      captchaError(e) {
-			        console.error('验证码错误:', e);
+			        console.error('[login] captchaError:', JSON.stringify(e));
+			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			        uni.showToast({ title: '验证失败，请重试', icon: "none" });
 			      },
 			      captchaFail() {
-			        uni.showToast({ title: '验证失败', icon: "none" });
+			        console.log('[login] captchaFail — 弹窗内自动刷新，不关闭');
 			      },
 			      captchaReady() {
-			        console.log('阿里验证码准备就绪');
+			        console.log('[login] captchaReady — 阿里验证码准备就绪');
 			      },
 			      captchaClose() {
-			        console.log('阿里验证码关闭');
+			        console.log('[login] captchaClose — 阿里验证码关闭');
+			        this.aliCaptchaResult = null;
+			        this.button_type = true;
 			      },
 				  
 				  
