@@ -6,6 +6,13 @@
 	//#ifdef APP-PLUS
 	var jpushModule = uni.requireNativePlugin("JG-JPush")
 	//#endif
+	const safeStringify = (value) => {
+		try {
+			return JSON.stringify(value)
+		} catch (err) {
+			return '[Unserializable]'
+		}
+	}
 
 	// #ifdef MP-WEIXIN
 	//daqin 注释掉直播
@@ -26,7 +33,7 @@
 		},
 		onLaunch: async function(e) {
 			console.log('e', e);
-			console.log(JSON.stringify(e) + 'onlaunch');
+			console.log(safeStringify(e) + 'onlaunch');
 			uni.getSystemInfo({
 				success: function(e) {
 					// #ifndef MP
