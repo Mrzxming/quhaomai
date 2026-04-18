@@ -53,11 +53,63 @@ export function cleanupAliCaptchaDom() {
 }
 
 /**
+ * 获取当前 H5 运行环境下的 static 资源基路径。
+ *
+ * 这个项目 manifest.json 里 h5.router.base = "/mobile/"，也就是 webpack
+ * publicPath 就是 "/mobile/"。如果调用方写死 scriptSrc="/static/ct4.js"，
+ * 实际 URL 会是 https://host/static/ct4.js，SPA 的 history fallback 会把它
+ * 当成路由兜底返回 index.html，浏览器把 HTML 当 JS 解析出 SyntaxError，
+ * script.onload 仍会触发，但 window.initAlicom4 始终 undefined，
+ * 报 "initAlicom4 is not a function"。
+ *
+ * 优先级：
+ *   1) webpack 注入的 __webpack_public_path__（uni-app H5 构建会带）
+ *   2) <base href> 标签的路径
+ *   3) window.location.pathname 里提取 /mobile/ 这种前缀段
+ *   4) '/'
+ */
+function resolveStaticBase() {
+	try {
+		// 1) webpack 的 publicPath（uni-app H5 编译后会把 manifest h5.router.base 注入到这里）
+		if (typeof __webpack_public_path__ !== 'undefined' && __webpack_public_path__) {
+			return String(__webpack_public_path__)
+		}
+	} catch (e) {}
+	try {
+		// 2) <base href>
+		const baseEl = document.querySelector('base')
+		if (baseEl && baseEl.getAttribute('href')) {
+			return baseEl.getAttribute('href')
+		}
+	} catch (e) {}
+	try {
+		// 3) 从当前 URL 推断第一级目录（最粗略兜底）
+		const m = window.location.pathname.match(/^\/([^\/]+)\//)
+		if (m) return '/' + m[1] + '/'
+	} catch (e) {}
+	return '/'
+}
+
+/**
+ * 把用户传入的 scriptSrc 规整为"publicPath + 相对路径"，兼容部署在 /mobile/ 等子路径下的情况。
+ *   - 绝对 URL（http/https/协议相对）原样返回
+ *   - '/static/xxx.js' 视为希望相对 publicPath 的路径，拼成 '<base>static/xxx.js'
+ *   - 相对路径也拼成 '<base>xxx'
+ */
+function resolveScriptSrc(scriptSrc) {
+	if (!scriptSrc) return scriptSrc
+	if (/^(https?:)?\/\//i.test(scriptSrc)) return scriptSrc
+	const base = resolveStaticBase().replace(/\/+$/, '/') // 保证末尾恰好一个 /
+	const rel = scriptSrc.replace(/^\/+/, '')             // 去掉开头所有 /
+	return base + rel
+}
+
+/**
  * H5 按需初始化阿里验证码。
  *
  * @param {Object} options
  * @param {String} options.captchaId   阿里控制台的 captchaId
- * @param {String} [options.scriptSrc] ct4.js 路径，默认 '/static/ct4.js'
+ * @param {String} [options.scriptSrc] ct4.js 相对路径（相对于 webpack publicPath），默认 'static/ct4.js'
  * @param {Function} options.onSuccess 校验成功回调，参数为 captcha.getValidate() 结果
  * @param {Function} [options.onReady] SDK 初始化完成回调（参数 captcha 实例）
  * @param {Function} [options.onError] SDK 加载/初始化失败回调
@@ -67,7 +119,7 @@ export function initAliCaptchaH5(options) {
 	// #ifdef H5
 	const {
 		captchaId,
-		scriptSrc = '/static/ct4.js',
+		scriptSrc = 'static/ct4.js',
 		onSuccess,
 		onReady,
 		onError
@@ -146,11 +198,26 @@ export function initAliCaptchaH5(options) {
 		}
 
 		const script = document.createElement('script')
-		script.src = scriptSrc
-		script.onload = boot
+		const finalSrc = resolveScriptSrc(scriptSrc)
+		script.src = finalSrc
+		script.onload = () => {
+			// 【关键】script.onload 并不保证 JS 解析成功。典型场景：
+			// 部署在 /mobile/ 下但 scriptSrc 写死 /static/ct4.js，SPA history
+			// fallback 会返回 index.html，浏览器当 JS 解析报 SyntaxError，
+			// onload 仍然触发。这里显式校验 window.initAlicom4 是否已注入，
+			// 未注入则视为加载失败并走 onerror 流程。
+			if (typeof window.initAlicom4 !== 'function') {
+				const err = new Error('[aliCaptcha] ct4.js loaded but window.initAlicom4 not found, src=' + finalSrc + ' (检查 publicPath / 部署 base 路径是否正确)')
+				if (onError) onError(err)
+				return reject(err)
+			}
+			boot()
+		}
 		script.onerror = (e) => {
-			if (onError) onError(e)
-			reject(e)
+			const err = new Error('[aliCaptcha] ct4.js load failed, src=' + finalSrc)
+			err.origin = e
+			if (onError) onError(err)
+			reject(err)
 		}
 		document.body.appendChild(script)
 	})
