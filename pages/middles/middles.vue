@@ -218,6 +218,13 @@
 
 	  <view class="king-kong-wrap">
 	  <view class="nav king-kong-nav king-kong-nav-float" :class="aClass">
+		  <!-- #ifdef MP-WEIXIN -->
+		  <!-- 小程序不绑定 touch 手势（原 APP 手势在 MP 分支里都是 return），省去 native↔JS 通信开销 -->
+		  <view class="nav-label king-kong-gesture-zone"
+			  :class="{'nav-label-expanded': kingKongIsExpanded}"
+			  :style="kingKongNavLabelStyle">
+		  <!-- #endif -->
+		  <!-- #ifndef MP-WEIXIN -->
 		  <view class="nav-label king-kong-gesture-zone"
 			  :class="{'nav-label-expanded': kingKongIsExpanded}"
 			  :style="kingKongNavLabelStyle"
@@ -225,6 +232,7 @@
 			  @touchmove="onKingKongGestureMove"
 			  @touchend="onKingKongGestureEnd"
 			  @touchcancel="onKingKongGestureEnd">
+		  <!-- #endif -->
 			  <!-- #ifndef MP-WEIXIN -->
 			  <view class="king-kong-track" :class="{'dragging': kingKongTrackDragging}" :style="kingKongTrackStyle">
 				  <view class="king-kong-panel king-kong-panel-preview">
@@ -267,9 +275,10 @@
 			  </view>
 			  <!-- #endif -->
 			  <!-- #ifdef MP-WEIXIN -->
-			  <!-- 小程序金刚区：原生 swiper，两个事件分工明确：
-			       @change       → 用户滑动时立即触发，同步高度（instant）
-			       @animationfinish → 动画结束后兜底同步，防止快速滑动边缘态不一致 -->
+			  <!-- 小程序金刚区：
+			       - @change 只同步 panelIndex（管高度/指示条），不再回写 :current，避免 Vue setData 反向驱动 swiper
+			       - @animationfinish 做一次兜底落位，快速连滑也能收敛
+			       - 图片锁死 96×96 方框 + aspectFit，消除 widthFix 加载后重排导致的"2 秒高度才变" -->
 			  <swiper class="king-kong-mp-swiper"
 				  :current="kingKongMpSwiperCurrent"
 				  :duration="250"
@@ -281,16 +290,14 @@
 					  <view class="king-kong-mp-panel king-kong-panel-preview">
 						  <view class="king-kong-preview-clip">
 							  <view class="nav-list nav-list-preview">
-								  <view class="list list-preview" :class="{'list1': indexs === 0}"
-									  v-for="(items, indexs) in kingKongPreviewData" :key="indexs" wx:key="indexs"
+								  <view class="list list-preview list-mp" :class="{'list1': indexs === 0}"
+									  v-for="(items, indexs) in kingKongPreviewData"
+									  :key="(items && (items.cat_id || items.id)) || indexs"
 									  @click="linknav(items)">
-									  <view class="icon" v-if="items.img">
-										  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+									  <view class="icon icon-mp">
+										  <image :src="items.img || imagePath.defaultImg" mode="aspectFit" class="image image-mp"></image>
 									  </view>
-									  <view class="icon" v-if="!items.img">
-										  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
-									  </view>
-									  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+									  <view class="con con-mp uni-ellipsis">
 										  <block v-if="items.desc">{{ items.desc }}</block>
 									  </view>
 								  </view>
@@ -302,16 +309,14 @@
 				  <swiper-item>
 					  <view class="king-kong-mp-panel king-kong-panel-expanded">
 						  <view class="nav-list nav-list-expanded">
-							  <view class="list list-expanded" :class="{'list1': indexs === 0}"
-								  v-for="(items, indexs) in kingKongExpandedData" :key="indexs" wx:key="indexs"
+							  <view class="list list-expanded list-mp" :class="{'list1': indexs === 0}"
+								  v-for="(items, indexs) in kingKongExpandedData"
+								  :key="(items && (items.cat_id || items.id)) || indexs"
 								  @click="linknav(items)">
-								  <view class="icon" v-if="items.img">
-									  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+								  <view class="icon icon-mp">
+									  <image :src="items.img || imagePath.defaultImg" mode="aspectFit" class="image image-mp"></image>
 								  </view>
-								  <view class="icon" v-if="!items.img">
-									  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
-								  </view>
-								  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+								  <view class="con con-mp uni-ellipsis">
 									  <block v-if="items.desc">{{ items.desc }}</block>
 								  </view>
 							  </view>
@@ -2966,22 +2971,27 @@ searchInputStyle() {
 		  // ─────────────────────────────────────────────────────────────────────
 		  onMpKingKongSwiperChange(e) {
 			  // #ifdef MP-WEIXIN
-			  // 关键：@change 在用户滑动触发页面切换时立即回调（远早于 @animationfinish）
-			  // 在这里同时更新 panelIndex（高度）和 SwiperCurrent（:current 对齐），
-			  // swiper 已在该页，:current 设成相同值对原生 swiper 是 no-op，不会触发二次 @change。
+			  // 【核心修复】快速连滑"自己来回切"的根因：
+			  //   旧逻辑在 change 里同时回写 kingKongMpSwiperCurrent ⇒ Vue setData 同步到 :current
+			  //   ⇒ 反向驱动原生 swiper 内部状态机 ⇒ 与用户手势打架。
+			  // 新策略：
+			  //   change 阶段只更新"高度/指示条"相关的 panelIndex（UI 跟手），
+			  //   不再回写 kingKongMpSwiperCurrent，彻底切断反向驱动；
+			  //   current 的最终落位交给 animationfinish 一次性做。
 			  const current = Number(e && e.detail && e.detail.current) || 0;
 			  const next = current > 0 ? 1 : 0;
-			  this.kingKongPanelIndex = next;       // ← 高度立即响应
-			  this.kingKongMpSwiperCurrent = next;  // ← 防止 Vue re-render 时 :current 回跳
-			  this.syncKingKongExpandedState();
+			  if (this.kingKongPanelIndex !== next) {
+				  this.kingKongPanelIndex = next;
+				  this.syncKingKongExpandedState();
+			  }
 			  // #endif
 		  },
 		  onMpKingKongSwiperAnimationFinish(e) {
 			  // #ifdef MP-WEIXIN
-			  // 兜底：@change 已处理主要状态，此处仅在快速连续滑动后确保最终一致性
+			  // 动画真正结束时才写 current，一次手势一次 setData，
+			  // 此时 swiper 内部位置已稳定，:current 写入同值对 swiper 是 no-op，不会反向驱动
 			  const current = Number(e && e.detail && e.detail.current) || 0;
 			  const next = current > 0 ? 1 : 0;
-			  // 只在与当前状态不一致时才更新，避免不必要的 setData
 			  if (this.kingKongPanelIndex !== next) this.kingKongPanelIndex = next;
 			  if (this.kingKongMpSwiperCurrent !== next) this.kingKongMpSwiperCurrent = next;
 			  this.syncKingKongExpandedState();
@@ -8100,6 +8110,45 @@ searchInputStyle() {
 		  width: 92rpx !important;
 		  min-width: 72rpx;
 	  }
+
+	  /* #ifdef MP-WEIXIN */
+	  /* 小程序专版：锁死图标容器 96rpx × 96rpx，aspectFit 让图片加载前后尺寸零变化，
+	     消除 widthFix 带来的"切到第二屏后还要再跳一下高度"问题。
+	     特异性 + !important 双保险，覆盖上方 .list-preview .icon .image 的 92rpx !important */
+	  .list-mp .icon-mp {
+		  width: 96rpx !important;
+		  height: 96rpx !important;
+		  min-width: 96rpx;
+		  min-height: 96rpx;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  overflow: hidden;
+		  margin: 0 auto;
+		  box-sizing: border-box;
+	  }
+	  .list-mp .icon-mp .image-mp {
+		  width: 96rpx !important;
+		  height: 96rpx !important;
+		  min-width: 96rpx !important;
+		  min-height: 96rpx !important;
+		  max-width: 96rpx !important;
+		  max-height: 96rpx !important;
+		  display: block;
+	  }
+	  .list-mp .con-mp {
+		  margin-top: 4rpx;
+		  font-size: 22rpx;
+		  line-height: 1.3;
+		  text-align: center;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+		  white-space: nowrap;
+		  max-width: 100%;
+		  padding: 0 4rpx;
+		  box-sizing: border-box;
+	  }
+	  /* #endif */
 
   }
 
