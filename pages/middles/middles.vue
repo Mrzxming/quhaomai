@@ -218,6 +218,13 @@
 
 	  <view class="king-kong-wrap">
 	  <view class="nav king-kong-nav king-kong-nav-float" :class="aClass">
+		  <!-- #ifdef MP-WEIXIN -->
+		  <!-- 小程序不绑定 touch 手势（原 APP 手势在 MP 分支里都是 return），省去 native↔JS 通信开销 -->
+		  <view class="nav-label king-kong-gesture-zone"
+			  :class="{'nav-label-expanded': kingKongIsExpanded}"
+			  :style="kingKongNavLabelStyle">
+		  <!-- #endif -->
+		  <!-- #ifndef MP-WEIXIN -->
 		  <view class="nav-label king-kong-gesture-zone"
 			  :class="{'nav-label-expanded': kingKongIsExpanded}"
 			  :style="kingKongNavLabelStyle"
@@ -225,6 +232,7 @@
 			  @touchmove="onKingKongGestureMove"
 			  @touchend="onKingKongGestureEnd"
 			  @touchcancel="onKingKongGestureEnd">
+		  <!-- #endif -->
 			  <!-- #ifndef MP-WEIXIN -->
 			  <view class="king-kong-track" :class="{'dragging': kingKongTrackDragging}" :style="kingKongTrackStyle">
 				  <view class="king-kong-panel king-kong-panel-preview">
@@ -267,51 +275,28 @@
 			  </view>
 			  <!-- #endif -->
 			  <!-- #ifdef MP-WEIXIN -->
-			  <!-- 小程序金刚区：原生 swiper，两个事件分工明确：
-			       @change       → 用户滑动时立即触发，同步高度（instant）
-			       @animationfinish → 动画结束后兜底同步，防止快速滑动边缘态不一致 -->
+			  <!-- 小程序金刚区：
+			       - 固定高度（swiper 高 = 2 行高），两屏之间没有任何高度变化
+			       - 每屏 2 行 × 5 列 = 10 个；总数 ≤10 只 1 屏；>10 按 10 个分页，屏数动态
+			       - 图标 96rpx × 96rpx + aspectFit，加载前后零布局抖动
+			       - @change 空操作 / @animationfinish 一次性落位页码，杜绝"高度自循环" -->
 			  <swiper class="king-kong-mp-swiper"
-				  :current="kingKongMpSwiperCurrent"
+				  :current="kingKongMpPageIndex"
 				  :duration="250"
 				  :circular="false"
-				  :style="mpKingKongSwiperStyle"
 				  @change="onMpKingKongSwiperChange"
 				  @animationfinish="onMpKingKongSwiperAnimationFinish">
-				  <swiper-item>
-					  <view class="king-kong-mp-panel king-kong-panel-preview">
-						  <view class="king-kong-preview-clip">
-							  <view class="nav-list nav-list-preview">
-								  <view class="list list-preview" :class="{'list1': indexs === 0}"
-									  v-for="(items, indexs) in kingKongPreviewData" :key="indexs" wx:key="indexs"
-									  @click="linknav(items)">
-									  <view class="icon" v-if="items.img">
-										  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
-									  </view>
-									  <view class="icon" v-if="!items.img">
-										  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
-									  </view>
-									  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
-										  <block v-if="items.desc">{{ items.desc }}</block>
-									  </view>
-								  </view>
-								  <view class="preview-tail"></view>
-							  </view>
-						  </view>
-					  </view>
-				  </swiper-item>
-				  <swiper-item>
-					  <view class="king-kong-mp-panel king-kong-panel-expanded">
-						  <view class="nav-list nav-list-expanded">
-							  <view class="list list-expanded" :class="{'list1': indexs === 0}"
-								  v-for="(items, indexs) in kingKongExpandedData" :key="indexs" wx:key="indexs"
+				  <swiper-item v-for="(page, pi) in kingKongMpPages" :key="pi">
+					  <view class="king-kong-mp-panel">
+						  <view class="nav-list-mp-grid">
+							  <view class="list-mp" :class="{'list1': indexs === 0}"
+								  v-for="(items, indexs) in page"
+								  :key="(items && (items.cat_id || items.id)) || (pi + '-' + indexs)"
 								  @click="linknav(items)">
-								  <view class="icon" v-if="items.img">
-									  <image :src="items.img" mode="widthFix" class="image" style="height: 144rpx;"></image>
+								  <view class="icon icon-mp">
+									  <image :src="items.img || imagePath.defaultImg" mode="aspectFit" class="image image-mp"></image>
 								  </view>
-								  <view class="icon" v-if="!items.img">
-									  <image :src="imagePath.defaultImg" mode="widthFix" class="image" style="height: 144rpx;"></image>
-								  </view>
-								  <view class="con uni-ellipsis" style="margin-top: -12rpx;">
+								  <view class="con con-mp uni-ellipsis">
 									  <block v-if="items.desc">{{ items.desc }}</block>
 								  </view>
 							  </view>
@@ -319,13 +304,20 @@
 					  </view>
 				  </swiper-item>
 			  </swiper>
+			  <!-- 屏数 > 1 才展示指示条；圆点数量 = 屏数 -->
+			  <view class="king-kong-mp-dots" v-if="kingKongMpPages.length > 1">
+				  <view v-for="(page, pi) in kingKongMpPages" :key="pi"
+					  :class="['king-kong-mp-dot', kingKongMpPageIndex === pi ? 'active' : '']"></view>
+			  </view>
 			  <!-- #endif -->
+			  <!-- #ifndef MP-WEIXIN -->
 			  <view class="king-kong-toggle-indicator">
 				  <view class="king-kong-toggle-item preview"
 					  :class="{'active': kingKongPanelIndex === 0}"></view>
 				  <view class="king-kong-toggle-item expanded"
 					  :class="{'active': kingKongPanelIndex === 1}"></view>
 			  </view>
+			  <!-- #endif -->
 		  </view>
 	  </view>
   </view>
@@ -1810,6 +1802,8 @@
 			  kingKongExpanded: false, // 金刚区：默认一行预览，滑动后展开全部
 			  kingKongPanelIndex: 0, // 0=预览，1=展开
 			  kingKongMpSwiperCurrent: 0,   // 小程序 swiper :current 控制
+			  // 【MP 专用】分页切屏：每屏 2 行 × 5 列 = 10 个，不固定屏数，按数据量自动算
+			  kingKongMpPageIndex: 0,
 			  kingKongTrackWidth: 0,
 			  kingKongTrackOffsetX: 0,
 			  kingKongTrackDragging: false,
@@ -2057,6 +2051,15 @@ searchInputStyle() {
 			  // 展开态仅显示首屏完整展示(5个)之后的剩余项
 			  return list.slice(5);
 		  },
+		  // 【MP 专用】按 10 个一屏分页，数量动态 → 屏数动态
+		  kingKongMpPages() {
+			  const list = Array.isArray(this.mergedData) ? this.mergedData : [];
+			  const pages = [];
+			  for (let i = 0; i < list.length; i += 10) {
+				  pages.push(list.slice(i, i + 10));
+			  }
+			  return pages.length ? pages : [[]];
+		  },
 		  kingKongIsExpanded() {
 			  return this.kingKongPanelIndex === 1;
 		  },
@@ -2084,12 +2087,11 @@ searchInputStyle() {
 		  },
 		  mpKingKongSwiperStyle() {
 			  // #ifdef MP-WEIXIN
-			  // 高度跟随面板状态，加 inline transition 确保小程序内平滑过渡
-			  const height = this.kingKongPanelIndex === 1 ? 420 : 152;
-			  return {
-				  height: `${height}rpx`,
-				  transition: 'height 0.25s ease'
-			  };
+			  // 【京东同款】高度完全交给 CSS class toggle（.king-kong-mp-swiper / .nav-label-expanded）。
+			  // 这里不再返回 inline style，原因：
+			  // 1) inline style 对象每次 setData 体积远大于 class toggle，大页面下显著更慢
+			  // 2) inline transition 与 CSS transition 叠加会互相打断，造成"高度自己循环变"
+			  return {};
 			  // #endif
 			  // #ifndef MP-WEIXIN
 			  return {};
@@ -2097,16 +2099,8 @@ searchInputStyle() {
 		  },
 		  kingKongNavLabelStyle() {
 			  // #ifdef MP-WEIXIN
-			  // 小程序：inline style 直接控制 height，transition 内联确保过渡生效
-			  // height 与 mpKingKongSwiperStyle 同步（swiper内容高度 + toggle指示条 14rpx）
-			  const mpExpanded = this.kingKongPanelIndex === 1;
-			  return {
-				  height: mpExpanded ? '434rpx' : '166rpx',
-				  maxHeight: mpExpanded ? '434rpx' : '166rpx',
-				  paddingBottom: mpExpanded ? '14rpx' : '8rpx',
-				  transition: 'height 0.25s ease, max-height 0.25s ease, padding-bottom 0.2s ease',
-				  overflow: 'hidden'
-			  };
+			  // 同上：MP 分支不返回 inline style，高度由 CSS `.nav-label` / `.nav-label-expanded` 负责
+			  return {};
 			  // #endif
 			  // iOS 第一屏进一步收紧，减少指示条与上方内容的空白
 			  // #ifdef APP-PLUS
@@ -2936,11 +2930,8 @@ searchInputStyle() {
 		  // ─────────────────────────────────────────────────────────────────────
 		  expandKingKong() {
 			  // #ifdef MP-WEIXIN
-			  // 小程序：点击指示器展开。同时更新 panelIndex（高度）和 SwiperCurrent（swiper 滑到位）
-			  if (this.kingKongPanelIndex === 1) return;
-			  this.kingKongPanelIndex = 1;        // 立即更新高度
-			  this.kingKongMpSwiperCurrent = 1;   // 触发 swiper 动画
-			  this.syncKingKongExpandedState();
+			  // MP 重构后金刚区改为"分页切屏 + 固定高度"，不再有展开/预览两态。
+			  // 保留空方法防止外部调用报错。
 			  return;
 			  // #endif
 			  // APP 原逻辑不变
@@ -2950,10 +2941,6 @@ searchInputStyle() {
 		  },
 		  collapseKingKong() {
 			  // #ifdef MP-WEIXIN
-			  if (this.kingKongPanelIndex === 0) return;
-			  this.kingKongPanelIndex = 0;
-			  this.kingKongMpSwiperCurrent = 0;
-			  this.syncKingKongExpandedState();
 			  return;
 			  // #endif
 			  if (this.kingKongPanelIndex === 0) return;
@@ -2966,25 +2953,18 @@ searchInputStyle() {
 		  // ─────────────────────────────────────────────────────────────────────
 		  onMpKingKongSwiperChange(e) {
 			  // #ifdef MP-WEIXIN
-			  // 关键：@change 在用户滑动触发页面切换时立即回调（远早于 @animationfinish）
-			  // 在这里同时更新 panelIndex（高度）和 SwiperCurrent（:current 对齐），
-			  // swiper 已在该页，:current 设成相同值对原生 swiper 是 no-op，不会触发二次 @change。
-			  const current = Number(e && e.detail && e.detail.current) || 0;
-			  const next = current > 0 ? 1 : 0;
-			  this.kingKongPanelIndex = next;       // ← 高度立即响应
-			  this.kingKongMpSwiperCurrent = next;  // ← 防止 Vue re-render 时 :current 回跳
-			  this.syncKingKongExpandedState();
+			  // 【京东同款策略】change 不改任何状态！
+			  // 高度固定不变，两屏之间只做内容切换，指示条也在 animationfinish 更新。
+			  // 快速连滑时 change 触发多次，全部空操作 → 无任何 setData → 不会触发任何抖动。
 			  // #endif
 		  },
 		  onMpKingKongSwiperAnimationFinish(e) {
 			  // #ifdef MP-WEIXIN
-			  // 兜底：@change 已处理主要状态，此处仅在快速连续滑动后确保最终一致性
+			  // swiper 真正停下来那一刻才触发一次，用来更新页码指示条
 			  const current = Number(e && e.detail && e.detail.current) || 0;
-			  const next = current > 0 ? 1 : 0;
-			  // 只在与当前状态不一致时才更新，避免不必要的 setData
-			  if (this.kingKongPanelIndex !== next) this.kingKongPanelIndex = next;
-			  if (this.kingKongMpSwiperCurrent !== next) this.kingKongMpSwiperCurrent = next;
-			  this.syncKingKongExpandedState();
+			  if (this.kingKongMpPageIndex !== current) {
+				  this.kingKongMpPageIndex = current;
+			  }
 			  // #endif
 		  },
 		  measureKingKongTrackWidth() {
@@ -7996,6 +7976,70 @@ searchInputStyle() {
 		  display: block;
 	  }
 
+	  /* #ifdef MP-WEIXIN */
+	  /* 【最终方案】小程序金刚区固定高度（2 行高 + 指示条），两屏之间没有任何高度变化 —— 绝对丝滑。
+	     屏数由数据量动态决定（每屏 10 个）。用 !important 压过上方非 MP 的 .nav-label* 规则。 */
+	  .king-kong-mp-swiper {
+		  width: 100% !important;
+		  height: 420rpx !important;
+		  display: block !important;
+	  }
+	  .nav-label {
+		  /* 纯粹的容器，高度由内部 swiper + dots 自然撑开，不做 transition */
+		  height: auto !important;
+		  max-height: none !important;
+		  padding-bottom: 14rpx !important;
+		  transition: none !important;
+	  }
+	  /* 2 行 × 5 列 Grid，每个 cell 固定 84rpx 列宽按 20%，行高 210rpx（总 420rpx 两行） */
+	  .king-kong-mp-panel {
+		  width: 100% !important;
+		  height: 420rpx !important;
+		  box-sizing: border-box;
+	  }
+	  .nav-list-mp-grid {
+		  width: 100%;
+		  height: 420rpx;
+		  display: flex;
+		  flex-wrap: wrap;
+		  align-content: flex-start;
+		  box-sizing: border-box;
+		  padding: 0 10rpx;
+	  }
+	  .nav-list-mp-grid .list-mp {
+		  width: 20%;
+		  height: 210rpx;
+		  box-sizing: border-box;
+		  display: flex;
+		  flex-direction: column;
+		  align-items: center;
+		  justify-content: flex-start;
+		  padding-top: 16rpx;
+		  margin: 0;
+	  }
+	  /* 圆点指示条：屏数动态 = 圆点数量动态 */
+	  .king-kong-mp-dots {
+		  width: 100%;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		  gap: 10rpx;
+		  padding: 2rpx 0 10rpx;
+	  }
+	  .king-kong-mp-dot {
+		  width: 10rpx;
+		  height: 10rpx;
+		  border-radius: 50%;
+		  background: rgba(0, 0, 0, 0.2);
+		  transition: background-color 0.2s ease, width 0.2s ease;
+	  }
+	  .king-kong-mp-dot.active {
+		  width: 22rpx;
+		  border-radius: 5rpx;
+		  background: #FE0302;
+	  }
+	  /* #endif */
+
 	  .king-kong-mp-panel {
 		  width: 100%;
 		  height: 100%;
@@ -8100,6 +8144,45 @@ searchInputStyle() {
 		  width: 92rpx !important;
 		  min-width: 72rpx;
 	  }
+
+	  /* #ifdef MP-WEIXIN */
+	  /* 小程序专版：锁死图标容器 96rpx × 96rpx，aspectFit 让图片加载前后尺寸零变化，
+	     消除 widthFix 带来的"切到第二屏后还要再跳一下高度"问题。
+	     特异性 + !important 双保险，覆盖上方 .list-preview .icon .image 的 92rpx !important */
+	  .list-mp .icon-mp {
+		  width: 96rpx !important;
+		  height: 96rpx !important;
+		  min-width: 96rpx;
+		  min-height: 96rpx;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  overflow: hidden;
+		  margin: 0 auto;
+		  box-sizing: border-box;
+	  }
+	  .list-mp .icon-mp .image-mp {
+		  width: 96rpx !important;
+		  height: 96rpx !important;
+		  min-width: 96rpx !important;
+		  min-height: 96rpx !important;
+		  max-width: 96rpx !important;
+		  max-height: 96rpx !important;
+		  display: block;
+	  }
+	  .list-mp .con-mp {
+		  margin-top: 4rpx;
+		  font-size: 22rpx;
+		  line-height: 1.3;
+		  text-align: center;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+		  white-space: nowrap;
+		  max-width: 100%;
+		  padding: 0 4rpx;
+		  box-sizing: border-box;
+	  }
+	  /* #endif */
 
   }
 
