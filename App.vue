@@ -456,4 +456,32 @@
 	}
 
 	/* end--Retina 屏幕下的 1px 边框--end */
+
+	/* #ifdef H5 */
+	/* 【H5 全局兜底】阿里图形验证码 SDK 默认按钮 / 容器 / 遮罩全部隐藏。
+	   项目采用"按需初始化 + 验证成功自动弹窗 + 页面销毁清 DOM"模式，
+	   SDK 自带 default trigger (.captcha4_btn_click) 在任何页面都不该出现。
+	   该规则作为 JS 隐藏失败时的最后防线，防止首页/详情页等看到残留按钮。 */
+	.captcha4_btn_click,
+	.captcha4_holder,
+	.captcha4_mask,
+	[class*="captcha4_btn"],
+	[class^="captcha4_holder"],
+	[class^="captcha4_nextReady"] {
+		display: none !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+		width: 0 !important;
+		height: 0 !important;
+		overflow: hidden !important;
+	}
+	/* 验证码弹窗本身仍需展示（用户点"发送验证码"时由 SDK 主动 show），不能误隐藏 */
+	.captcha4_popup_wrap,
+	.captcha4_popup_wrap *,
+	[class*="captcha4_popup"] {
+		display: initial !important;
+		visibility: visible !important;
+		pointer-events: auto !important;
+	}
+	/* #endif */
 </style>
