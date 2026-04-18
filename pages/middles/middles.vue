@@ -2089,12 +2089,11 @@ searchInputStyle() {
 		  },
 		  mpKingKongSwiperStyle() {
 			  // #ifdef MP-WEIXIN
-			  // 高度跟随面板状态，加 inline transition 确保小程序内平滑过渡
-			  const height = this.kingKongPanelIndex === 1 ? 420 : 152;
-			  return {
-				  height: `${height}rpx`,
-				  transition: 'height 0.25s ease'
-			  };
+			  // 【京东同款】高度完全交给 CSS class toggle（.king-kong-mp-swiper / .nav-label-expanded）。
+			  // 这里不再返回 inline style，原因：
+			  // 1) inline style 对象每次 setData 体积远大于 class toggle，大页面下显著更慢
+			  // 2) inline transition 与 CSS transition 叠加会互相打断，造成"高度自己循环变"
+			  return {};
 			  // #endif
 			  // #ifndef MP-WEIXIN
 			  return {};
@@ -2102,16 +2101,8 @@ searchInputStyle() {
 		  },
 		  kingKongNavLabelStyle() {
 			  // #ifdef MP-WEIXIN
-			  // 小程序：inline style 直接控制 height，transition 内联确保过渡生效
-			  // height 与 mpKingKongSwiperStyle 同步（swiper内容高度 + toggle指示条 14rpx）
-			  const mpExpanded = this.kingKongPanelIndex === 1;
-			  return {
-				  height: mpExpanded ? '434rpx' : '166rpx',
-				  maxHeight: mpExpanded ? '434rpx' : '166rpx',
-				  paddingBottom: mpExpanded ? '14rpx' : '8rpx',
-				  transition: 'height 0.25s ease, max-height 0.25s ease, padding-bottom 0.2s ease',
-				  overflow: 'hidden'
-			  };
+			  // 同上：MP 分支不返回 inline style，高度由 CSS `.nav-label` / `.nav-label-expanded` 负责
+			  return {};
 			  // #endif
 			  // iOS 第一屏进一步收紧，减少指示条与上方内容的空白
 			  // #ifdef APP-PLUS
@@ -2971,25 +2962,17 @@ searchInputStyle() {
 		  // ─────────────────────────────────────────────────────────────────────
 		  onMpKingKongSwiperChange(e) {
 			  // #ifdef MP-WEIXIN
-			  // 【核心修复】快速连滑"自己来回切"的根因：
-			  //   旧逻辑在 change 里同时回写 kingKongMpSwiperCurrent ⇒ Vue setData 同步到 :current
-			  //   ⇒ 反向驱动原生 swiper 内部状态机 ⇒ 与用户手势打架。
-			  // 新策略：
-			  //   change 阶段只更新"高度/指示条"相关的 panelIndex（UI 跟手），
-			  //   不再回写 kingKongMpSwiperCurrent，彻底切断反向驱动；
-			  //   current 的最终落位交给 animationfinish 一次性做。
-			  const current = Number(e && e.detail && e.detail.current) || 0;
-			  const next = current > 0 ? 1 : 0;
-			  if (this.kingKongPanelIndex !== next) {
-				  this.kingKongPanelIndex = next;
-				  this.syncKingKongExpandedState();
-			  }
+			  // 【京东同款策略】change 不改任何状态！
+			  // 理由：快速连滑 change 会触发多次(0→1→0→1…)，若在这里 setData，
+			  //      高度 transition 会被反复打断/重启，表现为"高度在那自己循环变"。
+			  // 京东的做法：@change 不动，所有状态只在 @animationfinish 一次性落位。
 			  // #endif
 		  },
 		  onMpKingKongSwiperAnimationFinish(e) {
 			  // #ifdef MP-WEIXIN
-			  // 动画真正结束时才写 current，一次手势一次 setData，
-			  // 此时 swiper 内部位置已稳定，:current 写入同值对 swiper 是 no-op，不会反向驱动
+			  // 动画真正结束的那一次 —— 不管用户连滑了多少次，animationfinish 只在
+			  // swiper 真正停下来那一刻触发。这里做一次性的 panelIndex/current 落位，
+			  // 对应一次完整的 0.25s 高度 transition，绝对不会被打断。
 			  const current = Number(e && e.detail && e.detail.current) || 0;
 			  const next = current > 0 ? 1 : 0;
 			  if (this.kingKongPanelIndex !== next) this.kingKongPanelIndex = next;
@@ -8005,6 +7988,30 @@ searchInputStyle() {
 		  width: 100%;
 		  display: block;
 	  }
+
+	  /* #ifdef MP-WEIXIN */
+	  /* 【京东同款】两态高度靠 class 驱动，transition 只此一套，不会被 inline style 打断。
+	     一次手势=一次 transition=250ms，完全跟数据同步。
+	     用 !important 强制覆盖上方非 MP 的 .nav-label / .nav-label.nav-label-expanded 规则 */
+	  .king-kong-mp-swiper {
+		  height: 152rpx !important;
+		  transition: height 0.25s ease !important;
+	  }
+	  .nav-label-expanded .king-kong-mp-swiper {
+		  height: 420rpx !important;
+	  }
+	  .nav-label {
+		  height: 166rpx !important;
+		  max-height: 166rpx !important;
+		  padding-bottom: 8rpx !important;
+		  transition: height 0.25s ease, max-height 0.25s ease, padding-bottom 0.2s ease !important;
+	  }
+	  .nav-label.nav-label-expanded {
+		  height: 434rpx !important;
+		  max-height: 434rpx !important;
+		  padding-bottom: 14rpx !important;
+	  }
+	  /* #endif */
 
 	  .king-kong-mp-panel {
 		  width: 100%;
